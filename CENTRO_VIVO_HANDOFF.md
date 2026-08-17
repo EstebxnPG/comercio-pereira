@@ -1,4 +1,4 @@
-# Centro Vivo — Handoff técnico del MVP
+# Compra en Pereira — Handoff técnico del MVP
 
 **Estado:** listo para implementación  
 **Prioridad:** publicar hoy  
@@ -9,13 +9,13 @@
 
 ## 1. Resumen del producto
 
-Centro Vivo es una iniciativa digital neutral que da visibilidad a una selección privada de comercios aliados del centro de Pereira que continúan atendiendo después del terremoto, ya sea desde su sede habitual, una ubicación alternativa o sus canales digitales.
+Compra en Pereira es una iniciativa digital neutral que da visibilidad a una selección privada de comercios aliados del centro de Pereira que continúan atendiendo después del terremoto, ya sea desde su sede habitual, una ubicación alternativa o sus canales digitales.
 
 La plataforma no procesa ventas, pagos ni domicilios. Su función es permitir que las personas descubran, contacten y compartan los comercios.
 
 ### Identidad base
 
-- **Nombre:** Centro Vivo
+- **Nombre:** Compra en Pereira
 - **Descriptor:** Red de comercios aliados de Pereira
 - **Eslogan:** El centro sigue latiendo
 - **Personalidad:** cercana, confiable, esperanzadora y comercial; no asistencialista
@@ -24,7 +24,7 @@ La plataforma no procesa ventas, pagos ni domicilios. Su función es permitir qu
 
 Texto sugerido para el footer:
 
-> Centro Vivo es una iniciativa ciudadana para dar visibilidad a los comercios aliados de Pereira. Tecnología desarrollada por el equipo de [MARCA DE LA CONSULTORA]. Con el respaldo de Fabián Sánchez “El Chinito”.
+> Compra en Pereira es una iniciativa ciudadana para dar visibilidad a los comercios aliados de Pereira. Tecnología desarrollada por el equipo de DPG Consultora. Con el respaldo de Fabián Sánchez “El Chinito”.
 
 No presentar todavía a la consultora como sociedad o empresa legalmente constituida.
 
@@ -242,7 +242,7 @@ No crear más páginas si el contenido puede resolverse dentro del inicio o el f
 
 Debe incluir, en este orden:
 
-1. Header compacto con marca Centro Vivo.
+1. Header compacto con marca Compra en Pereira.
 2. Hero con “El centro sigue latiendo”.
 3. Texto corto que explique la iniciativa.
 4. Directorio de comercios.
@@ -308,7 +308,7 @@ Esta es una función central del producto.
 
 Cada perfil debe generar metadatos propios mediante `generateMetadata`:
 
-- `title`: `[Nombre] | Centro Vivo`
+- `title`: `[Nombre] | Compra en Pereira`
 - `description`: descripción corta y estado actual
 - URL canónica
 - imagen Open Graph usando la portada del comercio
@@ -332,7 +332,7 @@ Mensaje sugerido:
 ```text
 El centro sigue latiendo 💛
 
-Conoce a [NOMBRE], comercio aliado de Centro Vivo:
+Conoce a [NOMBRE], comercio aliado de Compra en Pereira:
 [URL]
 ```
 
@@ -352,7 +352,7 @@ El sitio debe funcionar aunque JavaScript falle parcialmente: la navegación y l
 
 ### Explicación breve
 
-> Centro Vivo reúne comercios aliados para que puedas encontrarlos, contactarlos y compartirlos fácilmente. Cuando apoyas al comercio local, Pereira avanza.
+> Compra en Pereira reúne comercios aliados para que puedas encontrarlos, contactarlos y compartirlos fácilmente. Cuando apoyas al comercio local, Pereira avanza.
 
 ### Mensajes permitidos
 
@@ -405,7 +405,7 @@ No modificar firewall, SSH ni servicios existentes sin inspeccionar primero la V
 
 ## 12. Requisitos de SEO técnico
 
-- Metadata global de Centro Vivo.
+- Metadata global de Compra en Pereira.
 - Metadata individual por comercio.
 - URL canónica.
 - `sitemap.ts` con inicio y comercios publicados.
@@ -494,7 +494,7 @@ No comenzar este backlog antes de publicar y validar el MVP.
 Copiar desde aquí:
 
 ```text
-Quiero que implementes el MVP de “Centro Vivo” siguiendo estrictamente el archivo CENTRO_VIVO_HANDOFF.md de este repositorio.
+Quiero que implementes el MVP de “Compra en Pereira” siguiendo estrictamente el archivo CENTRO_VIVO_HANDOFF.md de este repositorio.
 
 Objetivo: publicar hoy una plataforma rápida, segura, responsive y compartible para visibilizar comercios aliados del centro de Pereira. Usa Next.js App Router, TypeScript estricto y Tailwind CSS. Los datos deben vivir temporalmente en un archivo TypeScript tipado; no construyas base de datos, autenticación, panel administrativo, endpoints de escritura ni catálogo de productos.
 
@@ -530,12 +530,12 @@ No despliegues ni modifiques la VPS hasta que te entregue acceso/contexto espec�
 
 No bloquea el inicio, pero debe sustituirse antes del lanzamiento:
 
-- `[MARCA DE LA CONSULTORA]` o texto provisional acordado.
+- `DPG Consultora` o texto provisional acordado.
 - Dominio definitivo.
 - Comercios reales en el formato del modelo.
 - Logos y portadas autorizados.
 - Redes, números, horarios y ubicaciones verificados.
-- Logo provisional de Centro Vivo, o autorización para usar una marca tipográfica simple.
+- Logo provisional de Compra en Pereira, o autorización para usar una marca tipográfica simple.
 - Contexto actual de la VPS cuando se vaya a desplegar.
 
 Si alguno falta, Codex debe dejarlo centralizado como placeholder y continuar con la implementación.

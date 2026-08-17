@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Portada de papeleria la 14">
+  <rect width="1200" height="675" fill="#1d4ed8"/>
+  <rect x="120" y="105" width="960" height="465" rx="26" fill="#eff6ff"/>
+  <rect x="190" y="175" width="260" height="325" rx="18" fill="#f5c84c"/>
+  <rect x="520" y="190" width="410" height="48" rx="24" fill="#1d4ed8"/>
+  <rect x="520" y="290" width="330" height="34" rx="17" fill="#93c5fd"/>
+  <rect x="520" y="355" width="390" height="34" rx="17" fill="#93c5fd"/>
+  <rect x="520" y="450" width="210" height="54" rx="27" fill="#22211f"/>
+</svg>

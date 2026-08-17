@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Portada de cafeteria centro">
+  <rect width="1200" height="675" fill="#7c3f2c"/>
+  <rect x="100" y="120" width="1000" height="435" rx="28" fill="#fff7ed"/>
+  <circle cx="360" cy="335" r="130" fill="#f5c84c"/>
+  <rect x="560" y="210" width="420" height="50" rx="25" fill="#7c3f2c"/>
+  <rect x="560" y="310" width="350" height="34" rx="17" fill="#d6a47b"/>
+  <rect x="560" y="375" width="290" height="34" rx="17" fill="#d6a47b"/>
+</svg>

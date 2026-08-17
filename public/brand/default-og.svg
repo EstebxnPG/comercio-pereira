@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Compra en Pereira">
+  <rect width="1200" height="630" fill="#fbfaf7"/>
+  <rect x="70" y="70" width="1060" height="490" rx="28" fill="#176b5b"/>
+  <circle cx="965" cy="170" r="82" fill="#f5c84c"/>
+  <text x="120" y="245" fill="#ffffff" font-family="Arial, sans-serif" font-size="72" font-weight="900">Compra en Pereira</text>
+  <text x="120" y="330" fill="#f5c84c" font-family="Arial, sans-serif" font-size="48" font-weight="800">El centro sigue latiendo.</text>
+  <text x="120" y="420" fill="#ffffff" font-family="Arial, sans-serif" font-size="34">Red de comercios aliados de Pereira</text>
+</svg>
