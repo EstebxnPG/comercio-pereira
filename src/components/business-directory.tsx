@@ -8,13 +8,19 @@ import type { Business, BusinessStatus } from "@/types/business";
 export function BusinessDirectory({
   businesses,
   categories,
+  initialCategory = "all",
+  initialQuery = "",
+  initialStatus = "all",
 }: {
   businesses: Business[];
   categories: string[];
+  initialCategory?: string;
+  initialQuery?: string;
+  initialStatus?: BusinessStatus | "all";
 }) {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("all");
-  const [status, setStatus] = useState<BusinessStatus | "all">("all");
+  const [query, setQuery] = useState(initialQuery);
+  const [category, setCategory] = useState(initialCategory);
+  const [status, setStatus] = useState<BusinessStatus | "all">(initialStatus);
 
   const filteredBusinesses = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -39,10 +45,10 @@ export function BusinessDirectory({
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[#176b5b]">
+            <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
               Directorio
             </p>
-            <h2 className="mt-2 text-3xl font-black text-stone-950">
+            <h2 className="mt-2 text-3xl font-black text-[#22211f]">
               Comercios aliados
             </h2>
           </div>
@@ -59,7 +65,7 @@ export function BusinessDirectory({
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Nombre, categoria o descripcion"
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-stone-950 outline-none focus:border-[#176b5b] focus:ring-2 focus:ring-[#176b5b]/20"
+              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
             />
           </label>
           <label>
@@ -67,7 +73,7 @@ export function BusinessDirectory({
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-stone-950 outline-none focus:border-[#176b5b] focus:ring-2 focus:ring-[#176b5b]/20"
+              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
             >
               <option value="all">Todas</option>
               {categories.map((item) => (
@@ -84,7 +90,7 @@ export function BusinessDirectory({
               onChange={(event) =>
                 setStatus(event.target.value as BusinessStatus | "all")
               }
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-stone-950 outline-none focus:border-[#176b5b] focus:ring-2 focus:ring-[#176b5b]/20"
+              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
             >
               <option value="all">Todos</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -104,7 +110,7 @@ export function BusinessDirectory({
           </div>
         ) : (
           <div className="mt-8 rounded-lg border border-dashed border-stone-300 bg-[#fbfaf7] p-8 text-center">
-            <p className="text-lg font-black text-stone-950">
+            <p className="text-lg font-black text-[#22211f]">
               No encontramos coincidencias.
             </p>
             <p className="mt-2 text-stone-600">

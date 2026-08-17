@@ -20,6 +20,17 @@ export function getCategories() {
   ).sort((a, b) => a.localeCompare(b, "es-CO"));
 }
 
+export function getCategorySummaries() {
+  const publishedBusinesses = getPublishedBusinesses();
+
+  return getCategories().map((category) => ({
+    name: category,
+    count: publishedBusinesses.filter(
+      (business) => business.category === category,
+    ).length,
+  }));
+}
+
 function validateBusinesses(items: Business[]) {
   const slugs = new Set<string>();
   const validStatuses = new Set<string>(BUSINESS_STATUSES);

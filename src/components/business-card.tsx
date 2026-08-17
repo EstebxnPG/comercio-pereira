@@ -8,7 +8,7 @@ export function BusinessCard({ business }: { business: Business }) {
     <article className="group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
       <Link
         href={`/comercios/${business.slug}`}
-        className="block focus:outline-none focus:ring-2 focus:ring-[#176b5b] focus:ring-offset-2"
+        className="block focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
       >
         <div className="relative aspect-[16/9] overflow-hidden bg-stone-100">
           <Image
@@ -32,10 +32,10 @@ export function BusinessCard({ business }: { business: Business }) {
             </div>
             <BusinessStatusBadge status={business.status} />
           </div>
-          <p className="text-sm font-bold uppercase tracking-wide text-[#176b5b]">
+          <p className="text-sm font-bold uppercase tracking-wide text-[#B3262E]">
             {business.category}
           </p>
-          <h2 className="mt-1 text-xl font-black text-stone-950">
+          <h2 className="mt-1 text-xl font-black text-[#22211f]">
             {business.name}
           </h2>
           <p className="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">
@@ -46,7 +46,7 @@ export function BusinessCard({ business }: { business: Business }) {
               {business.address}
             </p>
           ) : null}
-          <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#f5c84c] px-4 text-sm font-black text-stone-950">
+          <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#f5c84c] px-4 text-sm font-black text-[#22211f]">
             Conocer comercio
           </span>
         </div>

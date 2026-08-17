@@ -74,7 +74,7 @@ export default async function BusinessPage(
     <>
       <Header />
       <main className="bg-[#fbfaf7]">
-        <section className="relative bg-stone-950 text-white">
+        <section className="relative bg-[#7F1D1D] text-white">
           <div className="relative aspect-[16/9] max-h-[420px] min-h-[260px] overflow-hidden">
             <Image
               src={business.coverImage}
@@ -84,7 +84,7 @@ export default async function BusinessPage(
               className="object-cover opacity-55"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/35 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#7F1D1D] via-[#7F1D1D]/35 to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0">
             <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-6 sm:px-6 lg:px-8">
@@ -140,14 +140,14 @@ export default async function BusinessPage(
 
           <aside className="space-y-4">
             <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-              <h2 className="text-lg font-black text-stone-950">Contacto</h2>
+              <h2 className="text-lg font-black text-[#22211f]">Contacto</h2>
               <div className="mt-4 flex flex-col gap-3">
                 {whatsappContactUrl ? (
                   <a
                     href={whatsappContactUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-stone-950"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f]"
                   >
                     Escribir por WhatsApp
                   </a>
@@ -155,7 +155,7 @@ export default async function BusinessPage(
                 {business.phone ? (
                   <a
                     href={`tel:${business.phone.replace(/\s/g, "")}`}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-stone-900"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-[#22211f]"
                   >
                     Llamar
                   </a>
@@ -165,7 +165,7 @@ export default async function BusinessPage(
                     href={business.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-stone-900"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-[#22211f]"
                   >
                     Abrir Google Maps
                   </a>
@@ -177,7 +177,7 @@ export default async function BusinessPage(
             </div>
 
             <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
-              <h2 className="text-lg font-black text-stone-950">Compartir</h2>
+              <h2 className="text-lg font-black text-[#22211f]">Compartir</h2>
               <div className="mt-4">
                 <ShareButtons
                   title={`${business.name} | ${SITE_NAME}`}
@@ -188,8 +188,8 @@ export default async function BusinessPage(
             </div>
 
             <Link
-              href="/#comercios"
-              className="inline-flex min-h-11 items-center rounded-full px-1 text-sm font-black text-[#176b5b] underline-offset-4 hover:underline"
+              href="/comercios"
+              className="inline-flex min-h-11 items-center rounded-full px-1 text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
             >
               Volver al directorio
             </Link>
@@ -207,7 +207,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <dt className="text-sm font-black uppercase tracking-wide text-stone-500">
         {label}
       </dt>
-      <dd className="mt-1 text-base font-semibold text-stone-900">{value}</dd>
+      <dd className="mt-1 text-base font-semibold text-[#22211f]">{value}</dd>
     </div>
   );
 }

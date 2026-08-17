@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675" role="img" aria-label="Portada de comercio ejemplo">
-  <rect width="1200" height="675" fill="#176b5b"/>
+  <rect width="1200" height="675" fill="#B3262E"/>
   <rect x="84" y="94" width="1032" height="487" rx="26" fill="#fbfaf7"/>
   <rect x="145" y="170" width="420" height="250" rx="18" fill="#f5c84c"/>
-  <rect x="625" y="170" width="330" height="42" rx="21" fill="#176b5b"/>
+  <rect x="625" y="170" width="330" height="42" rx="21" fill="#B3262E"/>
   <rect x="625" y="250" width="420" height="34" rx="17" fill="#d6d0c5"/>
   <rect x="625" y="315" width="360" height="34" rx="17" fill="#d6d0c5"/>
   <rect x="625" y="435" width="220" height="62" rx="31" fill="#22211f"/>
