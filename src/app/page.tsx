@@ -86,30 +86,6 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="bg-white py-12 sm:py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
-                  Categorias
-                </p>
-                <h2 className="mt-2 text-3xl font-black text-[#22211f]">
-                  Explora por tipo de comercio
-                </h2>
-              </div>
-              <Link
-                href="/categorias"
-                className="inline-flex min-h-11 items-center text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
-              >
-                Ver todas las categorias
-              </Link>
-            </div>
-            <div className="mt-8">
-              <CategoryGrid categories={homeCategories} />
-            </div>
-          </div>
-        </section>
-
         <section className="bg-[#fbfaf7] py-12 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -132,6 +108,30 @@ export default async function Home() {
               {businessesToDiscover.map((business) => (
                 <BusinessCard key={business.id} business={business} />
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-12 sm:py-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
+                  Categorias
+                </p>
+                <h2 className="mt-2 text-3xl font-black text-[#22211f]">
+                  Explora por tipo de comercio
+                </h2>
+              </div>
+              <Link
+                href="/categorias"
+                className="inline-flex min-h-11 items-center text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
+              >
+                Ver todas las categorias
+              </Link>
+            </div>
+            <div className="mt-8">
+              <CategoryGrid categories={homeCategories} />
             </div>
           </div>
         </section>
