@@ -1,5 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BusinessCover } from "@/components/business-cover";
+import { BusinessLogo } from "@/components/business-logo";
 import { BusinessStatusBadge } from "@/components/business-status";
 import type { Business } from "@/types/business";
 
@@ -11,25 +12,21 @@ export function BusinessCard({ business }: { business: Business }) {
         className="md-focus block"
       >
         <div className="relative aspect-[16/9] overflow-hidden bg-stone-100">
-          <Image
-            src={business.coverImage}
-            alt={`Portada de ${business.name}`}
-            fill
-            className="object-cover transition duration-300 group-hover:scale-105"
+          <BusinessCover
+            businessName={business.name}
+            logo={business.logo}
+            coverImage={business.coverImage}
+            imageClassName="object-cover transition duration-300 group-hover:scale-105"
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           />
         </div>
         <div className="p-4">
           <div className="-mt-12 mb-3 flex items-end justify-between gap-3">
-            <div className="relative size-20 overflow-hidden rounded-xl border-4 border-white bg-white shadow-sm">
-              <Image
-                src={business.logo}
-                alt={`Logo de ${business.name}`}
-                fill
-                className="object-cover"
-                sizes="80px"
-              />
-            </div>
+            <BusinessLogo
+              businessName={business.name}
+              logo={business.logo}
+              size="card"
+            />
             <BusinessStatusBadge status={business.status} />
           </div>
           <p className="text-sm font-bold uppercase tracking-wide text-[#B3262E]">

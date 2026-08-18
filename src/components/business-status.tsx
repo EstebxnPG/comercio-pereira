@@ -5,6 +5,7 @@ import type { BusinessStatus } from "@/types/business";
 const statusStyles: Record<BusinessStatus, string> = {
   open: "border-emerald-200 bg-emerald-50 text-emerald-800",
   partial_service: "border-amber-200 bg-amber-50 text-amber-800",
+  remote_attention: "border-cyan-200 bg-cyan-50 text-cyan-800",
   relocated: "border-sky-200 bg-sky-50 text-sky-800",
   delivery_only: "border-violet-200 bg-violet-50 text-violet-800",
   temporarily_closed: "border-stone-200 bg-stone-100 text-stone-700",

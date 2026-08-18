@@ -1,5 +1,6 @@
 import { businesses } from "@/data/businesses";
 import { commerceCategories } from "@/data/categories";
+import { DEFAULT_BUSINESS_COVER_IMAGE } from "@/lib/constants";
 import { getSupabaseServerClient } from "@/lib/supabase";
 import { BUSINESS_STATUSES } from "@/types/business";
 import type { Business } from "@/types/business";
@@ -110,7 +111,7 @@ type SupabaseBusinessRow = {
   short_description: string;
   full_description: string | null;
   logo_url: string;
-  cover_image_url: string;
+  cover_image_url: string | null;
   status: Business["status"];
   phone: string | null;
   whatsapp: string | null;
@@ -143,7 +144,7 @@ function mapSupabaseBusiness(row: SupabaseBusinessRow): Business {
     shortDescription: row.short_description,
     fullDescription: row.full_description ?? undefined,
     logo: row.logo_url,
-    coverImage: row.cover_image_url,
+    coverImage: normalizeCoverImage(row.cover_image_url),
     status: row.status,
     phone: row.phone ?? undefined,
     whatsapp: row.whatsapp ?? undefined,
@@ -156,6 +157,28 @@ function mapSupabaseBusiness(row: SupabaseBusinessRow): Business {
     featured: row.featured,
     published: row.published,
   };
+}
+
+function normalizeCoverImage(value: string | null) {
+  const coverImage = value?.trim();
+
+  if (!coverImage) {
+    return DEFAULT_BUSINESS_COVER_IMAGE;
+  }
+
+  if (coverImage.startsWith("/")) {
+    return coverImage;
+  }
+
+  if (isHttpsUrl(coverImage)) {
+    return coverImage;
+  }
+
+  console.warn(
+    `Invalid business cover image "${coverImage}". Using the default cover.`,
+  );
+
+  return DEFAULT_BUSINESS_COVER_IMAGE;
 }
 
 function validateBusinesses(items: Business[]) {

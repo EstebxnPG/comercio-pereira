@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   BusinessProfileViewTracker,
   TrackedBusinessLink,
 } from "@/components/business-event-tracker";
+import { BusinessCover } from "@/components/business-cover";
+import { BusinessLogo } from "@/components/business-logo";
 import { BusinessStatusBadge } from "@/components/business-status";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -83,27 +84,23 @@ export default async function BusinessPage(
       <main className="bg-[#fbfaf7]">
         <section className="relative bg-[#7F1D1D] text-white">
           <div className="relative h-[320px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
-            <Image
-              src={business.coverImage}
-              alt={`Portada de ${business.name}`}
-              fill
+            <BusinessCover
+              businessName={business.name}
+              logo={business.logo}
+              coverImage={business.coverImage}
               priority
-              className="object-cover object-center opacity-55"
+              imageClassName="object-cover object-center opacity-55"
               sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#7F1D1D] via-[#7F1D1D]/35 to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0">
             <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-6 sm:px-6 lg:px-8">
-              <div className="relative size-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg sm:size-28">
-                <Image
-                  src={business.logo}
-                  alt={`Logo de ${business.name}`}
-                  fill
-                  className="object-cover"
-                  sizes="112px"
-                />
-              </div>
+              <BusinessLogo
+                businessName={business.name}
+                logo={business.logo}
+                size="profile"
+              />
               <div className="min-w-0 pb-1">
                 <p className="text-sm font-black uppercase tracking-wide text-[#f5c84c]">
                   {business.category}

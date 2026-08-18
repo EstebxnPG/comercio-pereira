@@ -1,6 +1,7 @@
 export const BUSINESS_STATUSES = [
   "open",
   "partial_service",
+  "remote_attention",
   "relocated",
   "delivery_only",
   "temporarily_closed",

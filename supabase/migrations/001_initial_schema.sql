@@ -20,11 +20,12 @@ create table if not exists public.businesses (
   short_description text not null,
   full_description text,
   logo_url text not null,
-  cover_image_url text not null,
+  cover_image_url text,
   status text not null check (
     status in (
       'open',
       'partial_service',
+      'remote_attention',
       'relocated',
       'delivery_only',
       'temporarily_closed'
