@@ -41,7 +41,7 @@ export function ShareButtons({
       <button
         type="button"
         onClick={handleShare}
-        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white transition hover:bg-[#7F1D1D] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+        className="md-filled-button px-5 text-sm"
       >
         Compartir perfil
       </button>
@@ -49,7 +49,7 @@ export function ShareButtons({
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] transition hover:bg-[#1fb457] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
       >
         Compartir por WhatsApp
       </a>

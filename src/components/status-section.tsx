@@ -21,7 +21,7 @@ export function StatusSection() {
           {Object.entries(STATUS_LABELS).map(([status, label]) => (
             <div
               key={status}
-              className="rounded-lg border border-stone-200 bg-white p-4"
+              className="md-surface p-4"
             >
               <p className="text-base font-black text-[#22211f]">{label}</p>
               <p className="mt-2 text-sm leading-6 text-stone-600">

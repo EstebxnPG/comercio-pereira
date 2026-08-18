@@ -1,4 +1,5 @@
 import { businesses } from "@/data/businesses";
+import { commerceCategories } from "@/data/categories";
 import { BUSINESS_STATUSES } from "@/types/business";
 import type { Business } from "@/types/business";
 
@@ -10,23 +11,33 @@ export function getPublishedBusinesses() {
     .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
 }
 
+export function getBusinessesToDiscover(limit = 9, date = new Date()) {
+  const hourlyBucket = Math.floor(date.getTime() / 3_600_000);
+
+  return [...getPublishedBusinesses()]
+    .sort(
+      (a, b) =>
+        getRotationScore(a.id, hourlyBucket) -
+        getRotationScore(b.id, hourlyBucket),
+    )
+    .slice(0, limit);
+}
+
 export function getBusinessBySlug(slug: string) {
   return getPublishedBusinesses().find((business) => business.slug === slug);
 }
 
 export function getCategories() {
-  return Array.from(
-    new Set(getPublishedBusinesses().map((business) => business.category)),
-  ).sort((a, b) => a.localeCompare(b, "es-CO"));
+  return commerceCategories.map((category) => category.name);
 }
 
 export function getCategorySummaries() {
   const publishedBusinesses = getPublishedBusinesses();
 
-  return getCategories().map((category) => ({
-    name: category,
+  return commerceCategories.map((category) => ({
+    ...category,
     count: publishedBusinesses.filter(
-      (business) => business.category === category,
+      (business) => business.category === category.name,
     ).length,
   }));
 }
@@ -92,6 +103,17 @@ function isHttpsUrl(value: string) {
   } catch {
     return false;
   }
+}
+
+function getRotationScore(value: string, bucket: number) {
+  let hash = 0;
+  const input = `${value}:${bucket}`;
+
+  for (let index = 0; index < input.length; index += 1) {
+    hash = (hash * 31 + input.charCodeAt(index)) >>> 0;
+  }
+
+  return hash;
 }
 
 function assert(condition: boolean, message: string): asserts condition {

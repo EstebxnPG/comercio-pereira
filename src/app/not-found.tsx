@@ -15,7 +15,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex min-h-11 items-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white"
+          className="md-filled-button mt-6 px-5 text-sm"
         >
           Volver al directorio
         </Link>

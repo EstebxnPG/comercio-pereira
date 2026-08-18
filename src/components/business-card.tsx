@@ -5,10 +5,10 @@ import type { Business } from "@/types/business";
 
 export function BusinessCard({ business }: { business: Business }) {
   return (
-    <article className="group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+    <article className="md-surface group overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
       <Link
         href={`/comercios/${business.slug}`}
-        className="block focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+        className="md-focus block"
       >
         <div className="relative aspect-[16/9] overflow-hidden bg-stone-100">
           <Image
@@ -21,7 +21,7 @@ export function BusinessCard({ business }: { business: Business }) {
         </div>
         <div className="p-4">
           <div className="-mt-12 mb-3 flex items-end justify-between gap-3">
-            <div className="relative size-20 overflow-hidden rounded-lg border-4 border-white bg-white shadow-sm">
+            <div className="relative size-20 overflow-hidden rounded-xl border-4 border-white bg-white shadow-sm">
               <Image
                 src={business.logo}
                 alt={`Logo de ${business.name}`}
@@ -46,7 +46,7 @@ export function BusinessCard({ business }: { business: Business }) {
               {business.address}
             </p>
           ) : null}
-          <span className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#f5c84c] px-4 text-sm font-black text-[#22211f]">
+          <span className="md-tonal-button mt-5 px-4 text-sm">
             Conocer comercio
           </span>
         </div>

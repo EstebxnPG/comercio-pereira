@@ -32,7 +32,7 @@ export function HowItWorksSection() {
           {steps.map((item) => (
             <article
               key={item.step}
-              className="rounded-lg border border-stone-200 bg-[#fbfaf7] p-5"
+              className="md-surface p-5"
             >
               <p className="text-sm font-black text-[#B3262E]">{item.step}</p>
               <h3 className="mt-3 text-2xl font-black text-[#22211f]">

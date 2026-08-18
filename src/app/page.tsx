@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { BusinessCard } from "@/components/business-card";
 import { CategoryGrid } from "@/components/category-grid";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -7,17 +8,35 @@ import { HeroSearch } from "@/components/hero-search";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
 import {
+  getBusinessesToDiscover,
   getCategories,
   getCategorySummaries,
   getPublishedBusinesses,
 } from "@/lib/businesses";
 import { SITE_SLOGAN } from "@/lib/constants";
 
+export const revalidate = 3600;
+
 export default function Home() {
   const businesses = getPublishedBusinesses();
   const categories = getCategories();
   const categorySummaries = getCategorySummaries();
-  const featuredBusinesses = businesses.slice(0, 3);
+  const businessesToDiscover = getBusinessesToDiscover(9);
+  const homeCategoryNames = [
+    "Moda y Ropa",
+    "Calzado y Marroquineria",
+    "Belleza y Cuidado Personal",
+    "Tecnologia y Electronica",
+    "Hogar y Decoracion",
+    "Ferreteria y Construccion",
+    "Servicios Profesionales",
+    "Comida y Restaurantes",
+  ];
+  const homeCategories = homeCategoryNames
+    .map((categoryName) =>
+      categorySummaries.find((category) => category.name === categoryName),
+    )
+    .filter((category) => category !== undefined);
 
   return (
     <>
@@ -33,8 +52,8 @@ export default function Home() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#7F1D1D]/90 via-[#7F1D1D]/58 to-[#7F1D1D]/20" />
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#7F1D1D]/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#7F1D1D]/88 via-[#7F1D1D]/52 to-[#7F1D1D]/16" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#fbfaf7] via-[#fbfaf7]/35 to-transparent" />
           </div>
           <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
             <div className="max-w-4xl">
@@ -86,7 +105,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="mt-8">
-              <CategoryGrid categories={categorySummaries.slice(0, 6)} />
+              <CategoryGrid categories={homeCategories} />
             </div>
           </div>
         </section>
@@ -96,10 +115,10 @@ export default function Home() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
-                  Comercios destacados
+                  Por descubrir
                 </p>
                 <h2 className="mt-2 text-3xl font-black text-[#22211f]">
-                  Perfiles para compartir hoy
+                  Comercios que rotan en la vitrina
                 </h2>
               </div>
               <Link
@@ -109,23 +128,9 @@ export default function Home() {
                 Abrir directorio completo
               </Link>
             </div>
-            <div className="mt-8 grid gap-4 md:grid-cols-3">
-              {featuredBusinesses.map((business) => (
-                <Link
-                  key={business.id}
-                  href={`/comercios/${business.slug}`}
-                  className="rounded-lg border border-stone-200 bg-white p-5 transition hover:-translate-y-0.5 hover:border-[#B3262E] hover:shadow-sm"
-                >
-                  <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
-                    {business.category}
-                  </p>
-                  <h3 className="mt-3 text-2xl font-black text-[#22211f]">
-                    {business.name}
-                  </h3>
-                  <p className="mt-3 text-sm leading-6 text-stone-600">
-                    {business.shortDescription}
-                  </p>
-                </Link>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {businessesToDiscover.map((business) => (
+                <BusinessCard key={business.id} business={business} />
               ))}
             </div>
           </div>

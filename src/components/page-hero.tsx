@@ -28,7 +28,7 @@ export function PageHero({
         {primaryHref && primaryLabel ? (
           <Link
             href={primaryHref}
-            className="mt-8 inline-flex min-h-11 items-center rounded-full bg-[#f5c84c] px-5 text-sm font-black text-[#22211f] transition hover:bg-[#e6b937] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+            className="md-tonal-button mt-8 px-5 text-sm"
           >
             {primaryLabel}
           </Link>

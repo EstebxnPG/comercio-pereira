@@ -15,7 +15,7 @@ export function InitiativeSection() {
             {FOOTER_TEXT}
           </p>
         </div>
-        <div id="sumar-comercio" className="rounded-lg border border-white/15 bg-white/5 p-5">
+        <div id="sumar-comercio" className="rounded-2xl border border-white/15 bg-white/10 p-5 shadow-lg">
           <h3 className="text-2xl font-black">Tienes un comercio aliado?</h3>
           <p className="mt-3 leading-7 text-stone-200">
             Por ahora la inclusion es privada y verificada. Esto evita datos
@@ -26,7 +26,7 @@ export function InitiativeSection() {
               href={`https://wa.me/${INCLUSION_WHATSAPP}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex min-h-11 items-center rounded-full bg-[#f5c84c] px-5 text-sm font-black text-[#22211f] transition hover:bg-[#e6b937] focus:outline-none focus:ring-2 focus:ring-[#f5c84c] focus:ring-offset-2 focus:ring-offset-[#7F1D1D]"
+              className="md-tonal-button mt-5 px-5 text-sm focus:ring-offset-[#7F1D1D]"
             >
               Solicitar inclusion
             </a>

@@ -88,7 +88,7 @@ export default async function BusinessPage(
           </div>
           <div className="absolute inset-x-0 bottom-0">
             <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-6 sm:px-6 lg:px-8">
-              <div className="relative size-24 shrink-0 overflow-hidden rounded-lg border-4 border-white bg-white shadow-lg sm:size-28">
+              <div className="relative size-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg sm:size-28">
                 <Image
                   src={business.logo}
                   alt={`Logo de ${business.name}`}
@@ -110,7 +110,7 @@ export default async function BusinessPage(
         </section>
 
         <section className="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[1fr_360px] lg:px-8">
-          <article className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+          <article className="md-surface p-5 sm:p-6">
             <div className="flex flex-wrap items-center gap-3">
               <BusinessStatusBadge status={business.status} />
               <span className="text-sm font-semibold text-stone-600">
@@ -131,7 +131,7 @@ export default async function BusinessPage(
               ) : null}
             </dl>
 
-            <div className="mt-8 rounded-lg bg-[#fbfaf7] p-4 text-sm leading-6 text-stone-600">
+            <div className="mt-8 rounded-2xl bg-[var(--md-primary-container)] p-4 text-sm leading-6 text-[var(--md-on-primary-container)]">
               La informacion de contacto y atencion fue suministrada por el
               establecimiento. Las compras, pagos, entregas y garantias se
               acuerdan directamente con cada comercio.
@@ -139,7 +139,7 @@ export default async function BusinessPage(
           </article>
 
           <aside className="space-y-4">
-            <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+            <div className="md-surface p-5">
               <h2 className="text-lg font-black text-[#22211f]">Contacto</h2>
               <div className="mt-4 flex flex-col gap-3">
                 {whatsappContactUrl ? (
@@ -147,7 +147,7 @@ export default async function BusinessPage(
                     href={whatsappContactUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f]"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
                   >
                     Escribir por WhatsApp
                   </a>
@@ -155,7 +155,7 @@ export default async function BusinessPage(
                 {business.phone ? (
                   <a
                     href={`tel:${business.phone.replace(/\s/g, "")}`}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-[#22211f]"
+                    className="md-outlined-button px-5 text-sm"
                   >
                     Llamar
                   </a>
@@ -165,7 +165,7 @@ export default async function BusinessPage(
                     href={business.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-300 px-5 text-sm font-black text-[#22211f]"
+                    className="md-outlined-button px-5 text-sm"
                   >
                     Abrir Google Maps
                   </a>
@@ -176,7 +176,7 @@ export default async function BusinessPage(
               </div>
             </div>
 
-            <div className="rounded-lg border border-stone-200 bg-white p-5 shadow-sm">
+            <div className="md-surface p-5">
               <h2 className="text-lg font-black text-[#22211f]">Compartir</h2>
               <div className="mt-4">
                 <ShareButtons

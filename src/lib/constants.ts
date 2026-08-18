@@ -2,7 +2,7 @@ import type { BusinessStatus } from "@/types/business";
 
 export const SITE_NAME = "Compra en Pereira";
 export const SITE_DESCRIPTOR = "Red de comercios aliados de Pereira";
-export const SITE_SLOGAN = "El centro sigue latiendo.";
+export const SITE_SLOGAN = "Encuentra comercios de Pereira en un solo lugar";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://compra-en-pereira.local";
 

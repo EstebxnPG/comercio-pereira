@@ -58,14 +58,14 @@ export function BusinessDirectory({
           </p>
         </div>
 
-        <div className="mt-6 grid gap-3 rounded-lg border border-stone-200 bg-[#fbfaf7] p-3 sm:grid-cols-3">
+        <div className="md-surface-high mt-6 grid gap-3 p-3 sm:grid-cols-3">
           <label className="sm:col-span-1">
             <span className="text-sm font-bold text-stone-700">Buscar</span>
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Nombre, categoria o descripcion"
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
+              className="md-field mt-2"
             />
           </label>
           <label>
@@ -73,7 +73,7 @@ export function BusinessDirectory({
             <select
               value={category}
               onChange={(event) => setCategory(event.target.value)}
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
+              className="md-field mt-2"
             >
               <option value="all">Todas</option>
               {categories.map((item) => (
@@ -90,7 +90,7 @@ export function BusinessDirectory({
               onChange={(event) =>
                 setStatus(event.target.value as BusinessStatus | "all")
               }
-              className="mt-2 min-h-11 w-full rounded-lg border border-stone-300 bg-white px-3 text-base text-[#22211f] outline-none focus:border-[#B3262E] focus:ring-2 focus:ring-[#B3262E]/20"
+              className="md-field mt-2"
             >
               <option value="all">Todos</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -109,7 +109,7 @@ export function BusinessDirectory({
             ))}
           </div>
         ) : (
-          <div className="mt-8 rounded-lg border border-dashed border-stone-300 bg-[#fbfaf7] p-8 text-center">
+          <div className="md-surface mt-8 border-dashed p-8 text-center">
             <p className="text-lg font-black text-[#22211f]">
               No encontramos coincidencias.
             </p>

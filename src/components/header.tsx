@@ -20,10 +20,10 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200 bg-[#fbfaf7]/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface)]/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="group flex items-center gap-3" onClick={closeMenu}>
-          <span className="grid size-10 place-items-center rounded-lg bg-[#B3262E] text-lg font-black text-white">
+          <span className="grid size-10 place-items-center rounded-xl bg-[#B3262E] text-lg font-black text-white shadow-sm">
             CP
           </span>
           <span className="leading-tight">
@@ -43,7 +43,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-full px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-white hover:text-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+              className="md-focus rounded-full px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-[var(--md-primary-container)] hover:text-[#7F1D1D]"
             >
               {item.label}
             </Link>
@@ -52,19 +52,19 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/iniciativa#sumar-comercio"
-            className="hidden min-h-11 items-center rounded-full border border-stone-300 bg-white px-4 text-sm font-bold text-[#22211f] transition hover:border-[#B3262E] hover:text-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2 sm:inline-flex"
+            className="md-outlined-button hidden px-4 text-sm sm:inline-flex"
           >
             Sumar comercio
           </Link>
           <Link
             href="/comercios"
-            className="inline-flex min-h-11 items-center rounded-full bg-[#7F1D1D] px-4 text-sm font-bold text-white transition hover:bg-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+            className="md-filled-button px-4 text-sm"
           >
             Ver comercios
           </Link>
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-full border border-stone-300 bg-white text-[#22211f] transition hover:border-[#B3262E] hover:text-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2 lg:hidden"
+            className="md-outlined-button size-11 px-0 lg:hidden"
             aria-label={isMenuOpen ? "Cerrar menu" : "Abrir menu"}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation"
@@ -96,7 +96,7 @@ export function Header() {
       <nav
         id="mobile-navigation"
         aria-label="Navegacion movil"
-        className={`border-t border-stone-200 bg-[#fbfaf7] px-4 py-3 shadow-sm sm:px-6 lg:hidden ${
+        className={`border-t border-[var(--md-outline-variant)] bg-[var(--md-surface)] px-4 py-3 shadow-sm sm:px-6 lg:hidden ${
           isMenuOpen ? "block" : "hidden"
         }`}
       >
@@ -106,7 +106,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               onClick={closeMenu}
-              className="flex min-h-11 items-center rounded-lg bg-white px-4 text-sm font-bold text-stone-800 transition hover:text-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+              className="md-focus flex min-h-12 items-center rounded-xl bg-[var(--md-surface-container)] px-4 text-sm font-bold text-stone-800 transition hover:text-[#B3262E]"
             >
               {item.label}
             </Link>
@@ -114,7 +114,7 @@ export function Header() {
           <Link
             href="/iniciativa#sumar-comercio"
             onClick={closeMenu}
-            className="flex min-h-11 items-center rounded-lg border border-stone-300 bg-[#f5c84c] px-4 text-sm font-black text-[#22211f] transition hover:bg-[#e6b937] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2 sm:hidden"
+            className="md-tonal-button px-4 text-sm sm:hidden"
           >
             Sumar comercio
           </Link>

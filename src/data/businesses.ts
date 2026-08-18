@@ -5,7 +5,7 @@ export const businesses: Business[] = [
     id: "business-001",
     slug: "comercio-ejemplo",
     name: "Comercio Ejemplo",
-    category: "Moda",
+    category: "Moda y Ropa",
     shortDescription:
       "Comercio pereirano que continua atendiendo a sus clientes desde una ubicacion confirmada.",
     fullDescription:
@@ -28,7 +28,7 @@ export const businesses: Business[] = [
     id: "business-002",
     slug: "cafeteria-centro",
     name: "Cafeteria Centro",
-    category: "Alimentos",
+    category: "Comida y Restaurantes",
     shortDescription:
       "Cafe local con atencion por WhatsApp y recogida coordinada directamente con el establecimiento.",
     logo: "/businesses/cafeteria-centro/logo.svg",
@@ -44,7 +44,7 @@ export const businesses: Business[] = [
     id: "business-003",
     slug: "papeleria-la-14",
     name: "Papeleria La 14",
-    category: "Servicios",
+    category: "Papeleria y Educacion",
     shortDescription:
       "Papeleria y servicios de impresion con atencion parcial durante la semana.",
     logo: "/businesses/papeleria-la-14/logo.svg",
