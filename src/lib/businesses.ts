@@ -13,6 +13,13 @@ export async function getPublishedBusinesses() {
     return supabaseBusinesses;
   }
 
+  if (process.env.NODE_ENV === "production") {
+    console.error(
+      "Supabase is not available in production. Returning an empty business list.",
+    );
+    return [];
+  }
+
   return getLocalPublishedBusinesses();
 }
 
