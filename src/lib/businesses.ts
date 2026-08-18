@@ -1,20 +1,25 @@
 import { businesses } from "@/data/businesses";
 import { commerceCategories } from "@/data/categories";
+import { getSupabaseServerClient } from "@/lib/supabase";
 import { BUSINESS_STATUSES } from "@/types/business";
 import type { Business } from "@/types/business";
 
 validateBusinesses(businesses);
 
-export function getPublishedBusinesses() {
-  return businesses
-    .filter((business) => business.published)
-    .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+export async function getPublishedBusinesses() {
+  const supabaseBusinesses = await getSupabasePublishedBusinesses();
+
+  if (supabaseBusinesses) {
+    return supabaseBusinesses;
+  }
+
+  return getLocalPublishedBusinesses();
 }
 
-export function getBusinessesToDiscover(limit = 9, date = new Date()) {
+export async function getBusinessesToDiscover(limit = 9, date = new Date()) {
   const hourlyBucket = Math.floor(date.getTime() / 3_600_000);
 
-  return [...getPublishedBusinesses()]
+  return [...(await getPublishedBusinesses())]
     .sort(
       (a, b) =>
         getRotationScore(a.id, hourlyBucket) -
@@ -23,16 +28,16 @@ export function getBusinessesToDiscover(limit = 9, date = new Date()) {
     .slice(0, limit);
 }
 
-export function getBusinessBySlug(slug: string) {
-  return getPublishedBusinesses().find((business) => business.slug === slug);
+export async function getBusinessBySlug(slug: string) {
+  return (await getPublishedBusinesses()).find((business) => business.slug === slug);
 }
 
 export function getCategories() {
   return commerceCategories.map((category) => category.name);
 }
 
-export function getCategorySummaries() {
-  const publishedBusinesses = getPublishedBusinesses();
+export async function getCategorySummaries() {
+  const publishedBusinesses = await getPublishedBusinesses();
 
   return commerceCategories.map((category) => ({
     ...category,
@@ -40,6 +45,110 @@ export function getCategorySummaries() {
       (business) => business.category === category.name,
     ).length,
   }));
+}
+
+function getLocalPublishedBusinesses() {
+  return businesses
+    .filter((business) => business.published)
+    .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)));
+}
+
+async function getSupabasePublishedBusinesses() {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .select(
+      `
+        id,
+        slug,
+        name,
+        short_description,
+        full_description,
+        logo_url,
+        cover_image_url,
+        status,
+        phone,
+        whatsapp,
+        address,
+        maps_url,
+        schedule,
+        published,
+        featured,
+        last_updated_at,
+        categories(name),
+        business_social_links(platform, url)
+      `,
+    )
+    .eq("published", true)
+    .order("featured", { ascending: false })
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Supabase businesses query failed", error);
+    return null;
+  }
+
+  return data.map(mapSupabaseBusiness);
+}
+
+type SupabaseBusinessRow = {
+  id: string;
+  slug: string;
+  name: string;
+  short_description: string;
+  full_description: string | null;
+  logo_url: string;
+  cover_image_url: string;
+  status: Business["status"];
+  phone: string | null;
+  whatsapp: string | null;
+  address: string | null;
+  maps_url: string | null;
+  schedule: string | null;
+  published: boolean;
+  featured: boolean;
+  last_updated_at: string;
+  categories: { name: string } | Array<{ name: string }> | null;
+  business_social_links: Array<{ platform: string; url: string }>;
+};
+
+function mapSupabaseBusiness(row: SupabaseBusinessRow): Business {
+  const category = Array.isArray(row.categories)
+    ? row.categories[0]
+    : row.categories;
+  const instagramUrl = row.business_social_links.find(
+    (link) => link.platform === "instagram",
+  )?.url;
+  const facebookUrl = row.business_social_links.find(
+    (link) => link.platform === "facebook",
+  )?.url;
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    category: category?.name ?? "Otros Comercios y Servicios",
+    shortDescription: row.short_description,
+    fullDescription: row.full_description ?? undefined,
+    logo: row.logo_url,
+    coverImage: row.cover_image_url,
+    status: row.status,
+    phone: row.phone ?? undefined,
+    whatsapp: row.whatsapp ?? undefined,
+    instagramUrl,
+    facebookUrl,
+    address: row.address ?? undefined,
+    mapsUrl: row.maps_url ?? undefined,
+    schedule: row.schedule ?? undefined,
+    lastUpdated: row.last_updated_at,
+    featured: row.featured,
+    published: row.published,
+  };
 }
 
 function validateBusinesses(items: Business[]) {

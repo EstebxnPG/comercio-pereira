@@ -22,7 +22,7 @@ type BusinessesPageProps = {
 };
 
 export default async function BusinessesPage(props: BusinessesPageProps) {
-  const businesses = getPublishedBusinesses();
+  const businesses = await getPublishedBusinesses();
   const categories = getCategories();
   const searchParams = await props.searchParams;
   const selectedCategory =

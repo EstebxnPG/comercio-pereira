@@ -17,11 +17,11 @@ import { SITE_SLOGAN } from "@/lib/constants";
 
 export const revalidate = 3600;
 
-export default function Home() {
-  const businesses = getPublishedBusinesses();
+export default async function Home() {
+  const businesses = await getPublishedBusinesses();
   const categories = getCategories();
-  const categorySummaries = getCategorySummaries();
-  const businessesToDiscover = getBusinessesToDiscover(9);
+  const categorySummaries = await getCategorySummaries();
+  const businessesToDiscover = await getBusinessesToDiscover(9);
   const homeCategoryNames = [
     "Moda y Ropa",
     "Calzado y Marroquineria",

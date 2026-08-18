@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { SITE_DESCRIPTOR, SITE_NAME } from "@/lib/constants";
+import {
+  INCLUSION_WHATSAPP,
+  INCLUSION_WHATSAPP_MESSAGE,
+  SITE_DESCRIPTOR,
+  SITE_NAME,
+} from "@/lib/constants";
 
 const navItems = [
   { href: "/", label: "Inicio" },
@@ -14,6 +19,12 @@ const navItems = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const inclusionHref = INCLUSION_WHATSAPP
+    ? `https://wa.me/${INCLUSION_WHATSAPP}?text=${encodeURIComponent(
+        INCLUSION_WHATSAPP_MESSAGE,
+      )}`
+    : "/iniciativa#sumar-comercio";
+  const isInclusionExternal = Boolean(INCLUSION_WHATSAPP);
 
   function closeMenu() {
     setIsMenuOpen(false);
@@ -50,15 +61,17 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link
-            href="/iniciativa#sumar-comercio"
-            className="md-outlined-button hidden px-4 text-sm sm:inline-flex"
+          <a
+            href={inclusionHref}
+            className="md-focus hidden min-h-11 items-center justify-center rounded-full border border-[#B3262E]/45 px-5 text-sm font-black text-[#8F2026] transition hover:border-[#B3262E] hover:bg-[#ffdad8] hover:text-[#410006] sm:inline-flex"
+            target={isInclusionExternal ? "_blank" : undefined}
+            rel={isInclusionExternal ? "noopener noreferrer" : undefined}
           >
             Sumar comercio
-          </Link>
+          </a>
           <Link
             href="/comercios"
-            className="md-filled-button px-4 text-sm"
+            className="md-focus inline-flex min-h-11 items-center justify-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white shadow-sm transition hover:bg-[#8F2026] hover:shadow-md"
           >
             Ver comercios
           </Link>
@@ -111,13 +124,15 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-          <Link
-            href="/iniciativa#sumar-comercio"
+          <a
+            href={inclusionHref}
+            target={isInclusionExternal ? "_blank" : undefined}
+            rel={isInclusionExternal ? "noopener noreferrer" : undefined}
             onClick={closeMenu}
-            className="md-tonal-button px-4 text-sm sm:hidden"
+            className="md-focus inline-flex min-h-12 items-center justify-center rounded-xl bg-[#ffdad8] px-4 text-sm font-black text-[#410006] transition hover:bg-[#ffc7c3] sm:hidden"
           >
             Sumar comercio
-          </Link>
+          </a>
         </div>
       </nav>
     </header>

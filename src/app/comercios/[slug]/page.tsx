@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  BusinessProfileViewTracker,
+  TrackedBusinessLink,
+} from "@/components/business-event-tracker";
 import { BusinessStatusBadge } from "@/components/business-status";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
@@ -11,8 +15,10 @@ import { getBusinessBySlug, getPublishedBusinesses } from "@/lib/businesses";
 import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
 import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return getPublishedBusinesses().map((business) => ({
+export async function generateStaticParams() {
+  const businesses = await getPublishedBusinesses();
+
+  return businesses.map((business) => ({
     slug: business.slug,
   }));
 }
@@ -21,7 +27,7 @@ export async function generateMetadata(
   props: PageProps<"/comercios/[slug]">,
 ): Promise<Metadata> {
   const { slug } = await props.params;
-  const business = getBusinessBySlug(slug);
+  const business = await getBusinessBySlug(slug);
 
   if (!business) {
     notFound();
@@ -58,7 +64,7 @@ export default async function BusinessPage(
   props: PageProps<"/comercios/[slug]">,
 ) {
   const { slug } = await props.params;
-  const business = getBusinessBySlug(slug);
+  const business = await getBusinessBySlug(slug);
 
   if (!business) {
     notFound();
@@ -73,15 +79,16 @@ export default async function BusinessPage(
   return (
     <>
       <Header />
+      <BusinessProfileViewTracker businessId={business.id} />
       <main className="bg-[#fbfaf7]">
         <section className="relative bg-[#7F1D1D] text-white">
-          <div className="relative aspect-[16/9] max-h-[420px] min-h-[260px] overflow-hidden">
+          <div className="relative h-[320px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
             <Image
               src={business.coverImage}
               alt={`Portada de ${business.name}`}
               fill
               priority
-              className="object-cover opacity-55"
+              className="object-cover object-center opacity-55"
               sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#7F1D1D] via-[#7F1D1D]/35 to-transparent" />
@@ -143,32 +150,38 @@ export default async function BusinessPage(
               <h2 className="text-lg font-black text-[#22211f]">Contacto</h2>
               <div className="mt-4 flex flex-col gap-3">
                 {whatsappContactUrl ? (
-                  <a
+                  <TrackedBusinessLink
+                    businessId={business.id}
+                    eventType="click_whatsapp"
                     href={whatsappContactUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
                   >
                     Escribir por WhatsApp
-                  </a>
+                  </TrackedBusinessLink>
                 ) : null}
                 {business.phone ? (
-                  <a
+                  <TrackedBusinessLink
+                    businessId={business.id}
+                    eventType="click_phone"
                     href={`tel:${business.phone.replace(/\s/g, "")}`}
                     className="md-outlined-button px-5 text-sm"
                   >
                     Llamar
-                  </a>
+                  </TrackedBusinessLink>
                 ) : null}
                 {business.mapsUrl && isSafeExternalUrl(business.mapsUrl) ? (
-                  <a
+                  <TrackedBusinessLink
+                    businessId={business.id}
+                    eventType="click_maps"
                     href={business.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="md-outlined-button px-5 text-sm"
                   >
                     Abrir Google Maps
-                  </a>
+                  </TrackedBusinessLink>
                 ) : null}
               </div>
               <div className="mt-4">

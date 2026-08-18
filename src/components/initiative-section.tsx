@@ -1,3 +1,4 @@
+import { FoundersLogos } from "@/components/founders-logos";
 import { FOOTER_TEXT, INCLUSION_WHATSAPP } from "@/lib/constants";
 
 export function InitiativeSection() {
@@ -14,6 +15,9 @@ export function InitiativeSection() {
           <p className="mt-5 max-w-3xl leading-8 text-stone-200">
             {FOOTER_TEXT}
           </p>
+          <div className="mt-6">
+            <FoundersLogos variant="dark" />
+          </div>
         </div>
         <div id="sumar-comercio" className="rounded-2xl border border-white/15 bg-white/10 p-5 shadow-lg">
           <h3 className="text-2xl font-black">Tienes un comercio aliado?</h3>

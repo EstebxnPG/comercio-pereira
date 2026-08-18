@@ -1,3 +1,9 @@
+"use client";
+
+import {
+  trackBusinessEvent,
+  type BusinessEventType,
+} from "@/components/business-event-tracker";
 import { isSafeExternalUrl } from "@/lib/utils";
 import type { Business } from "@/types/business";
 
@@ -7,15 +13,26 @@ const linkClasses =
 export function SocialLinks({ business }: { business: Business }) {
   const links = [
     business.instagramUrl && isSafeExternalUrl(business.instagramUrl)
-      ? { href: business.instagramUrl, label: "Instagram", icon: InstagramIcon }
+      ? {
+          href: business.instagramUrl,
+          label: "Instagram",
+          icon: InstagramIcon,
+          eventType: "click_instagram",
+        }
       : null,
     business.facebookUrl && isSafeExternalUrl(business.facebookUrl)
-      ? { href: business.facebookUrl, label: "Facebook", icon: FacebookIcon }
+      ? {
+          href: business.facebookUrl,
+          label: "Facebook",
+          icon: FacebookIcon,
+          eventType: "click_facebook",
+        }
       : null,
   ].filter(Boolean) as Array<{
     href: string;
     label: string;
     icon: () => React.JSX.Element;
+    eventType: BusinessEventType;
   }>;
 
   if (links.length === 0) {
@@ -39,6 +56,7 @@ export function SocialLinks({ business }: { business: Business }) {
               rel="noopener noreferrer"
               className={linkClasses}
               aria-label={`Abrir ${link.label} de ${business.name}`}
+              onClick={() => trackBusinessEvent(business.id, link.eventType)}
             >
               <Icon />
               <span>{link.label}</span>

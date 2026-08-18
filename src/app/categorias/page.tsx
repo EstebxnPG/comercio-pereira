@@ -11,8 +11,8 @@ export const metadata: Metadata = {
     "Categorias de comercios aliados de Pereira disponibles en Compra en Pereira.",
 };
 
-export default function CategoriesPage() {
-  const categorySummaries = getCategorySummaries();
+export default async function CategoriesPage() {
+  const categorySummaries = await getCategorySummaries();
 
   return (
     <>
