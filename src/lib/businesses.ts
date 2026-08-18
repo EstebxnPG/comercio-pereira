@@ -37,7 +37,17 @@ export async function getBusinessesToDiscover(limit = 9, date = new Date()) {
 }
 
 export async function getBusinessBySlug(slug: string) {
-  return (await getPublishedBusinesses()).find((business) => business.slug === slug);
+  const supabaseBusiness = await getSupabasePublishedBusinessBySlug(slug);
+
+  if (supabaseBusiness) {
+    return supabaseBusiness;
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    return undefined;
+  }
+
+  return getLocalPublishedBusinesses().find((business) => business.slug === slug);
 }
 
 export function getCategories() {
@@ -102,6 +112,49 @@ async function getSupabasePublishedBusinesses() {
   }
 
   return data.map(mapSupabaseBusiness);
+}
+
+async function getSupabasePublishedBusinessBySlug(slug: string) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .select(
+      `
+        id,
+        slug,
+        name,
+        short_description,
+        full_description,
+        logo_url,
+        cover_image_url,
+        status,
+        phone,
+        whatsapp,
+        address,
+        maps_url,
+        schedule,
+        published,
+        featured,
+        last_updated_at,
+        categories(name),
+        business_social_links(platform, url)
+      `,
+    )
+    .eq("published", true)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error) {
+    console.error(`Supabase business query failed for slug "${slug}"`, error);
+    return null;
+  }
+
+  return data ? mapSupabaseBusiness(data) : null;
 }
 
 type SupabaseBusinessRow = {

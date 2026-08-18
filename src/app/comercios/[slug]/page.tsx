@@ -12,17 +12,11 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ShareButtons } from "@/components/share-buttons";
 import { SocialLinks } from "@/components/social-links";
-import { getBusinessBySlug, getPublishedBusinesses } from "@/lib/businesses";
+import { getBusinessBySlug } from "@/lib/businesses";
 import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
 import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
 
-export async function generateStaticParams() {
-  const businesses = await getPublishedBusinesses();
-
-  return businesses.map((business) => ({
-    slug: business.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(
   props: PageProps<"/comercios/[slug]">,
