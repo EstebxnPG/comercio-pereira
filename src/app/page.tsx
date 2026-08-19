@@ -15,7 +15,7 @@ import {
 } from "@/lib/businesses";
 import { SITE_SLOGAN } from "@/lib/constants";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const businesses = await getPublishedBusinesses();

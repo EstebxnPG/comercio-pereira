@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { BusinessCard } from "@/components/business-card";
 import { STATUS_LABELS } from "@/lib/constants";
 import type { Business, BusinessStatus } from "@/types/business";
@@ -21,24 +21,36 @@ export function BusinessDirectory({
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [status, setStatus] = useState<BusinessStatus | "all">(initialStatus);
+  const deferredQuery = useDeferredValue(query);
+  const deferredCategory = useDeferredValue(category);
+  const deferredStatus = useDeferredValue(status);
+  const isSearching =
+    query !== deferredQuery ||
+    category !== deferredCategory ||
+    status !== deferredStatus;
+  const searchableBusinesses = useMemo(
+    () =>
+      businesses.map((business) => ({
+        business,
+        searchText: getBusinessSearchText(business),
+      })),
+    [businesses],
+  );
 
   const filteredBusinesses = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = normalizeSearchText(deferredQuery.trim());
 
-    return businesses.filter((business) => {
+    return searchableBusinesses.filter(({ business, searchText }) => {
       const matchesQuery =
-        normalizedQuery.length === 0 ||
-        [business.name, business.category, business.shortDescription]
-          .join(" ")
-          .toLowerCase()
-          .includes(normalizedQuery);
+        normalizedQuery.length === 0 || searchText.includes(normalizedQuery);
       const matchesCategory =
-        category === "all" || business.category === category;
-      const matchesStatus = status === "all" || business.status === status;
+        deferredCategory === "all" || business.category === deferredCategory;
+      const matchesStatus =
+        deferredStatus === "all" || business.status === deferredStatus;
 
       return matchesQuery && matchesCategory && matchesStatus;
-    });
-  }, [businesses, category, query, status]);
+    }).map(({ business }) => business);
+  }, [deferredCategory, deferredQuery, deferredStatus, searchableBusinesses]);
 
   return (
     <section id="comercios" className="bg-white py-12 sm:py-16">
@@ -52,9 +64,24 @@ export function BusinessDirectory({
               Comercios aliados
             </h2>
           </div>
-          <p className="text-sm font-semibold text-stone-600">
-            {filteredBusinesses.length} resultado
-            {filteredBusinesses.length === 1 ? "" : "s"}
+          <p
+            aria-live="polite"
+            className="inline-flex min-h-6 items-center gap-2 text-sm font-semibold text-stone-600"
+          >
+            {isSearching ? (
+              <>
+                <span
+                  aria-hidden="true"
+                  className="size-4 animate-spin rounded-full border-2 border-stone-300 border-t-[#B3262E]"
+                />
+                Buscando
+              </>
+            ) : (
+              <>
+                {filteredBusinesses.length} resultado
+                {filteredBusinesses.length === 1 ? "" : "s"}
+              </>
+            )}
           </p>
         </div>
 
@@ -66,6 +93,7 @@ export function BusinessDirectory({
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Nombre, categoria o descripcion"
               className="md-field mt-2"
+              aria-busy={isSearching}
             />
           </label>
           <label>
@@ -121,4 +149,34 @@ export function BusinessDirectory({
       </div>
     </section>
   );
+}
+
+function getBusinessSearchText(business: Business) {
+  return normalizeSearchText(
+    [
+      business.name,
+      business.slug,
+      business.category,
+      business.shortDescription,
+      business.fullDescription,
+      business.status,
+      STATUS_LABELS[business.status],
+      business.phone,
+      business.whatsapp,
+      business.address,
+      business.schedule,
+      business.instagramUrl,
+      business.facebookUrl,
+      business.mapsUrl,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function normalizeSearchText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 }
