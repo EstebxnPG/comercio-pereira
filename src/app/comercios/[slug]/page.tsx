@@ -67,8 +67,12 @@ export default async function BusinessPage(
 
   const profileUrl = absoluteUrl(`/comercios/${business.slug}`);
   const shareText = `El centro sigue latiendo\n\nConoce a ${business.name}, comercio aliado de ${SITE_NAME}:`;
+  const whatsappContactMessage =
+    "Hola, vi tu perfil en *COMPRAENPEREIRA.COM* y quiero mas informacion.";
   const whatsappContactUrl = business.whatsapp
-    ? `https://wa.me/${business.whatsapp}`
+    ? `https://wa.me/${business.whatsapp}?text=${encodeURIComponent(
+        whatsappContactMessage,
+      )}`
     : null;
 
   return (
