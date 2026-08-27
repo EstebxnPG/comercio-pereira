@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import {
   INCLUSION_WHATSAPP,
@@ -34,8 +35,14 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface)]/95 shadow-sm backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="group flex items-center gap-3" onClick={closeMenu}>
-          <span className="grid size-10 place-items-center rounded-xl bg-[#B3262E] text-lg font-black text-white shadow-sm">
-            CP
+          <span className="grid size-10 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
+            <Image
+              src="/brand/compra-en-pereira-logo.png"
+              alt=""
+              width={1254}
+              height={1254}
+              className="h-8 w-8 object-contain"
+            />
           </span>
           <span className="leading-tight">
             <span className="block text-base font-black text-[#22211f]">
