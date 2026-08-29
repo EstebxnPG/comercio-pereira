@@ -18,29 +18,31 @@ const steps = [
 
 export function HowItWorksSection() {
   return (
-    <section className="bg-white py-12 sm:py-16">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl">
-          <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
-            Como funciona
-          </p>
-          <h2 className="mt-2 text-3xl font-black text-[#22211f]">
-            Tres pasos, sin intermediarios
-          </h2>
-        </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+    <section className="bg-[#fffdf8] py-10 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase text-[#B3262E]">
+              Como funciona
+            </p>
+            <h2 className="mt-2 text-2xl font-black leading-tight text-[#22211f] sm:text-3xl">
+              Encuentra, revisa y contacta directo.
+            </h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
           {steps.map((item) => (
             <article
               key={item.step}
-              className="md-surface p-5"
+              className="rounded-2xl border border-stone-200 bg-white p-4"
             >
-              <p className="text-sm font-black text-[#B3262E]">{item.step}</p>
-              <h3 className="mt-3 text-2xl font-black text-[#22211f]">
+              <p className="text-xs font-black text-[#B3262E]">{item.step}</p>
+              <h3 className="mt-2 text-lg font-black text-[#22211f]">
                 {item.title}
               </h3>
-              <p className="mt-3 leading-7 text-stone-600">{item.text}</p>
+              <p className="mt-2 text-sm leading-6 text-stone-600">{item.text}</p>
             </article>
           ))}
+          </div>
         </div>
       </div>
     </section>

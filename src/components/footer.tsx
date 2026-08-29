@@ -1,11 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
-import { FoundersLogos } from "@/components/founders-logos";
-import { FOOTER_TEXT, SITE_DESCRIPTOR, SITE_NAME } from "@/lib/constants";
+import {
+  INCLUSION_WHATSAPP,
+  INCLUSION_WHATSAPP_MESSAGE,
+  SITE_DESCRIPTOR,
+  SITE_NAME,
+} from "@/lib/constants";
 
-const footerLinks = [
+const exploreLinks = [
   { href: "/comercios", label: "Comercios" },
   { href: "/categorias", label: "Categorias" },
+];
+
+const platformLinks = [
   { href: "/como-funciona", label: "Como funciona" },
   { href: "/iniciativa", label: "Iniciativa" },
 ];
@@ -51,20 +58,26 @@ const socialLinks = [
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const inclusionHref = INCLUSION_WHATSAPP
+    ? `https://wa.me/${INCLUSION_WHATSAPP}?text=${encodeURIComponent(
+        INCLUSION_WHATSAPP_MESSAGE,
+      )}`
+    : "/iniciativa#sumar-comercio";
+  const isInclusionExternal = Boolean(INCLUSION_WHATSAPP);
 
   return (
     <footer className="border-t border-stone-200 bg-[#fffdf8]">
-      <div className="mx-auto max-w-6xl px-4 py-10 text-sm text-stone-600 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">
+      <div className="mx-auto max-w-7xl px-4 py-9 text-sm text-stone-600 sm:px-6 lg:px-8">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.55fr_0.65fr_0.8fr] lg:items-start">
           <div>
-            <div className="flex items-start gap-4">
-              <div className="grid size-12 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
+            <div className="flex items-start gap-3">
+              <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
                 <Image
                   src="/brand/compra-en-pereira-logo.png"
                   alt=""
                   width={1254}
                   height={1254}
-                  className="h-10 w-10 object-contain"
+                  className="h-9 w-9 object-contain"
                 />
               </div>
               <div>
@@ -72,65 +85,84 @@ export function Footer() {
                 <p className="mt-1 font-semibold text-stone-500">{SITE_DESCRIPTOR}</p>
               </div>
             </div>
-            <p className="mt-5 max-w-3xl leading-7">{FOOTER_TEXT}</p>
+            <p className="mt-4 max-w-md leading-6">
+              Vitrina digital para descubrir comercios, servicios y negocios de
+              Pereira.
+            </p>
+            <p className="mt-3 text-xs leading-5 text-stone-500">
+              Desarrollado por DPG Consultora, con el respaldo de Fenalco y de
+              Fabian Sanchez &quot;El Chinito&quot;.
+            </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-1">
-            <nav aria-label="Navegacion secundaria">
-              <p className="text-xs font-black uppercase tracking-wide text-[#B3262E]">
-                Explorar
-              </p>
-              <div className="mt-3 grid gap-2">
-                {footerLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </nav>
-
-            <div>
-              <p className="text-xs font-black uppercase tracking-wide text-[#B3262E]">
-                Contacto
-              </p>
-              <p className="mt-3 leading-6">
-                Para actualizaciones, alianzas o correcciones de informacion,
-                usa los canales oficiales de la iniciativa.
-              </p>
+          <nav aria-label="Explorar">
+            <p className="text-xs font-black uppercase text-[#B3262E]">
+              Explorar
+            </p>
+            <div className="mt-3 grid gap-1">
+              {exploreLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </div>
+          </nav>
 
-            <nav aria-label="Redes sociales de Compra en Pereira">
-              <p className="text-xs font-black uppercase tracking-wide text-[#B3262E]">
-                Redes sociales
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                {socialLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
-                    title={link.label}
-                    className="md-focus grid size-11 place-items-center rounded-full border border-stone-200 bg-white text-[#B3262E] shadow-sm transition hover:border-[#B3262E]/45 hover:bg-[#ffdad8] hover:text-[#7F1D1D]"
-                  >
-                    {link.icon}
-                  </a>
-                ))}
-              </div>
-            </nav>
-          </div>
+          <nav aria-label="Compra en Pereira">
+            <p className="text-xs font-black uppercase text-[#B3262E]">
+              Compra en Pereira
+            </p>
+            <div className="mt-3 grid gap-1">
+              {platformLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <a
+                href={inclusionHref}
+                target={isInclusionExternal ? "_blank" : undefined}
+                rel={isInclusionExternal ? "noopener noreferrer" : undefined}
+                className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+              >
+                Solicitar inclusion
+              </a>
+            </div>
+          </nav>
+
+          <nav aria-label="Redes sociales de Compra en Pereira">
+            <p className="text-xs font-black uppercase text-[#B3262E]">
+              Contacto
+            </p>
+            <p className="mt-3 leading-6">
+              Actualizaciones, alianzas y correcciones por canales oficiales.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  title={link.label}
+                  className="md-focus grid size-10 place-items-center rounded-full border border-stone-200 bg-white text-[#B3262E] shadow-sm transition hover:border-[#B3262E]/45 hover:bg-[#ffdad8] hover:text-[#7F1D1D]"
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </div>
+          </nav>
         </div>
 
-        <div className="mt-8 border-y border-stone-200 py-6">
-          <FoundersLogos compact />
-        </div>
-
-        <div className="flex flex-col gap-3 pt-6 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-stone-200 pt-5 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {currentYear} {SITE_NAME}. Todos los derechos reservados.
           </p>

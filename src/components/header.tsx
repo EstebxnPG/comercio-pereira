@@ -14,7 +14,6 @@ const navItems = [
   { href: "/", label: "Inicio" },
   { href: "/comercios", label: "Comercios" },
   { href: "/categorias", label: "Categorias" },
-  { href: "/como-funciona", label: "Como funciona" },
   { href: "/iniciativa", label: "Iniciativa" },
 ];
 
@@ -32,8 +31,8 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--md-outline-variant)] bg-[var(--md-surface)]/95 shadow-sm backdrop-blur">
-      <div className="mx-auto flex min-h-16 max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-[#fffdf8]/95 backdrop-blur">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="group flex items-center gap-3" onClick={closeMenu}>
           <span className="grid size-10 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
             <Image
@@ -45,10 +44,10 @@ export function Header() {
             />
           </span>
           <span className="leading-tight">
-            <span className="block text-base font-black text-[#22211f]">
+            <span className="block text-base font-black leading-5 text-[#22211f]">
               {SITE_NAME}
             </span>
-            <span className="hidden text-sm text-stone-600 sm:block">
+            <span className="hidden text-xs font-semibold text-stone-500 sm:block">
               {SITE_DESCRIPTOR}
             </span>
           </span>
@@ -61,7 +60,7 @@ export function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="md-focus rounded-full px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-[var(--md-primary-container)] hover:text-[#7F1D1D]"
+              className="md-focus rounded-full px-3 py-2 text-sm font-bold text-stone-700 transition hover:bg-[#fff3bd] hover:text-[#7F1D1D]"
             >
               {item.label}
             </Link>
@@ -70,7 +69,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           <a
             href={inclusionHref}
-            className="md-focus hidden min-h-11 items-center justify-center rounded-full border border-[#B3262E]/45 px-5 text-sm font-black text-[#8F2026] transition hover:border-[#B3262E] hover:bg-[#ffdad8] hover:text-[#410006] sm:inline-flex"
+            className="md-focus hidden min-h-11 items-center justify-center rounded-full border border-stone-300 px-4 text-sm font-black text-[#8F2026] transition hover:border-[#B3262E] hover:bg-[#fff3bd] sm:inline-flex"
             target={isInclusionExternal ? "_blank" : undefined}
             rel={isInclusionExternal ? "noopener noreferrer" : undefined}
           >
@@ -78,7 +77,7 @@ export function Header() {
           </a>
           <Link
             href="/comercios"
-            className="md-focus inline-flex min-h-11 items-center justify-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white shadow-sm transition hover:bg-[#8F2026] hover:shadow-md"
+            className="md-focus hidden min-h-11 items-center justify-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white shadow-sm transition hover:bg-[#8F2026] hover:shadow-md min-[420px]:inline-flex"
           >
             Ver comercios
           </Link>
@@ -116,17 +115,17 @@ export function Header() {
       <nav
         id="mobile-navigation"
         aria-label="Navegacion movil"
-        className={`border-t border-[var(--md-outline-variant)] bg-[var(--md-surface)] px-4 py-3 shadow-sm sm:px-6 lg:hidden ${
+        className={`border-t border-stone-200 bg-[#fffdf8] px-4 py-3 shadow-sm sm:px-6 lg:hidden ${
           isMenuOpen ? "block" : "hidden"
         }`}
       >
-        <div className="mx-auto grid max-w-6xl gap-2">
+        <div className="mx-auto grid max-w-7xl gap-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={closeMenu}
-              className="md-focus flex min-h-12 items-center rounded-xl bg-[var(--md-surface-container)] px-4 text-sm font-bold text-stone-800 transition hover:text-[#B3262E]"
+              className="md-focus flex min-h-12 items-center rounded-xl bg-[#f7f1ea] px-4 text-sm font-bold text-stone-800 transition hover:text-[#B3262E]"
             >
               {item.label}
             </Link>

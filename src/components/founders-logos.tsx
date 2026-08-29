@@ -1,4 +1,5 @@
 import Image from "next/image";
+import fenalcoLogo from "../../Logo_Fenalco_RGB_VERTICAL.png";
 
 const founders = [
   {
@@ -8,6 +9,14 @@ const founders = [
     width: 733,
     height: 190,
     imageClassName: "h-14 w-auto object-contain sm:h-16",
+  },
+  {
+    name: "Fenalco",
+    role: "Aliado fundador",
+    src: fenalcoLogo,
+    width: 1043,
+    height: 834,
+    imageClassName: "h-20 max-w-full object-contain sm:h-20",
   },
   {
     name: "DPG Consultora",
@@ -28,22 +37,22 @@ export function FoundersLogos({ compact = false, variant = "light" }: FoundersLo
   const isDark = variant === "dark";
 
   return (
-    <div aria-label="Fundadores de la iniciativa">
+    <div aria-label="Aliados fundadores de la iniciativa">
       <p
         className={`text-xs font-black uppercase tracking-wide ${
           isDark ? "text-[#f5c84c]" : "text-[#B3262E]"
         }`}
       >
-        Fundadores
+        Aliados fundadores
       </p>
       <div className={`mt-3 flex flex-wrap items-center ${compact ? "gap-4" : "gap-5"}`}>
         {founders.map((founder) => (
           <div
             key={founder.name}
-            className={`flex w-full items-center rounded-lg border bg-white text-[#22211f] sm:w-auto ${
+            className={`flex w-full items-center rounded-lg border bg-white text-[#22211f] ${
               compact
-                ? "min-h-20 gap-4 px-4 py-3"
-                : "min-h-28 flex-col items-start justify-center gap-3 px-4 py-3"
+                ? "min-h-20 gap-4 px-4 py-3 sm:w-auto"
+                : "min-h-32 flex-col items-start justify-center gap-3 px-4 py-3 sm:w-60"
             } ${
               isDark
                 ? "border-white/20"

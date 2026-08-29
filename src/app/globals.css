@@ -27,6 +27,14 @@
 body {
   background: var(--background);
   color: var(--foreground);
+  text-rendering: optimizeLegibility;
+}
+
+a,
+button,
+input,
+select {
+  letter-spacing: 0;
 }
 
 html {
@@ -134,6 +142,63 @@ html {
   }
 
   .md-focus:focus-visible {
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-primary) 24%, transparent);
+    outline: 2px solid color-mix(in srgb, var(--md-primary) 75%, transparent);
+    outline-offset: 3px;
+    box-shadow: none;
+  }
+}
+
+.brand-rail-mask {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+.brand-rail-mask::-webkit-scrollbar {
+  display: none;
+}
+
+.brand-rail-track {
+  animation: brand-rail-marquee 42s linear infinite;
+}
+
+.brand-rail-track:hover,
+.brand-rail-track:focus-within {
+  animation-play-state: paused;
+}
+
+@keyframes brand-rail-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .brand-rail-track {
+    animation: none !important;
   }
 }

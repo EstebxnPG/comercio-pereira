@@ -15,7 +15,7 @@ export function BusinessStatusBadge({ status }: { status: BusinessStatus }) {
   return (
     <span
       className={cn(
-        "inline-flex min-h-8 items-center rounded-full border px-3 py-1 text-sm font-semibold",
+        "inline-flex min-h-7 items-center rounded-full border px-2.5 py-1 text-xs font-bold sm:min-h-8 sm:px-3 sm:text-sm sm:font-semibold",
         statusStyles[status],
       )}
       title={STATUS_DESCRIPTIONS[status]}

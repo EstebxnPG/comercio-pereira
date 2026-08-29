@@ -26,7 +26,7 @@ export const STATUS_DESCRIPTIONS: Record<BusinessStatus, string> = {
 };
 
 export const FOOTER_TEXT =
-  'Compra en Pereira es una iniciativa ciudadana para dar visibilidad a los comercios aliados de Pereira. Tecnologia desarrollada por el equipo de DPG Consultora. Con el respaldo de Fabian Sanchez "El Chinito".';
+  'Compra en Pereira es una iniciativa ciudadana para dar visibilidad a los comercios aliados de Pereira. Tecnologia desarrollada por el equipo de DPG Consultora, con el respaldo de Fenalco y de Fabian Sanchez "El Chinito".';
 
 export const INCLUSION_WHATSAPP = process.env.NEXT_PUBLIC_INCLUSION_WHATSAPP ?? "";
 export const INCLUSION_WHATSAPP_MESSAGE =
