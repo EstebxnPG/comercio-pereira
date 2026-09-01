@@ -6,7 +6,9 @@ const LOGO_BUCKET =
   process.env.SUPABASE_BUSINESS_LOGOS_BUCKET ?? "business-logos";
 const COVER_BUCKET =
   process.env.SUPABASE_BUSINESS_COVERS_BUCKET ?? "business-covers";
-const MAX_IMAGE_BYTES = 3 * 1024 * 1024;
+const MAX_LOGO_BYTES = 1.5 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 2 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = 4 * 1024 * 1024;
 const RATE_LIMIT_MAX_SUBMISSIONS = 100;
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 const ALLOWED_LOGO_TYPES = [
@@ -15,6 +17,13 @@ const ALLOWED_LOGO_TYPES = [
   "image/webp",
 ];
 const ALLOWED_COVER_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
+export function GET() {
+  return NextResponse.json({
+    ok: true,
+    endpoint: "business-submissions",
+  });
+}
 
 type BusinessSubmissionPayload = {
   businessName: string;
@@ -91,6 +100,19 @@ async function handleBusinessSubmission(request: NextRequest) {
     return NextResponse.json(
       { ok: false, error: rateLimit.error },
       { status: rateLimit.status },
+    );
+  }
+
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+
+  if (contentLength > MAX_MULTIPART_BYTES) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "La solicitud es demasiado grande. Sube imagenes mas livianas e intenta de nuevo.",
+      },
+      { status: 413 },
     );
   }
 
@@ -568,6 +590,7 @@ async function uploadSubmissionImages({
         bucket: LOGO_BUCKET,
         file: logo,
         folder: submissionId,
+        maxBytes: MAX_LOGO_BYTES,
         name: "logo",
         supabase,
       })
@@ -583,6 +606,7 @@ async function uploadSubmissionImages({
         bucket: COVER_BUCKET,
         file: coverImage,
         folder: submissionId,
+        maxBytes: MAX_COVER_IMAGE_BYTES,
         name: "cover",
         supabase,
       })
@@ -610,6 +634,7 @@ function validateSubmissionImages({
     const logoValidation = validateImageFile({
       allowedTypes: ALLOWED_LOGO_TYPES,
       file: logo,
+      maxBytes: MAX_LOGO_BYTES,
       name: "logo",
     });
 
@@ -622,6 +647,7 @@ function validateSubmissionImages({
     const coverValidation = validateImageFile({
       allowedTypes: ALLOWED_COVER_TYPES,
       file: coverImage,
+      maxBytes: MAX_COVER_IMAGE_BYTES,
       name: "cover",
     });
 
@@ -643,6 +669,7 @@ async function uploadImage({
   bucket,
   file,
   folder,
+  maxBytes,
   name,
   supabase,
 }: {
@@ -650,12 +677,13 @@ async function uploadImage({
   bucket: string;
   file: File;
   folder: string;
+  maxBytes: number;
   name: string;
   supabase: NonNullable<ReturnType<typeof getSupabaseServiceRoleClient>>;
 }): Promise<
   { ok: true; image: UploadedImage } | { ok: false; error: string }
 > {
-  const validation = validateImageFile({ allowedTypes, file, name });
+  const validation = validateImageFile({ allowedTypes, file, maxBytes, name });
 
   if (!validation.ok) {
     return validation;
@@ -691,10 +719,12 @@ async function uploadImage({
 function validateImageFile({
   allowedTypes,
   file,
+  maxBytes,
   name,
 }: {
   allowedTypes: string[];
   file: File;
+  maxBytes: number;
   name: string;
 }): { ok: true } | { ok: false; error: string } {
   if (!allowedTypes.includes(file.type)) {
@@ -704,14 +734,20 @@ function validateImageFile({
     };
   }
 
-  if (file.size > MAX_IMAGE_BYTES) {
+  if (file.size > maxBytes) {
     return {
       ok: false,
-      error: `${name} image must be 3 MB or less`,
+      error: `${name} image must be ${formatMegabytes(maxBytes)} MB or less`,
     };
   }
 
   return { ok: true };
+}
+
+function formatMegabytes(bytes: number) {
+  return Number(bytes / (1024 * 1024)).toLocaleString("en", {
+    maximumFractionDigits: 1,
+  });
 }
 
 function optionalFile(value: FormDataEntryValue | null) {

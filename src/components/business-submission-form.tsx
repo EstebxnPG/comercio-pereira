@@ -71,6 +71,10 @@ const STEPS: Array<{ eyebrow: string; title: string }> = [
   { eyebrow: "Final", title: "Revision final" },
 ] as const;
 
+const MAX_LOGO_BYTES = 1.5 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+
 export function BusinessSubmissionForm({
   categories,
 }: {
@@ -146,6 +150,13 @@ export function BusinessSubmissionForm({
   }
 
   function updateLogoFile(file: File | null) {
+    const validation = validateImageFile(file, MAX_LOGO_BYTES, "logo");
+
+    if (!validation.ok) {
+      setStepError(validation.error);
+      return;
+    }
+
     if (logoPreviewUrl) {
       URL.revokeObjectURL(logoPreviewUrl);
     }
@@ -155,6 +166,17 @@ export function BusinessSubmissionForm({
   }
 
   function updateCoverFile(file: File | null) {
+    const validation = validateImageFile(
+      file,
+      MAX_COVER_IMAGE_BYTES,
+      "imagen de portada",
+    );
+
+    if (!validation.ok) {
+      setStepError(validation.error);
+      return;
+    }
+
     if (coverPreviewUrl) {
       URL.revokeObjectURL(coverPreviewUrl);
     }
@@ -568,6 +590,7 @@ export function BusinessSubmissionForm({
                   accept="image/png,image/jpeg,image/webp"
                   file={logoFile}
                   label="Adjuntar logo"
+                  limitLabel={`${formatMegabytes(MAX_LOGO_BYTES)} MB maximo`}
                   name="logo"
                   onChange={updateLogoFile}
                   required
@@ -576,6 +599,7 @@ export function BusinessSubmissionForm({
                   accept="image/png,image/jpeg,image/webp"
                   file={coverFile}
                   label="Adjuntar imagen de portada"
+                  limitLabel={`${formatMegabytes(MAX_COVER_IMAGE_BYTES)} MB maximo`}
                   name="coverImage"
                   onChange={updateCoverFile}
                 />
@@ -867,6 +891,7 @@ function FileField({
   accept,
   file,
   label,
+  limitLabel,
   name,
   onChange,
   required = false,
@@ -874,6 +899,7 @@ function FileField({
   accept: string;
   file: File | null;
   label: string;
+  limitLabel: string;
   name: string;
   onChange: (file: File | null) => void;
   required?: boolean;
@@ -893,7 +919,7 @@ function FileField({
         onChange={(event) => onChange(event.target.files?.[0] ?? null)}
       />
       <span className="text-xs font-semibold text-stone-500">
-        {file ? file.name : "PNG, JPG o WebP."}
+        {file ? file.name : `PNG, JPG o WebP. ${limitLabel}.`}
       </span>
     </label>
   );
@@ -968,6 +994,34 @@ function validateStep(step: number, form: FormState, logoFile: File | null) {
   return { ok: true as const };
 }
 
+function validateImageFile(file: File | null, maxBytes: number, label: string) {
+  if (!file) {
+    return { ok: true as const };
+  }
+
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return {
+      ok: false as const,
+      error: `El ${label} debe ser una imagen PNG, JPG o WebP.`,
+    };
+  }
+
+  if (file.size > maxBytes) {
+    return {
+      ok: false as const,
+      error: `El ${label} debe pesar ${formatMegabytes(maxBytes)} MB o menos.`,
+    };
+  }
+
+  return { ok: true as const };
+}
+
+function formatMegabytes(bytes: number) {
+  return Number(bytes / (1024 * 1024)).toLocaleString("es-CO", {
+    maximumFractionDigits: 1,
+  });
+}
+
 function normalizeColombianWhatsapp(value: string) {
   const digits = value.replace(/\D/g, "");
 
@@ -1000,10 +1054,13 @@ async function readSubmissionResponse(response: Response): Promise<{
     return (await response.json()) as { ok?: boolean; error?: string };
   }
 
+  const text = await response.text();
+  const preview = text.replace(/\s+/g, " ").trim().slice(0, 180);
+
   return {
     ok: false,
     error:
-      "El servidor no respondio con JSON. Revisa que el endpoint de postulaciones este disponible.",
+      `El servidor respondio ${response.status} con ${contentType || "content-type desconocido"} en lugar de JSON.${preview ? ` Respuesta: ${preview}` : ""}`,
   };
 }
 
