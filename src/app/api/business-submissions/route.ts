@@ -437,6 +437,10 @@ function normalizeSubmissionField(
     return normalizeSocialUrl("facebook", value);
   }
 
+  if (key === "mapsUrl" || key === "tiktokUrl" || key === "websiteUrl") {
+    return normalizeHttpsUrl(value);
+  }
+
   return value;
 }
 
@@ -487,6 +491,20 @@ function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
     .replace(/^\/+|\/+$/g, "");
 
   return username ? `https://www.${host}/${username}` : cleaned;
+}
+
+function normalizeHttpsUrl(value: string) {
+  const cleaned = value.trim();
+
+  if (!cleaned) {
+    return cleaned;
+  }
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    return cleaned.replace(/^http:\/\//i, "https://");
+  }
+
+  return `https://${cleaned.replace(/^\/+/, "")}`;
 }
 
 async function uploadSubmissionImages({

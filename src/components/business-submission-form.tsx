@@ -216,7 +216,7 @@ export function BusinessSubmissionForm({
       for (const [key, value] of Object.entries(form)) {
         body.append(
           key,
-          key === "whatsapp" ? normalizeColombianWhatsapp(String(value)) : String(value),
+          serializeSubmissionValue(key as keyof FormState, String(value)),
         );
       }
 
@@ -232,10 +232,7 @@ export function BusinessSubmissionForm({
         method: "POST",
         body,
       });
-      const result = (await response.json()) as {
-        ok?: boolean;
-        error?: string;
-      };
+      const result = await readSubmissionResponse(response);
 
       if (!response.ok || !result.ok) {
         throw new Error(result.error ?? "No pudimos guardar el comercio.");
@@ -480,10 +477,12 @@ export function BusinessSubmissionForm({
                   maxLength={260}
                   name="mapsUrl"
                   placeholder="https://maps.google.com/..."
-                  type="url"
                   value={form.mapsUrl}
                   onChange={(event) =>
                     updateField("mapsUrl", event.target.value)
+                  }
+                  onBlur={(event) =>
+                    updateField("mapsUrl", normalizeHttpsUrl(event.target.value))
                   }
                 />
               </Field>
@@ -539,10 +538,12 @@ export function BusinessSubmissionForm({
                     maxLength={220}
                     name="tiktokUrl"
                     placeholder="https://tiktok.com/@..."
-                    type="url"
                     value={form.tiktokUrl}
                     onChange={(event) =>
                       updateField("tiktokUrl", event.target.value)
+                    }
+                    onBlur={(event) =>
+                      updateField("tiktokUrl", normalizeHttpsUrl(event.target.value))
                     }
                   />
                 </Field>
@@ -552,10 +553,12 @@ export function BusinessSubmissionForm({
                     maxLength={220}
                     name="websiteUrl"
                     placeholder="https://..."
-                    type="url"
                     value={form.websiteUrl}
                     onChange={(event) =>
                       updateField("websiteUrl", event.target.value)
+                    }
+                    onBlur={(event) =>
+                      updateField("websiteUrl", normalizeHttpsUrl(event.target.value))
                     }
                   />
                 </Field>
@@ -971,6 +974,35 @@ function normalizeColombianWhatsapp(value: string) {
   return digits ? `57${digits}` : "";
 }
 
+function serializeSubmissionValue(key: keyof FormState, value: string) {
+  if (key === "whatsapp") {
+    return normalizeColombianWhatsapp(value);
+  }
+
+  if (key === "mapsUrl" || key === "tiktokUrl" || key === "websiteUrl") {
+    return normalizeHttpsUrl(value);
+  }
+
+  return value;
+}
+
+async function readSubmissionResponse(response: Response): Promise<{
+  ok?: boolean;
+  error?: string;
+}> {
+  const contentType = response.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return (await response.json()) as { ok?: boolean; error?: string };
+  }
+
+  return {
+    ok: false,
+    error:
+      "El servidor no respondio con JSON. Revisa que el endpoint de postulaciones este disponible.",
+  };
+}
+
 function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
   const cleaned = value.trim();
 
@@ -991,4 +1023,18 @@ function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
     .replace(/^\/+|\/+$/g, "");
 
   return username ? `https://www.${host}/${username}` : undefined;
+}
+
+function normalizeHttpsUrl(value: string) {
+  const cleaned = value.trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    return cleaned.replace(/^http:\/\//i, "https://");
+  }
+
+  return `https://${cleaned.replace(/^\/+/, "")}`;
 }
