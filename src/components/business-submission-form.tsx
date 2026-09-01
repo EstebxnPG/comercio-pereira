@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { BusinessCard } from "@/components/business-card";
 import {
@@ -90,6 +90,17 @@ export function BusinessSubmissionForm({
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
   const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
   const [stepError, setStepError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+  const hasChangedStep = useRef(false);
+
+  useEffect(() => {
+    if (!hasChangedStep.current) {
+      hasChangedStep.current = true;
+      return;
+    }
+
+    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [currentStep]);
 
   const previewBusiness = useMemo<Business>(
     () => ({
@@ -106,7 +117,7 @@ export function BusinessSubmissionForm({
       coverImage: coverPreviewUrl || DEFAULT_BUSINESS_COVER_IMAGE,
       status: "open",
       phone: form.phone.trim() || undefined,
-      whatsapp: form.whatsapp.replace(/\D/g, "") || undefined,
+      whatsapp: normalizeColombianWhatsapp(form.whatsapp) || undefined,
       instagramUrl: normalizeSocialUrl("instagram", form.instagramUrl),
       facebookUrl: normalizeSocialUrl("facebook", form.facebookUrl),
       mapsUrl: form.mapsUrl.trim() || undefined,
@@ -203,7 +214,10 @@ export function BusinessSubmissionForm({
       const body = new FormData();
 
       for (const [key, value] of Object.entries(form)) {
-        body.append(key, String(value));
+        body.append(
+          key,
+          key === "whatsapp" ? normalizeColombianWhatsapp(String(value)) : String(value),
+        );
       }
 
       if (logoFile) {
@@ -253,6 +267,7 @@ export function BusinessSubmissionForm({
     <section className="bg-[#fbfaf7] py-6 sm:py-14">
       <div className="mx-auto grid max-w-7xl gap-6 px-3 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_430px] lg:px-8">
         <form
+          ref={formRef}
           className="overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_8px_30px_rgb(34_21_20/0.08)]"
           onSubmit={handleSubmit}
         >
@@ -373,18 +388,23 @@ export function BusinessSubmissionForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="WhatsApp" required>
-                  <input
-                    className="md-field"
-                    inputMode="tel"
-                    maxLength={18}
-                    name="whatsapp"
-                    placeholder="573001234567"
-                    required
-                    value={form.whatsapp}
-                    onChange={(event) =>
-                      updateField("whatsapp", event.target.value)
-                    }
-                  />
+                  <div className="flex overflow-hidden rounded-xl border border-[#85736f] bg-white focus-within:ring-2 focus-within:ring-[#B3262E] focus-within:ring-offset-2">
+                    <span className="flex min-h-12 items-center border-r border-stone-200 bg-[#fffdf8] px-4 text-sm font-black text-stone-700">
+                      +57
+                    </span>
+                    <input
+                      className="min-h-12 w-full bg-transparent px-4 py-2 text-base font-semibold text-[#22211f] outline-none placeholder:text-stone-400"
+                      inputMode="numeric"
+                      maxLength={10}
+                      name="whatsapp"
+                      placeholder="3001234567"
+                      required
+                      value={form.whatsapp}
+                      onChange={(event) =>
+                        updateField("whatsapp", event.target.value.replace(/\D/g, ""))
+                      }
+                    />
+                  </div>
                 </Field>
                 <Field label="Telefono">
                   <input
@@ -920,10 +940,10 @@ function validateStep(step: number, form: FormState, logoFile: File | null) {
       };
     }
 
-    if (!/^\d{10,15}$/.test(form.whatsapp.replace(/\D/g, ""))) {
+    if (!/^3\d{9}$/.test(form.whatsapp.replace(/\D/g, ""))) {
       return {
         ok: false as const,
-        error: "El WhatsApp del comercio debe incluir indicativo y tener entre 10 y 15 digitos.",
+        error: "Escribe el WhatsApp del comercio sin indicativo: 10 digitos, por ejemplo 3001234567.",
       };
     }
   }
@@ -943,6 +963,12 @@ function validateStep(step: number, form: FormState, logoFile: File | null) {
   }
 
   return { ok: true as const };
+}
+
+function normalizeColombianWhatsapp(value: string) {
+  const digits = value.replace(/\D/g, "");
+
+  return digits ? `57${digits}` : "";
 }
 
 function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
