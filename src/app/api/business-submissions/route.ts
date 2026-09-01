@@ -6,17 +6,19 @@ const LOGO_BUCKET =
   process.env.SUPABASE_BUSINESS_LOGOS_BUCKET ?? "business-logos";
 const COVER_BUCKET =
   process.env.SUPABASE_BUSINESS_COVERS_BUCKET ?? "business-covers";
-const MAX_LOGO_BYTES = 1.5 * 1024 * 1024;
-const MAX_COVER_IMAGE_BYTES = 2 * 1024 * 1024;
-const MAX_MULTIPART_BYTES = 4 * 1024 * 1024;
+const MAX_LOGO_BYTES = 10 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = 20 * 1024 * 1024;
 const RATE_LIMIT_MAX_SUBMISSIONS = 100;
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 const ALLOWED_LOGO_TYPES = [
+  "image/heic",
+  "image/heif",
   "image/png",
   "image/jpeg",
   "image/webp",
 ];
-const ALLOWED_COVER_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const ALLOWED_COVER_TYPES = ALLOWED_LOGO_TYPES;
 
 export function GET() {
   return NextResponse.json({
@@ -110,7 +112,7 @@ async function handleBusinessSubmission(request: NextRequest) {
       {
         ok: false,
         error:
-          "La solicitud es demasiado grande. Sube imagenes mas livianas e intenta de nuevo.",
+          "La solicitud es demasiado grande. Sube imagenes de 10 MB o menos e intenta de nuevo.",
       },
       { status: 413 },
     );
@@ -730,7 +732,7 @@ function validateImageFile({
   if (!allowedTypes.includes(file.type)) {
     return {
       ok: false,
-      error: `${name} must be a PNG, JPG or WebP image`,
+      error: `${name} must be a PNG, JPG, WebP, HEIC or HEIF image`,
     };
   }
 
@@ -767,6 +769,14 @@ function getImageExtension(file: File) {
     return "webp";
   }
 
+  if (file.type === "image/heic") {
+    return "heic";
+  }
+
+  if (file.type === "image/heif") {
+    return "heif";
+  }
+
   return "jpg";
 }
 
@@ -800,6 +810,17 @@ async function hasValidImageSignature(file: File) {
       bytes[9] === 0x45 &&
       bytes[10] === 0x42 &&
       bytes[11] === 0x50
+    );
+  }
+
+  if (file.type === "image/heic" || file.type === "image/heif") {
+    const brand = String.fromCharCode(...bytes.slice(4, 12));
+
+    return (
+      brand.startsWith("ftyp") &&
+      ["heic", "heix", "hevc", "hevx", "mif1", "msf1"].some((value) =>
+        brand.includes(value),
+      )
     );
   }
 

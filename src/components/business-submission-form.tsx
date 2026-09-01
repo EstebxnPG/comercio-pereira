@@ -71,9 +71,16 @@ const STEPS: Array<{ eyebrow: string; title: string }> = [
   { eyebrow: "Final", title: "Revision final" },
 ] as const;
 
-const MAX_LOGO_BYTES = 1.5 * 1024 * 1024;
-const MAX_COVER_IMAGE_BYTES = 2 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
+const MAX_LOGO_BYTES = 10 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 10 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = [
+  "image/heic",
+  "image/heif",
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+];
+const IMAGE_ACCEPT = "image/png,image/jpeg,image/webp,image/heic,image/heif";
 
 export function BusinessSubmissionForm({
   categories,
@@ -154,7 +161,7 @@ export function BusinessSubmissionForm({
 
     if (!validation.ok) {
       setStepError(validation.error);
-      return;
+      return false;
     }
 
     if (logoPreviewUrl) {
@@ -163,6 +170,8 @@ export function BusinessSubmissionForm({
 
     setLogoFile(file);
     setLogoPreviewUrl(file ? URL.createObjectURL(file) : "");
+    setStepError("");
+    return true;
   }
 
   function updateCoverFile(file: File | null) {
@@ -174,7 +183,7 @@ export function BusinessSubmissionForm({
 
     if (!validation.ok) {
       setStepError(validation.error);
-      return;
+      return false;
     }
 
     if (coverPreviewUrl) {
@@ -183,6 +192,8 @@ export function BusinessSubmissionForm({
 
     setCoverFile(file);
     setCoverPreviewUrl(file ? URL.createObjectURL(file) : "");
+    setStepError("");
+    return true;
   }
 
   function goToNextStep() {
@@ -587,7 +598,7 @@ export function BusinessSubmissionForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <FileField
-                  accept="image/png,image/jpeg,image/webp"
+                  accept={IMAGE_ACCEPT}
                   file={logoFile}
                   label="Adjuntar logo"
                   limitLabel={`${formatMegabytes(MAX_LOGO_BYTES)} MB maximo`}
@@ -596,7 +607,7 @@ export function BusinessSubmissionForm({
                   required
                 />
                 <FileField
-                  accept="image/png,image/jpeg,image/webp"
+                  accept={IMAGE_ACCEPT}
                   file={coverFile}
                   label="Adjuntar imagen de portada"
                   limitLabel={`${formatMegabytes(MAX_COVER_IMAGE_BYTES)} MB maximo`}
@@ -901,7 +912,7 @@ function FileField({
   label: string;
   limitLabel: string;
   name: string;
-  onChange: (file: File | null) => void;
+  onChange: (file: File | null) => boolean;
   required?: boolean;
 }) {
   return (
@@ -916,10 +927,16 @@ function FileField({
         name={name}
         required={required}
         type="file"
-        onChange={(event) => onChange(event.target.files?.[0] ?? null)}
+        onChange={(event) => {
+          const accepted = onChange(event.target.files?.[0] ?? null);
+
+          if (!accepted) {
+            event.currentTarget.value = "";
+          }
+        }}
       />
       <span className="text-xs font-semibold text-stone-500">
-        {file ? file.name : `PNG, JPG o WebP. ${limitLabel}.`}
+        {file ? file.name : `PNG, JPG, WebP, HEIC o HEIF. ${limitLabel}.`}
       </span>
     </label>
   );
@@ -1002,7 +1019,7 @@ function validateImageFile(file: File | null, maxBytes: number, label: string) {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return {
       ok: false as const,
-      error: `El ${label} debe ser una imagen PNG, JPG o WebP.`,
+      error: `El ${label} debe ser una imagen PNG, JPG, WebP, HEIC o HEIF.`,
     };
   }
 
