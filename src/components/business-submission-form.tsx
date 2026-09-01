@@ -979,7 +979,11 @@ function serializeSubmissionValue(key: keyof FormState, value: string) {
     return normalizeColombianWhatsapp(value);
   }
 
-  if (key === "mapsUrl" || key === "tiktokUrl" || key === "websiteUrl") {
+  if (key === "tiktokUrl") {
+    return normalizeTikTokUrl(value);
+  }
+
+  if (key === "mapsUrl" || key === "websiteUrl") {
     return normalizeHttpsUrl(value);
   }
 
@@ -1023,6 +1027,26 @@ function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
     .replace(/^\/+|\/+$/g, "");
 
   return username ? `https://www.${host}/${username}` : undefined;
+}
+
+function normalizeTikTokUrl(value: string) {
+  const cleaned = value.trim();
+
+  if (!cleaned) {
+    return "";
+  }
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    return cleaned.replace(/^http:\/\//i, "https://");
+  }
+
+  const username = cleaned
+    .replace(/^@/, "")
+    .replace(/^www\./i, "")
+    .replace(/^tiktok\.com\/@?/i, "")
+    .replace(/^\/+|\/+$/g, "");
+
+  return username ? `https://www.tiktok.com/@${username}` : "";
 }
 
 function normalizeHttpsUrl(value: string) {

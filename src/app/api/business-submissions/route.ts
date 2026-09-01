@@ -63,6 +63,19 @@ const MAX_LENGTHS = {
 } as const;
 
 export async function POST(request: NextRequest) {
+  try {
+    return await handleBusinessSubmission(request);
+  } catch (error) {
+    console.error("Unexpected business submission failure", error);
+
+    return NextResponse.json(
+      { ok: false, error: "Business submission could not be processed" },
+      { status: 500 },
+    );
+  }
+}
+
+async function handleBusinessSubmission(request: NextRequest) {
   const supabase = getSupabaseServiceRoleClient();
 
   if (!supabase) {
@@ -437,7 +450,11 @@ function normalizeSubmissionField(
     return normalizeSocialUrl("facebook", value);
   }
 
-  if (key === "mapsUrl" || key === "tiktokUrl" || key === "websiteUrl") {
+  if (key === "tiktokUrl") {
+    return normalizeTikTokUrl(value);
+  }
+
+  if (key === "mapsUrl" || key === "websiteUrl") {
     return normalizeHttpsUrl(value);
   }
 
@@ -491,6 +508,26 @@ function normalizeSocialUrl(platform: "instagram" | "facebook", value: string) {
     .replace(/^\/+|\/+$/g, "");
 
   return username ? `https://www.${host}/${username}` : cleaned;
+}
+
+function normalizeTikTokUrl(value: string) {
+  const cleaned = value.trim();
+
+  if (!cleaned) {
+    return cleaned;
+  }
+
+  if (/^https?:\/\//i.test(cleaned)) {
+    return cleaned.replace(/^http:\/\//i, "https://");
+  }
+
+  const username = cleaned
+    .replace(/^@/, "")
+    .replace(/^www\./i, "")
+    .replace(/^tiktok\.com\/@?/i, "")
+    .replace(/^\/+|\/+$/g, "");
+
+  return username ? `https://www.tiktok.com/@${username}` : cleaned;
 }
 
 function normalizeHttpsUrl(value: string) {
