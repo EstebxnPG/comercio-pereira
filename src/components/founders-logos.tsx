@@ -19,6 +19,14 @@ const founders = [
     imageClassName: "h-20 max-w-full object-contain sm:h-20",
   },
   {
+    name: "RAP Eje Cafetero",
+    role: "Aliado fundador",
+    src: "/brand/LOGO_RAP-web.png",
+    width: 3110,
+    height: 1461,
+    imageClassName: "h-16 max-w-full object-contain sm:h-20",
+  },
+  {
     name: "DPG Consultora",
     role: "Tecnologia",
     src: "/brand/LOGO-DPG-CONSULTORIA-PNG-web.png",
@@ -45,14 +53,20 @@ export function FoundersLogos({ compact = false, variant = "light" }: FoundersLo
       >
         Aliados fundadores
       </p>
-      <div className={`mt-3 flex flex-wrap items-center ${compact ? "gap-4" : "gap-5"}`}>
+      <div
+        className={`mt-3 grid ${
+          compact
+            ? "grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+            : "grid-cols-1 gap-4 sm:grid-cols-2 lg:gap-5"
+        }`}
+      >
         {founders.map((founder) => (
           <div
             key={founder.name}
-            className={`flex w-full items-center rounded-lg border bg-white text-[#22211f] ${
+            className={`flex min-w-0 items-center rounded-lg border bg-white text-[#22211f] ${
               compact
-                ? "min-h-20 gap-4 px-4 py-3 sm:w-auto"
-                : "min-h-32 flex-col items-start justify-center gap-3 px-4 py-3 sm:w-60"
+                ? "min-h-20 gap-4 px-4 py-3"
+                : "min-h-32 flex-col items-start justify-center gap-3 px-4 py-3"
             } ${
               isDark
                 ? "border-white/20"
