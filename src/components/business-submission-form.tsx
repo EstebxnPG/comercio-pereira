@@ -543,7 +543,7 @@ export function BusinessSubmissionForm({
                       updateField("tiktokUrl", event.target.value)
                     }
                     onBlur={(event) =>
-                      updateField("tiktokUrl", normalizeHttpsUrl(event.target.value))
+                      updateField("tiktokUrl", normalizeTikTokUrl(event.target.value))
                     }
                   />
                 </Field>
