@@ -11,6 +11,8 @@ export const metadata: Metadata = {
     "Categorias de comercios aliados de Pereira disponibles en Compra en Pereira.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function CategoriesPage() {
   const categorySummaries = await getCategorySummaries();
 

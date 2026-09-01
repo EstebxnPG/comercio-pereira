@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { getSupabaseServiceRoleClient } from "@/lib/supabase";
 
 const EVENT_TYPES = [
   "profile_view",
@@ -15,7 +15,7 @@ const EVENT_TYPES = [
 type EventType = (typeof EVENT_TYPES)[number];
 
 export async function POST(request: NextRequest) {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseServiceRoleClient();
 
   if (!supabase) {
     return NextResponse.json(

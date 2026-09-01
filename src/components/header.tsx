@@ -4,8 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import {
-  INCLUSION_WHATSAPP,
-  INCLUSION_WHATSAPP_MESSAGE,
   SITE_DESCRIPTOR,
   SITE_NAME,
 } from "@/lib/constants";
@@ -19,12 +17,7 @@ const navItems = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const inclusionHref = INCLUSION_WHATSAPP
-    ? `https://wa.me/${INCLUSION_WHATSAPP}?text=${encodeURIComponent(
-        INCLUSION_WHATSAPP_MESSAGE,
-      )}`
-    : "/iniciativa#sumar-comercio";
-  const isInclusionExternal = Boolean(INCLUSION_WHATSAPP);
+  const inclusionHref = "/registrar-comercio";
 
   function closeMenu() {
     setIsMenuOpen(false);
@@ -67,14 +60,12 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a
+          <Link
             href={inclusionHref}
             className="md-focus hidden min-h-11 items-center justify-center rounded-full border border-stone-300 px-4 text-sm font-black text-[#8F2026] transition hover:border-[#B3262E] hover:bg-[#fff3bd] sm:inline-flex"
-            target={isInclusionExternal ? "_blank" : undefined}
-            rel={isInclusionExternal ? "noopener noreferrer" : undefined}
           >
-            Sumar comercio
-          </a>
+            Sumar mi comercio
+          </Link>
           <Link
             href="/comercios"
             className="md-focus hidden min-h-11 items-center justify-center rounded-full bg-[#B3262E] px-5 text-sm font-black text-white shadow-sm transition hover:bg-[#8F2026] hover:shadow-md min-[420px]:inline-flex"
@@ -130,15 +121,13 @@ export function Header() {
               {item.label}
             </Link>
           ))}
-          <a
+          <Link
             href={inclusionHref}
-            target={isInclusionExternal ? "_blank" : undefined}
-            rel={isInclusionExternal ? "noopener noreferrer" : undefined}
             onClick={closeMenu}
             className="md-focus inline-flex min-h-12 items-center justify-center rounded-xl bg-[#ffdad8] px-4 text-sm font-black text-[#410006] transition hover:bg-[#ffc7c3] sm:hidden"
           >
-            Sumar comercio
-          </a>
+            Sumar mi comercio
+          </Link>
         </div>
       </nav>
     </header>
