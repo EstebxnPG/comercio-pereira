@@ -166,7 +166,11 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
         maps_url,
         schedule,
         logo_url,
-        cover_image_url
+        cover_image_url,
+        logo_bucket,
+        logo_storage_path,
+        cover_image_bucket,
+        cover_image_storage_path
       `,
     )
     .eq("id", submissionId)
@@ -184,6 +188,17 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
   const address = [submission.address, submission.neighborhood]
     .filter(Boolean)
     .join(", ");
+  const logoUrl =
+    submission.logo_url ??
+    getPublicStorageUrl(submission.logo_bucket, submission.logo_storage_path) ??
+    DEFAULT_APPROVED_LOGO;
+  const coverImageUrl =
+    submission.cover_image_url ??
+    getPublicStorageUrl(
+      submission.cover_image_bucket,
+      submission.cover_image_storage_path,
+    ) ??
+    DEFAULT_APPROVED_COVER_IMAGE;
 
   const { data: business, error: businessError } = await supabase
     .from("businesses")
@@ -193,8 +208,8 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
       name: submission.business_name,
       short_description: submission.description ?? "Comercio aliado de Pereira.",
       full_description: submission.full_description ?? submission.description,
-      logo_url: submission.logo_url ?? DEFAULT_APPROVED_LOGO,
-      cover_image_url: submission.cover_image_url ?? DEFAULT_APPROVED_COVER_IMAGE,
+      logo_url: logoUrl,
+      cover_image_url: coverImageUrl,
       status: "open",
       phone: submission.phone,
       whatsapp: submission.whatsapp,
@@ -238,6 +253,18 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
 
   await updateSubmissionStatus(submissionId, "approved", notes);
   revalidatePath("/comercios");
+  revalidatePath(`/comercios/${slug}`);
+}
+
+function getPublicStorageUrl(bucket: string | null, path: string | null) {
+  if (!bucket || !path) {
+    return undefined;
+  }
+
+  const supabase = getRequiredSupabaseClient();
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+
+  return data.publicUrl;
 }
 
 async function addSignedUrls(submission: BusinessSubmission) {

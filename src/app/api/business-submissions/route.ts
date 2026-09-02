@@ -222,6 +222,7 @@ async function handleBusinessSubmission(request: NextRequest) {
   }
 
   const uploadResult = await uploadSubmissionImages({
+    businessName: parsed.value.businessName,
     coverImage,
     logo,
     submissionId: submission.id,
@@ -569,11 +570,13 @@ function normalizeHttpsUrl(value: string) {
 }
 
 async function uploadSubmissionImages({
+  businessName,
   coverImage,
   logo,
   submissionId,
   supabase,
 }: {
+  businessName: string;
   coverImage?: File;
   logo?: File;
   submissionId: string;
@@ -586,12 +589,13 @@ async function uploadSubmissionImages({
     }
   | { ok: false; error: string }
 > {
+  const folder = getSubmissionImageFolder(businessName, submissionId);
   const logoResult = logo
     ? await uploadImage({
         allowedTypes: ALLOWED_LOGO_TYPES,
         bucket: LOGO_BUCKET,
         file: logo,
-        folder: submissionId,
+        folder,
         maxBytes: MAX_LOGO_BYTES,
         name: "logo",
         supabase,
@@ -607,7 +611,7 @@ async function uploadSubmissionImages({
         allowedTypes: ALLOWED_COVER_TYPES,
         bucket: COVER_BUCKET,
         file: coverImage,
-        folder: submissionId,
+        folder,
         maxBytes: MAX_COVER_IMAGE_BYTES,
         name: "cover",
         supabase,
@@ -659,6 +663,13 @@ function validateSubmissionImages({
   }
 
   return { ok: true as const };
+}
+
+function getSubmissionImageFolder(businessName: string, submissionId: string) {
+  const readableName = slugify(businessName);
+  const uniqueSuffix = submissionId.replace(/-/g, "").slice(0, 8);
+
+  return `${readableName}-${uniqueSuffix}`;
 }
 
 type UploadedImage = {
@@ -778,6 +789,17 @@ function getImageExtension(file: File) {
   }
 
   return "jpg";
+}
+
+function slugify(value: string) {
+  const slug = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+  return slug || "comercio";
 }
 
 async function hasValidImageSignature(file: File) {
