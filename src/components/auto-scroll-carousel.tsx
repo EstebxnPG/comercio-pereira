@@ -35,7 +35,7 @@ export function AutoScrollCarousel({
         left: isAtEnd ? 0 : scroller.scrollLeft + step,
         behavior: "smooth",
       });
-    }, 4200);
+    }, 8500);
 
     return () => window.clearInterval(interval);
   }, []);

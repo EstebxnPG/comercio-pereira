@@ -10,10 +10,10 @@ import { HeroSearch } from "@/components/hero-search";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
 import {
-  getBusinessesToDiscover,
   getCategories,
   getCategorySummaries,
   getPublishedBusinesses,
+  getTrustedBusinessesToDiscover,
 } from "@/lib/businesses";
 import { SITE_SLOGAN } from "@/lib/constants";
 
@@ -23,7 +23,7 @@ export default async function Home() {
   const businesses = await getPublishedBusinesses();
   const categories = getCategories();
   const categorySummaries = await getCategorySummaries();
-  const businessesToDiscover = await getBusinessesToDiscover(6);
+  const businessesToDiscover = await getTrustedBusinessesToDiscover();
   const homeCategoryNames = [
     "Moda y Ropa",
     "Calzado y Marroquineria",
@@ -118,8 +118,8 @@ export default async function Home() {
                   Comercios para explorar hoy
                 </h2>
                 <p className="mt-3 max-w-2xl leading-7 text-stone-600">
-                  Una muestra rotativa de negocios publicados. La informacion
-                  completa vive en cada perfil.
+                  Una seleccion de negocios reconocidos para darle confianza a
+                  la red desde el primer vistazo.
                 </p>
               </div>
               <Link

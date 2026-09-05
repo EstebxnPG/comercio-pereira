@@ -36,6 +36,45 @@ export async function getBusinessesToDiscover(limit = 9, date = new Date()) {
     .slice(0, limit);
 }
 
+export async function getTrustedBusinessesToDiscover() {
+  const trustedNames = [
+    "fantasias new york",
+    "crediconfiemos",
+    "flamingo",
+    "fucsia",
+    "vicenza",
+    "la viña",
+    "el punto de la belleza",
+    "katherine-mayo",
+    "las gafas",
+  ];
+  const publishedBusinesses = await getPublishedBusinesses();
+  const selectedBusinessIds = new Set<string>();
+
+  return trustedNames
+    .map((trustedName) => {
+      const trustedNormalizedName = normalizeBusinessName(trustedName);
+      const business = publishedBusinesses.find((candidate) => {
+        const candidateNormalizedName = normalizeBusinessName(candidate.name);
+
+        return (
+          !selectedBusinessIds.has(candidate.id) &&
+          (candidate.slug === trustedNormalizedName ||
+            candidateNormalizedName === trustedNormalizedName ||
+            candidateNormalizedName.includes(trustedNormalizedName) ||
+            trustedNormalizedName.includes(candidateNormalizedName))
+        );
+      });
+
+      if (business) {
+        selectedBusinessIds.add(business.id);
+      }
+
+      return business;
+    })
+    .filter((business) => business !== undefined);
+}
+
 export async function getBusinessBySlug(slug: string) {
   const supabaseBusiness = await getSupabasePublishedBusinessBySlug(slug);
 
@@ -306,6 +345,14 @@ function getRotationScore(value: string, bucket: number) {
   }
 
   return hash;
+}
+
+function normalizeBusinessName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
 }
 
 function assert(condition: boolean, message: string): asserts condition {

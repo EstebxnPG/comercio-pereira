@@ -170,7 +170,7 @@ html {
 }
 
 .brand-rail-track {
-  animation: brand-rail-marquee 42s linear infinite;
+  animation: brand-rail-marquee 120s linear infinite;
 }
 
 .brand-rail-track:hover,

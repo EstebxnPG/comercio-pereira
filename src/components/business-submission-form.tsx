@@ -321,6 +321,10 @@ export function BusinessSubmissionForm({
           <div className="grid gap-5 p-4 sm:p-6">
             {currentStep === 0 ? (
             <StepSection>
+              <div className="rounded-2xl border border-[#f5c84c] bg-[#fff8d8] px-4 py-3 text-sm font-bold leading-6 text-[#5b1b00]">
+                Al continuar con este formulario declaras que el comercio esta
+                registrado ante Camara de Comercio. 
+              </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Nombre del comercio" required>
                   <input
