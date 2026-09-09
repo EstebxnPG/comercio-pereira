@@ -71,8 +71,8 @@ const STEPS: Array<{ eyebrow: string; title: string }> = [
   { eyebrow: "Final", title: "Revision final" },
 ] as const;
 
-const MAX_LOGO_BYTES = 10 * 1024 * 1024;
-const MAX_COVER_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = [
   "image/heic",
   "image/heif",

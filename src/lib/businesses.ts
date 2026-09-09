@@ -24,6 +24,41 @@ export async function getPublishedBusinesses() {
   return getLocalPublishedBusinesses();
 }
 
+export async function getPublishedBusinessesPage({
+  category = "all",
+  limit = 24,
+  query = "",
+  status = "all",
+}: {
+  category?: string;
+  limit?: number;
+  query?: string;
+  status?: Business["status"] | "all";
+}) {
+  const normalizedLimit = Math.max(1, Math.min(limit, 96));
+  const supabaseBusinesses = await getSupabasePublishedBusinessesPage({
+    category,
+    limit: normalizedLimit,
+    query,
+    status,
+  });
+
+  if (supabaseBusinesses) {
+    return supabaseBusinesses;
+  }
+
+  const filteredBusinesses = filterBusinesses(getLocalPublishedBusinesses(), {
+    category,
+    query,
+    status,
+  });
+
+  return {
+    businesses: filteredBusinesses.slice(0, normalizedLimit),
+    total: filteredBusinesses.length,
+  };
+}
+
 export async function getBusinessesToDiscover(limit = 9, date = new Date()) {
   const hourlyBucket = Math.floor(date.getTime() / 3_600_000);
 
@@ -151,6 +186,92 @@ async function getSupabasePublishedBusinesses() {
   }
 
   return data.map(mapSupabaseBusiness);
+}
+
+async function getSupabasePublishedBusinessesPage({
+  category,
+  limit,
+  query,
+  status,
+}: {
+  category: string;
+  limit: number;
+  query: string;
+  status: Business["status"] | "all";
+}) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  let request = supabase
+    .from("businesses")
+    .select(
+      `
+        id,
+        slug,
+        name,
+        short_description,
+        full_description,
+        logo_url,
+        cover_image_url,
+        status,
+        phone,
+        whatsapp,
+        address,
+        maps_url,
+        schedule,
+        published,
+        featured,
+        last_updated_at,
+        categories!inner(name),
+        business_social_links(platform, url)
+      `,
+      { count: "exact" },
+    )
+    .eq("published", true)
+    .order("featured", { ascending: false })
+    .order("name", { ascending: true })
+    .range(0, limit - 1);
+
+  if (category !== "all") {
+    request = request.eq("categories.name", category);
+  }
+
+  if (status !== "all") {
+    request = request.eq("status", status);
+  }
+
+  const search = normalizeSearchQuery(query);
+
+  if (search) {
+    const pattern = `*${search}*`;
+
+    request = request.or(
+      [
+        `name.ilike.${pattern}`,
+        `slug.ilike.${pattern}`,
+        `short_description.ilike.${pattern}`,
+        `full_description.ilike.${pattern}`,
+        `address.ilike.${pattern}`,
+        `phone.ilike.${pattern}`,
+        `whatsapp.ilike.${pattern}`,
+      ].join(","),
+    );
+  }
+
+  const { count, data, error } = await request;
+
+  if (error) {
+    console.error("Supabase businesses page query failed", error);
+    return null;
+  }
+
+  return {
+    businesses: data.map(mapSupabaseBusiness),
+    total: count ?? 0,
+  };
 }
 
 async function getSupabasePublishedBusinessBySlug(slug: string) {
@@ -353,6 +474,63 @@ function normalizeBusinessName(value: string) {
     .replace(/[\u0300-\u036f]/g, "")
     .trim()
     .toLowerCase();
+}
+
+function filterBusinesses(
+  items: Business[],
+  {
+    category,
+    query,
+    status,
+  }: {
+    category: string;
+    query: string;
+    status: Business["status"] | "all";
+  },
+) {
+  const search = normalizeSearchQuery(query);
+
+  return items.filter((business) => {
+    const matchesCategory = category === "all" || business.category === category;
+    const matchesStatus = status === "all" || business.status === status;
+    const matchesSearch =
+      !search || getBusinessSearchText(business).includes(search);
+
+    return matchesCategory && matchesStatus && matchesSearch;
+  });
+}
+
+function getBusinessSearchText(business: Business) {
+  return normalizeSearchQuery(
+    [
+      business.name,
+      business.slug,
+      business.category,
+      business.shortDescription,
+      business.fullDescription,
+      business.status,
+      business.phone,
+      business.whatsapp,
+      business.address,
+      business.schedule,
+      business.instagramUrl,
+      business.facebookUrl,
+      business.mapsUrl,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+function normalizeSearchQuery(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .replace(/[,%]/g, " ")
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .slice(0, 80);
 }
 
 function assert(condition: boolean, message: string): asserts condition {

@@ -1,56 +1,31 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
+import Link from "next/link";
 import { BusinessCard } from "@/components/business-card";
 import { STATUS_LABELS } from "@/lib/constants";
 import type { Business, BusinessStatus } from "@/types/business";
+
+const PAGE_SIZE = 24;
 
 export function BusinessDirectory({
   businesses,
   categories,
   initialCategory = "all",
+  initialLimit = PAGE_SIZE,
   initialQuery = "",
   initialStatus = "all",
+  totalBusinesses,
 }: {
   businesses: Business[];
   categories: string[];
   initialCategory?: string;
+  initialLimit?: number;
   initialQuery?: string;
   initialStatus?: BusinessStatus | "all";
+  totalBusinesses: number;
 }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [category, setCategory] = useState(initialCategory);
-  const [status, setStatus] = useState<BusinessStatus | "all">(initialStatus);
-  const deferredQuery = useDeferredValue(query);
-  const deferredCategory = useDeferredValue(category);
-  const deferredStatus = useDeferredValue(status);
-  const isSearching =
-    query !== deferredQuery ||
-    category !== deferredCategory ||
-    status !== deferredStatus;
-  const searchableBusinesses = useMemo(
-    () =>
-      businesses.map((business) => ({
-        business,
-        searchText: getBusinessSearchText(business),
-      })),
-    [businesses],
-  );
-
-  const filteredBusinesses = useMemo(() => {
-    const normalizedQuery = normalizeSearchText(deferredQuery.trim());
-
-    return searchableBusinesses.filter(({ business, searchText }) => {
-      const matchesQuery =
-        normalizedQuery.length === 0 || searchText.includes(normalizedQuery);
-      const matchesCategory =
-        deferredCategory === "all" || business.category === deferredCategory;
-      const matchesStatus =
-        deferredStatus === "all" || business.status === deferredStatus;
-
-      return matchesQuery && matchesCategory && matchesStatus;
-    }).map(({ business }) => business);
-  }, [deferredCategory, deferredQuery, deferredStatus, searchableBusinesses]);
+  const hasMore = businesses.length < totalBusinesses;
+  const nextLimit = Math.min(initialLimit + PAGE_SIZE, totalBusinesses);
 
   return (
     <section id="comercios" className="bg-white py-12 sm:py-16">
@@ -68,40 +43,32 @@ export function BusinessDirectory({
             aria-live="polite"
             className="inline-flex min-h-6 items-center gap-2 text-sm font-semibold text-stone-600"
           >
-            {isSearching ? (
-              <>
-                <span
-                  aria-hidden="true"
-                  className="size-4 animate-spin rounded-full border-2 border-stone-300 border-t-[#B3262E]"
-                />
-                Buscando
-              </>
-            ) : (
-              <>
-                {filteredBusinesses.length} resultado
-                {filteredBusinesses.length === 1 ? "" : "s"}
-              </>
-            )}
+            Mostrando {businesses.length} de {totalBusinesses} resultado
+            {totalBusinesses === 1 ? "" : "s"}
           </p>
         </div>
 
-        <div className="md-surface-high mt-6 grid gap-3 p-3 sm:grid-cols-3">
+        <form
+          action="/comercios"
+          className="md-surface-high mt-6 grid gap-3 p-3 sm:grid-cols-3"
+        >
+          <input name="limite" type="hidden" value={PAGE_SIZE} />
           <label className="sm:col-span-1">
             <span className="text-sm font-bold text-stone-700">Buscar</span>
             <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Nombre, categoria o descripcion"
+              defaultValue={initialQuery}
+              placeholder="Nombre, descripcion, telefono o direccion"
               className="md-field mt-2"
-              aria-busy={isSearching}
+              name="q"
+              type="search"
             />
           </label>
           <label>
             <span className="text-sm font-bold text-stone-700">Categoria</span>
             <select
-              value={category}
-              onChange={(event) => setCategory(event.target.value)}
+              defaultValue={initialCategory}
               className="md-field mt-2"
+              name="categoria"
             >
               <option value="all">Todas</option>
               {categories.map((item) => (
@@ -114,11 +81,9 @@ export function BusinessDirectory({
           <label>
             <span className="text-sm font-bold text-stone-700">Estado</span>
             <select
-              value={status}
-              onChange={(event) =>
-                setStatus(event.target.value as BusinessStatus | "all")
-              }
+              defaultValue={initialStatus}
               className="md-field mt-2"
+              name="estado"
             >
               <option value="all">Todos</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -128,11 +93,19 @@ export function BusinessDirectory({
               ))}
             </select>
           </label>
-        </div>
+          <div className="flex flex-col gap-2 sm:col-span-3 sm:flex-row sm:justify-end">
+            <Link className="md-outlined-button px-4 text-center" href="/comercios">
+              Limpiar
+            </Link>
+            <button className="md-filled-button px-5" type="submit">
+              Aplicar filtros
+            </button>
+          </div>
+        </form>
 
-        {filteredBusinesses.length > 0 ? (
+        {businesses.length > 0 ? (
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredBusinesses.map((business) => (
+            {businesses.map((business) => (
               <BusinessCard key={business.id} business={business} />
             ))}
           </div>
@@ -146,37 +119,54 @@ export function BusinessDirectory({
             </p>
           </div>
         )}
+
+        {hasMore ? (
+          <div className="mt-8 flex justify-center">
+            <Link
+              className="md-filled-button px-6"
+              href={getDirectoryHref({
+                category: initialCategory,
+                limit: nextLimit,
+                query: initialQuery,
+                status: initialStatus,
+              })}
+              scroll={false}
+            >
+              Mostrar mas
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   );
 }
 
-function getBusinessSearchText(business: Business) {
-  return normalizeSearchText(
-    [
-      business.name,
-      business.slug,
-      business.category,
-      business.shortDescription,
-      business.fullDescription,
-      business.status,
-      STATUS_LABELS[business.status],
-      business.phone,
-      business.whatsapp,
-      business.address,
-      business.schedule,
-      business.instagramUrl,
-      business.facebookUrl,
-      business.mapsUrl,
-    ]
-      .filter(Boolean)
-      .join(" "),
-  );
-}
+function getDirectoryHref({
+  category,
+  limit,
+  query,
+  status,
+}: {
+  category: string;
+  limit: number;
+  query: string;
+  status: BusinessStatus | "all";
+}) {
+  const params = new URLSearchParams();
 
-function normalizeSearchText(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
+  if (query) {
+    params.set("q", query);
+  }
+
+  if (category !== "all") {
+    params.set("categoria", category);
+  }
+
+  if (status !== "all") {
+    params.set("estado", status);
+  }
+
+  params.set("limite", String(limit));
+
+  return `/comercios?${params.toString()}`;
 }

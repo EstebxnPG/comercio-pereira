@@ -4,7 +4,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { PageHero } from "@/components/page-hero";
 import { StatusSection } from "@/components/status-section";
-import { getCategories, getPublishedBusinesses } from "@/lib/businesses";
+import { getCategories, getPublishedBusinessesPage } from "@/lib/businesses";
 import { BUSINESS_STATUSES, type BusinessStatus } from "@/types/business";
 
 export const metadata: Metadata = {
@@ -17,26 +17,32 @@ type BusinessesPageProps = {
   searchParams: Promise<{
     categoria?: string | string[];
     estado?: string | string[];
+    limite?: string | string[];
     q?: string | string[];
   }>;
 };
 
 export default async function BusinessesPage(props: BusinessesPageProps) {
-  const businesses = await getPublishedBusinesses();
   const categories = getCategories();
   const searchParams = await props.searchParams;
-  const selectedCategory =
-    typeof searchParams.categoria === "string" &&
-    categories.includes(searchParams.categoria)
-      ? searchParams.categoria
+  const selectedCategory = categories.includes(
+    getSingleParam(searchParams.categoria) ?? "",
+  )
+    ? getSingleParam(searchParams.categoria) ?? "all"
       : "all";
+  const rawStatus = getSingleParam(searchParams.estado);
   const selectedStatus =
-    typeof searchParams.estado === "string" &&
-    BUSINESS_STATUSES.includes(searchParams.estado as BusinessStatus)
-      ? (searchParams.estado as BusinessStatus)
+    rawStatus && BUSINESS_STATUSES.includes(rawStatus as BusinessStatus)
+      ? (rawStatus as BusinessStatus)
       : "all";
-  const selectedQuery =
-    typeof searchParams.q === "string" ? searchParams.q : "";
+  const selectedQuery = parseSearch(getSingleParam(searchParams.q));
+  const limit = parseLimit(getSingleParam(searchParams.limite));
+  const businessesPage = await getPublishedBusinessesPage({
+    category: selectedCategory,
+    limit,
+    query: selectedQuery,
+    status: selectedStatus,
+  });
 
   return (
     <>
@@ -48,15 +54,35 @@ export default async function BusinessesPage(props: BusinessesPageProps) {
           description="Busca negocios por nombre, categoria o descripcion. Filtra por estado de atencion y abre perfiles listos para contactar o compartir."
         />
         <BusinessDirectory
-          businesses={businesses}
+          businesses={businessesPage.businesses}
           categories={categories}
           initialCategory={selectedCategory}
+          initialLimit={limit}
           initialStatus={selectedStatus}
           initialQuery={selectedQuery}
+          totalBusinesses={businessesPage.total}
         />
         <StatusSection />
       </main>
       <Footer />
     </>
   );
+}
+
+function getSingleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function parseSearch(value: string | undefined) {
+  return value?.trim().replace(/\s+/g, " ").slice(0, 80) ?? "";
+}
+
+function parseLimit(value: string | undefined) {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 24) {
+    return 24;
+  }
+
+  return Math.min(parsed, 96);
 }

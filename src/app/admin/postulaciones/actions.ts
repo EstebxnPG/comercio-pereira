@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import {
   approveAndPublishSubmission,
   isValidAdminToken,
+  updateBusinessSubmission,
   updateSubmissionStatus,
   type SubmissionStatus,
 } from "@/lib/admin-submissions";
@@ -59,6 +60,22 @@ export async function updateSubmissionStatusAction(formData: FormData) {
   await updateSubmissionStatus(
     getString(formData.get("submissionId")),
     status,
+    getString(formData.get("notes")),
+  );
+}
+
+export async function updateBusinessSubmissionAction(formData: FormData) {
+  await assertAdminSession();
+  await updateBusinessSubmission(formData);
+}
+
+export async function updateAndApproveBusinessSubmissionAction(
+  formData: FormData,
+) {
+  await assertAdminSession();
+  await updateBusinessSubmission(formData);
+  await approveAndPublishSubmission(
+    getString(formData.get("submissionId")),
     getString(formData.get("notes")),
   );
 }

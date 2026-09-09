@@ -6,9 +6,9 @@ const LOGO_BUCKET =
   process.env.SUPABASE_BUSINESS_LOGOS_BUCKET ?? "business-logos";
 const COVER_BUCKET =
   process.env.SUPABASE_BUSINESS_COVERS_BUCKET ?? "business-covers";
-const MAX_LOGO_BYTES = 10 * 1024 * 1024;
-const MAX_COVER_IMAGE_BYTES = 10 * 1024 * 1024;
-const MAX_MULTIPART_BYTES = 20 * 1024 * 1024;
+const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+const MAX_COVER_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_MULTIPART_BYTES = 11 * 1024 * 1024;
 const RATE_LIMIT_MAX_SUBMISSIONS = 100;
 const RATE_LIMIT_WINDOW_SECONDS = 60 * 60;
 const ALLOWED_LOGO_TYPES = [
@@ -112,7 +112,7 @@ async function handleBusinessSubmission(request: NextRequest) {
       {
         ok: false,
         error:
-          "La solicitud es demasiado grande. Sube imagenes de 10 MB o menos e intenta de nuevo.",
+          "La solicitud es demasiado grande. Sube imagenes de 5 MB o menos e intenta de nuevo.",
       },
       { status: 413 },
     );
