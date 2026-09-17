@@ -27,7 +27,7 @@ export default async function CategoriesPage() {
           primaryHref="/comercios"
           primaryLabel="Ver todos los comercios"
         />
-        <section className="bg-[#fbfaf7] py-12 sm:py-16">
+        <section className="bg-paper py-10 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <CategoryGrid categories={categorySummaries} />
           </div>

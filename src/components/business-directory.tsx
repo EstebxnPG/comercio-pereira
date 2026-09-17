@@ -28,14 +28,14 @@ export function BusinessDirectory({
   const nextLimit = Math.min(initialLimit + PAGE_SIZE, totalBusinesses);
 
   return (
-    <section id="comercios" className="bg-white py-12 sm:py-16">
+    <section id="comercios" className="bg-white py-10 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
+            <p className="text-sm font-black uppercase tracking-wide text-brand">
               Directorio
             </p>
-            <h2 className="mt-2 text-3xl font-black text-[#22211f]">
+            <h2 className="mt-2 font-display text-2xl font-extrabold text-ink sm:text-3xl">
               Comercios aliados
             </h2>
           </div>
@@ -111,7 +111,7 @@ export function BusinessDirectory({
           </div>
         ) : (
           <div className="md-surface mt-8 border-dashed p-8 text-center">
-            <p className="text-lg font-black text-[#22211f]">
+            <p className="font-display text-lg font-bold text-ink">
               No encontramos coincidencias.
             </p>
             <p className="mt-2 text-stone-600">

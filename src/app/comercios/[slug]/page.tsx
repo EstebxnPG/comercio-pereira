@@ -84,9 +84,9 @@ export default async function BusinessPage(
     <>
       <Header />
       <BusinessProfileViewTracker businessId={business.id} />
-      <main className="bg-[#fbfaf7]">
-        <section className="relative bg-[#7F1D1D] text-white">
-          <div className="relative h-[320px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
+      <main className="bg-paper">
+        <section className="relative bg-brand-deep text-white">
+          <div className="relative h-[280px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
             <BusinessCover
               businessName={business.name}
               logo={business.logo}
@@ -95,20 +95,20 @@ export default async function BusinessPage(
               imageClassName="object-cover object-center opacity-55"
               sizes="100vw"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#7F1D1D] via-[#7F1D1D]/35 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/35 to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0">
-            <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-6 sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
               <BusinessLogo
                 businessName={business.name}
                 logo={business.logo}
                 size="profile"
               />
               <div className="min-w-0 pb-1">
-                <p className="text-sm font-black uppercase tracking-wide text-[#f5c84c]">
+                <p className="text-xs font-black uppercase tracking-wide text-gold sm:text-sm">
                   {business.category}
                 </p>
-                <h1 className="mt-1 text-3xl font-black leading-tight sm:text-5xl">
+                <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-5xl">
                   {business.name}
                 </h1>
               </div>
@@ -148,13 +148,13 @@ export default async function BusinessPage(
               <section className="mt-8 border-t border-stone-200 pt-8">
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase text-[#B3262E]">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
                       Catalogo
                     </p>
-                    <h2 className="mt-1 text-2xl font-black">Productos</h2>
+                    <h2 className="mt-1 font-display text-2xl font-extrabold">Productos</h2>
                   </div>
                   <Link
-                    className="text-sm font-black text-[#B3262E] hover:underline"
+                    className="text-sm font-black text-brand hover:underline"
                     href="/productos"
                   >
                     Ver catalogo
@@ -188,7 +188,7 @@ export default async function BusinessPage(
                         <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
                           {product.shortDescription}
                         </p>
-                        <p className="text-sm font-black text-[#B3262E]">
+                        <p className="text-sm font-black text-brand">
                           {formatProductPrice(product)}
                         </p>
                       </div>
@@ -201,7 +201,7 @@ export default async function BusinessPage(
 
           <aside className="space-y-4">
             <div className="md-surface p-5">
-              <h2 className="text-lg font-black text-[#22211f]">Contacto</h2>
+              <h2 className="font-display text-lg font-bold text-ink">Contacto</h2>
               <div className="mt-4 flex flex-col gap-3">
                 {whatsappContactUrl ? (
                   <TrackedBusinessLink
@@ -210,7 +210,7 @@ export default async function BusinessPage(
                     href={whatsappContactUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-ink shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
                   >
                     Escribir por WhatsApp
                   </TrackedBusinessLink>
@@ -244,7 +244,7 @@ export default async function BusinessPage(
             </div>
 
             <div className="md-surface p-5">
-              <h2 className="text-lg font-black text-[#22211f]">Compartir</h2>
+              <h2 className="font-display text-lg font-bold text-ink">Compartir</h2>
               <div className="mt-4">
                 <ShareButtons
                   title={`${business.name} | ${SITE_NAME}`}
@@ -256,7 +256,7 @@ export default async function BusinessPage(
 
             <Link
               href="/comercios"
-              className="inline-flex min-h-11 items-center rounded-full px-1 text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
+              className="inline-flex min-h-11 items-center rounded-full px-1 text-sm font-black text-brand underline-offset-4 hover:underline"
             >
               Volver al directorio
             </Link>
@@ -274,7 +274,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <dt className="text-sm font-black uppercase tracking-wide text-stone-500">
         {label}
       </dt>
-      <dd className="mt-1 text-base font-semibold text-[#22211f]">{value}</dd>
+      <dd className="mt-1 text-base font-semibold text-ink">{value}</dd>
     </div>
   );
 }

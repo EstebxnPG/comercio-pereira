@@ -15,14 +15,16 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
   return (
     <>
       <Header />
-      <main className="bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+      <main className="bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-6xl gap-8">
           <header className="grid gap-4 border-b border-stone-200 pb-6 md:grid-cols-[1fr_320px] md:items-end">
             <div>
-              <p className="text-sm font-black uppercase text-[#B3262E]">
+              <p className="text-sm font-black uppercase tracking-wide text-brand">
                 Catalogo local
               </p>
-              <h1 className="mt-2 text-4xl font-black">Productos en Pereira</h1>
+              <h1 className="mt-2 font-display text-4xl font-extrabold">
+                Productos en Pereira
+              </h1>
               <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-stone-600">
                 Descubre productos publicados por comercios aliados y contacta
                 directamente con cada negocio.
@@ -43,7 +45,9 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
 
           {products.length === 0 ? (
             <section className="md-surface p-6">
-              <h2 className="text-xl font-black">Sin productos publicados</h2>
+              <h2 className="font-display text-xl font-bold">
+                Sin productos publicados
+              </h2>
               <p className="mt-2 text-sm font-semibold text-stone-600">
                 Cuando admin apruebe productos, apareceran en este catalogo.
               </p>
@@ -71,16 +75,16 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
                     )}
                   </div>
                   <div className="grid gap-2 p-4">
-                    <p className="text-xs font-black uppercase text-[#B3262E]">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
                       {product.businessName}
                     </p>
-                    <h2 className="text-xl font-black group-hover:underline">
+                    <h2 className="font-display text-xl font-bold group-hover:underline">
                       {product.name}
                     </h2>
                     <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
                       {product.shortDescription}
                     </p>
-                    <p className="text-sm font-black text-[#22211f]">
+                    <p className="text-sm font-black text-ink">
                       {formatProductPrice(product)}
                     </p>
                   </div>

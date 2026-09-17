@@ -48,7 +48,7 @@ export function FoundersLogos({ compact = false, variant = "light" }: FoundersLo
     <div aria-label="Aliados fundadores de la iniciativa">
       <p
         className={`text-xs font-black uppercase tracking-wide ${
-          isDark ? "text-[#f5c84c]" : "text-[#B3262E]"
+          isDark ? "text-gold" : "text-brand"
         }`}
       >
         Aliados fundadores
@@ -63,14 +63,14 @@ export function FoundersLogos({ compact = false, variant = "light" }: FoundersLo
         {founders.map((founder) => (
           <div
             key={founder.name}
-            className={`flex min-w-0 items-center rounded-lg border bg-white text-[#22211f] ${
+            className={`flex min-w-0 items-center rounded-lg border bg-white text-ink ${
               compact
                 ? "min-h-20 gap-4 px-4 py-3"
                 : "min-h-32 flex-col items-start justify-center gap-3 px-4 py-3"
             } ${
               isDark
                 ? "border-white/20"
-                : "border-stone-200 bg-[#fbfaf7] text-[#22211f]"
+                : "border-[var(--md-outline-variant)] bg-paper text-ink"
             }`}
           >
             <Image

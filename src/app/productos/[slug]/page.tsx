@@ -58,7 +58,7 @@ export default async function ProductDetailPage(
     <>
       <Header />
       <ProductViewTracker businessId={product.businessId} productId={product.id} />
-      <main className="bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+      <main className="bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
         <article className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
             {product.primaryImageUrl ? (
@@ -77,17 +77,19 @@ export default async function ProductDetailPage(
           <section className="grid content-start gap-5">
             <div>
               <Link
-                className="text-sm font-black text-[#B3262E] hover:underline"
+                className="text-sm font-black text-brand hover:underline"
                 href={`/comercios/${product.businessSlug}`}
               >
                 {product.businessName}
               </Link>
-              <h1 className="mt-2 text-4xl font-black">{product.name}</h1>
-              <p className="mt-3 text-lg font-black text-[#B3262E]">
+              <h1 className="mt-2 font-display text-4xl font-extrabold">
+                {product.name}
+              </h1>
+              <p className="mt-3 text-lg font-black text-brand">
                 {formatProductPrice(product)}
               </p>
             </div>
-            <span className="w-fit rounded-full bg-[#ffdad8] px-3 py-1 text-xs font-black uppercase text-[#410006]">
+            <span className="w-fit rounded-full bg-brand-soft px-3 py-1 text-xs font-black uppercase text-brand-deep">
               {PRODUCT_AVAILABILITY_LABELS[product.availability]}
             </span>
             <p className="text-base font-semibold leading-7 text-stone-700">
@@ -96,7 +98,7 @@ export default async function ProductDetailPage(
             {whatsappUrl ? (
               <TrackedProductLink
                 businessId={product.businessId}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-ink shadow-sm transition hover:bg-[#1fb457] hover:shadow-md"
                 eventType="click_whatsapp"
                 href={whatsappUrl}
                 productId={product.id}

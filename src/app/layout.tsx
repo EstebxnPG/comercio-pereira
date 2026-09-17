@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Public_Sans, Space_Mono } from "next/font/google";
+import { CategoryIconDefs } from "@/components/icons/category-icons";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fontDisplay = Bricolage_Grotesque({
+  variable: "--font-display-raw",
   subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fontBody = Public_Sans({
+  variable: "--font-body-raw",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const fontMono = Space_Mono({
+  variable: "--font-mono-raw",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -45,9 +54,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="es-CO"
       data-scroll-behavior="smooth"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${fontDisplay.variable} ${fontBody.variable} ${fontMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        <CategoryIconDefs />
+        {children}
+      </body>
     </html>
   );
 }

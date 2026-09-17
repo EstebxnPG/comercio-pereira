@@ -294,24 +294,24 @@ export function BusinessSubmissionForm({
   }
 
   return (
-    <section className="bg-[#fbfaf7] py-6 sm:py-14">
+    <section className="bg-paper py-6 sm:py-14">
       <div className="mx-auto grid max-w-7xl gap-6 px-3 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_430px] lg:px-8">
         <form
           ref={formRef}
           className="overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_8px_30px_rgb(34_21_20/0.08)]"
           onSubmit={handleSubmit}
         >
-          <div className="grid gap-4 bg-[#fffdf8] px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
+          <div className="grid gap-4 bg-brand-soft/40 px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase text-[#B3262E]">
+                <p className="font-mono text-xs font-bold uppercase tracking-wide text-brand-deep">
                   Registro de comercio
                 </p>
-                <h2 className="mt-1 text-2xl font-black tracking-normal text-[#22211f] sm:text-3xl">
+                <h2 className="mt-1 font-display text-2xl font-extrabold tracking-normal text-ink sm:text-3xl">
                   {STEPS[currentStep].title}
                 </h2>
               </div>
-              <span className="shrink-0 rounded-full bg-[#f4ede7] px-3 py-1.5 text-xs font-black text-stone-700">
+              <span className="shrink-0 rounded-full bg-brand-soft px-3 py-1.5 text-xs font-black text-brand-deep">
                 {currentStep + 1}/{STEPS.length}
               </span>
             </div>
@@ -321,7 +321,7 @@ export function BusinessSubmissionForm({
           <div className="grid gap-5 p-4 sm:p-6">
             {currentStep === 0 ? (
             <StepSection>
-              <div className="rounded-2xl border border-[#f5c84c] bg-[#fff8d8] px-4 py-3 text-sm font-bold leading-6 text-[#5b1b00]">
+              <div className="rounded-2xl border border-gold bg-gold-soft px-4 py-3 text-sm font-bold leading-6 text-gold-ink">
                 Al continuar con este formulario declaras que el comercio esta
                 registrado ante Camara de Comercio. 
               </div>
@@ -422,12 +422,12 @@ export function BusinessSubmissionForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="WhatsApp" required>
-                  <div className="flex overflow-hidden rounded-xl border border-[#85736f] bg-white focus-within:ring-2 focus-within:ring-[#B3262E] focus-within:ring-offset-2">
-                    <span className="flex min-h-12 items-center border-r border-stone-200 bg-[#fffdf8] px-4 text-sm font-black text-stone-700">
+                  <div className="flex overflow-hidden rounded-xl border border-outline bg-white focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2">
+                    <span className="flex min-h-12 items-center border-r border-stone-200 bg-paper px-4 text-sm font-black text-stone-700">
                       +57
                     </span>
                     <input
-                      className="min-h-12 w-full bg-transparent px-4 py-2 text-base font-semibold text-[#22211f] outline-none placeholder:text-stone-400"
+                      className="min-h-12 w-full bg-transparent px-4 py-2 text-base font-semibold text-ink outline-none placeholder:text-stone-400"
                       inputMode="numeric"
                       maxLength={10}
                       name="whatsapp"
@@ -669,12 +669,12 @@ export function BusinessSubmissionForm({
 
           {currentStep === 5 ? (
             <StepSection>
-              <div className="rounded-2xl bg-[#fff3bd] p-4 text-sm font-bold leading-6 text-[#5b1b00]">
+              <div className="rounded-2xl bg-gold-soft p-4 text-sm font-bold leading-6 text-gold-ink">
                 Revisa la vista previa antes de enviar. La publicacion no es
                 automatica: primero validamos la informacion y luego creamos el
                 perfil definitivo.
               </div>
-              <div className="grid gap-3 rounded-2xl border border-stone-200 bg-[#fffdf8] p-4 text-sm font-semibold leading-6 text-stone-700 shadow-sm">
+              <div className="grid gap-3 rounded-2xl border border-stone-200 bg-paper p-4 text-sm font-semibold leading-6 text-stone-700 shadow-sm">
                 <p className="font-black text-stone-900">
                   Terminos de publicacion y autorizacion
                 </p>
@@ -699,7 +699,7 @@ export function BusinessSubmissionForm({
                     estado de revision, puedes escribirle a Fabian Sanchez
                     &quot;El Chinito&quot;.{" "}
                     <a
-                      className="font-black text-[#B3262E] underline underline-offset-4"
+                      className="font-black text-brand underline underline-offset-4"
                       href={`https://wa.me/${INCLUSION_WHATSAPP}?text=${encodeURIComponent(
                         "Hola Chinito, ya envie mi solicitud para unirme a compra en Pereira",
                       )}`}
@@ -712,10 +712,10 @@ export function BusinessSubmissionForm({
                   </p>
                 ) : null}
               </div>
-              <label className="flex gap-3 rounded-2xl border border-stone-200 bg-[#fffdf8] p-4 text-sm font-bold leading-6 text-stone-800 shadow-sm">
+              <label className="flex gap-3 rounded-2xl border border-stone-200 bg-paper p-4 text-sm font-bold leading-6 text-stone-800 shadow-sm">
                 <input
                   checked={form.acceptsPublication}
-                  className="mt-1 size-5 accent-[#B3262E]"
+                  className="mt-1 size-5 accent-brand"
                   name="acceptsPublication"
                   required
                   type="checkbox"
@@ -785,8 +785,8 @@ export function BusinessSubmissionForm({
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-xl font-black text-[#22211f]">Vista previa</h2>
-            <span className="rounded-full bg-[#fff3bd] px-3 py-1 text-xs font-black text-[#5b1b00]">
+            <h2 className="font-display text-xl font-bold text-ink">Vista previa</h2>
+            <span className="rounded-full bg-gold-soft px-3 py-1 text-xs font-black text-gold-ink">
               Vista previa de la Tarjeta web
             </span>
           </div>
@@ -811,10 +811,10 @@ function StepProgress({
   const nextStep = currentStep + 1 < STEPS.length ? currentStep + 1 : null;
 
   return (
-    <div className="rounded-[24px] bg-[#f4ede7] p-3 shadow-inner">
+    <div className="rounded-[24px] bg-brand-soft/60 p-3 shadow-inner">
       <div className="mb-3 h-2 overflow-hidden rounded-full bg-white">
         <div
-          className="h-full rounded-full bg-[#B3262E] transition-all duration-300"
+          className="h-full rounded-full bg-brand transition-all duration-300"
           style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
         />
       </div>
@@ -865,7 +865,7 @@ function StepBubble({
     >
       <span
         className={`grid size-10 place-items-center rounded-full text-sm font-black sm:size-11 ${
-          active ? "bg-[#B3262E] text-white" : "bg-white text-stone-600"
+          active ? "bg-brand text-white" : "bg-white text-stone-600"
         }`}
       >
         {stepText}
@@ -874,7 +874,7 @@ function StepBubble({
         <span className="block truncate text-xs font-black uppercase text-stone-500">
           Paso
         </span>
-        <span className="block truncate text-sm font-black text-[#22211f]">
+        <span className="block truncate text-sm font-black text-ink">
           {label}
         </span>
       </span>
@@ -895,7 +895,7 @@ function Field({
     <label className="grid gap-2 text-sm font-black text-stone-800">
       <span>
         {label}
-        {required ? <span className="text-[#B3262E]"> *</span> : null}
+        {required ? <span className="text-brand"> *</span> : null}
       </span>
       {children}
     </label>
@@ -923,11 +923,11 @@ function FileField({
     <label className="grid gap-2 text-sm font-black text-stone-800">
       <span>
         {label}
-        {required ? <span className="text-[#B3262E]"> *</span> : null}
+        {required ? <span className="text-brand"> *</span> : null}
       </span>
       <input
         accept={accept}
-        className="md-field h-auto min-h-16 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+        className="md-field h-auto min-h-16 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
         name={name}
         required={required}
         type="file"

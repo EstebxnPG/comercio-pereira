@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CategoryIcon } from "@/components/icons/category-icons";
 
 export function CategoryGrid({
   categories,
@@ -16,20 +17,20 @@ export function CategoryGrid({
         <Link
           key={category.name}
           href={`/comercios?categoria=${encodeURIComponent(category.name)}`}
-          className="md-focus group flex min-h-[112px] flex-col justify-between rounded-2xl border border-stone-200 bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#B3262E]/30 hover:shadow-md active:translate-y-0 sm:min-h-[132px] sm:p-4"
+          className="md-focus group flex min-h-[128px] flex-col justify-between rounded-2xl border border-[var(--md-outline-variant)] bg-white p-3 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md active:translate-y-0 sm:min-h-[144px] sm:p-4"
         >
           <div className="flex items-start gap-3">
             <span
               aria-hidden="true"
-              className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#fff3bd] text-xl"
+              className="grid size-11 shrink-0 place-items-center rounded-xl bg-[var(--md-surface-container)] ring-1 ring-black/5"
             >
-              {category.icon}
+              <CategoryIcon name={category.name} className="size-6" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-sm font-black leading-5 text-[#22211f] sm:text-base">
+              <h2 className="font-display text-sm font-bold leading-5 text-ink sm:text-base">
                 {category.name}
               </h2>
-              <p className="mt-1 text-xs font-black uppercase text-[#B3262E]">
+              <p className="mt-1.5 inline-flex items-center rounded-full bg-gold-soft px-2 py-0.5 font-mono text-[11px] font-bold text-gold-ink">
                 {category.count} comercio{category.count === 1 ? "" : "s"}
               </p>
             </div>

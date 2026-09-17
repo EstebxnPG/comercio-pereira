@@ -66,7 +66,7 @@ export function Footer() {
   const isInclusionExternal = Boolean(INCLUSION_WHATSAPP);
 
   return (
-    <footer className="border-t border-stone-200 bg-[#fffdf8]">
+    <footer className="border-t border-[var(--md-outline-variant)] bg-white">
       <div className="mx-auto max-w-7xl px-4 py-9 text-sm text-stone-600 sm:px-6 lg:px-8">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.55fr_0.65fr_0.8fr] lg:items-start">
           <div>
@@ -81,7 +81,7 @@ export function Footer() {
                 />
               </div>
               <div>
-                <p className="text-lg font-black text-[#22211f]">{SITE_NAME}</p>
+                <p className="font-display text-lg font-extrabold text-ink">{SITE_NAME}</p>
                 <p className="mt-1 font-semibold text-stone-500">{SITE_DESCRIPTOR}</p>
               </div>
             </div>
@@ -96,7 +96,7 @@ export function Footer() {
           </div>
 
           <nav aria-label="Explorar">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Explorar
             </p>
             <div className="mt-3 grid gap-1">
@@ -104,7 +104,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
                 >
                   {link.label}
                 </Link>
@@ -113,7 +113,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Compra en Pereira">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Compra en Pereira
             </p>
             <div className="mt-3 grid gap-1">
@@ -121,7 +121,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
                 >
                   {link.label}
                 </Link>
@@ -130,7 +130,7 @@ export function Footer() {
                 href={inclusionHref}
                 target={isInclusionExternal ? "_blank" : undefined}
                 rel={isInclusionExternal ? "noopener noreferrer" : undefined}
-                className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
               >
                 Solicitar inclusion
               </a>
@@ -138,7 +138,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Redes sociales de Compra en Pereira">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Contacto
             </p>
             <p className="mt-3 leading-6">
@@ -153,7 +153,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={link.label}
                   title={link.label}
-                  className="md-focus grid size-10 place-items-center rounded-full border border-stone-200 bg-white text-[#B3262E] shadow-sm transition hover:border-[#B3262E]/45 hover:bg-[#ffdad8] hover:text-[#7F1D1D]"
+                  className="md-focus grid size-10 place-items-center rounded-full border border-[var(--md-outline-variant)] bg-white text-brand shadow-sm transition hover:border-brand/45 hover:bg-brand-soft hover:text-brand-deep"
                 >
                   {link.icon}
                 </a>
@@ -162,7 +162,7 @@ export function Footer() {
           </nav>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-stone-200 pt-5 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-[var(--md-outline-variant)] pt-5 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {currentYear} {SITE_NAME}. Todos los derechos reservados.
           </p>

@@ -49,7 +49,7 @@ export function ShareButtons({
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-[#22211f] shadow-sm transition hover:bg-[#1fb457] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2"
+        className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#25d366] px-5 text-sm font-black text-ink shadow-sm transition hover:bg-[#1fb457] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2"
       >
         Compartir por WhatsApp
       </a>
@@ -57,7 +57,7 @@ export function ShareButtons({
         {copied ? "Enlace copiado" : ""}
       </span>
       {copied ? (
-        <span className="inline-flex min-h-11 items-center text-sm font-bold text-[#B3262E]">
+        <span className="inline-flex min-h-11 items-center text-sm font-bold text-brand">
           Enlace copiado
         </span>
       ) : null}
