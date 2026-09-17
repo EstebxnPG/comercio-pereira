@@ -14,6 +14,10 @@ import { ShareButtons } from "@/components/share-buttons";
 import { SocialLinks } from "@/components/social-links";
 import { getBusinessBySlug } from "@/lib/businesses";
 import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
+import {
+  formatProductPrice,
+  getPublishedProductsForBusiness,
+} from "@/lib/products";
 import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -65,6 +69,7 @@ export default async function BusinessPage(
     notFound();
   }
 
+  const products = await getPublishedProductsForBusiness(business.id);
   const profileUrl = absoluteUrl(`/comercios/${business.slug}`);
   const shareText = `El centro sigue latiendo\n\nConoce a ${business.name}, comercio aliado de ${SITE_NAME}:`;
   const whatsappContactMessage =
@@ -138,6 +143,60 @@ export default async function BusinessPage(
               establecimiento. Las compras, pagos, entregas y garantias se
               acuerdan directamente con cada comercio.
             </div>
+
+            {products.length > 0 ? (
+              <section className="mt-8 border-t border-stone-200 pt-8">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-black uppercase text-[#B3262E]">
+                      Catalogo
+                    </p>
+                    <h2 className="mt-1 text-2xl font-black">Productos</h2>
+                  </div>
+                  <Link
+                    className="text-sm font-black text-[#B3262E] hover:underline"
+                    href="/productos"
+                  >
+                    Ver catalogo
+                  </Link>
+                </div>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  {products.map((product) => (
+                    <Link
+                      className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                      href={`/productos/${product.slug}`}
+                      key={product.id}
+                    >
+                      <div className="grid aspect-[4/3] place-items-center bg-stone-100">
+                        {product.primaryImageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            alt=""
+                            className="h-full w-full object-cover"
+                            src={product.primaryImageUrl}
+                          />
+                        ) : (
+                          <span className="text-xs font-black uppercase text-stone-500">
+                            Producto local
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid gap-2 p-4">
+                        <h3 className="text-lg font-black group-hover:underline">
+                          {product.name}
+                        </h3>
+                        <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+                          {product.shortDescription}
+                        </p>
+                        <p className="text-sm font-black text-[#B3262E]">
+                          {formatProductPrice(product)}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </article>
 
           <aside className="space-y-4">

@@ -1,8 +1,8 @@
 import "server-only";
 
-import { timingSafeEqual } from "crypto";
 import { revalidatePath } from "next/cache";
 import { getSupabaseServiceRoleClient } from "@/lib/supabase";
+import { logBusinessAudit } from "@/lib/business-audit";
 
 export type SubmissionStatus = "pending" | "approved" | "rejected" | "needs_info";
 
@@ -69,25 +69,6 @@ const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
   "image/webp",
 ];
-
-export function getAdminToken() {
-  return process.env.ADMIN_ACCESS_TOKEN ?? "";
-}
-
-export function isValidAdminToken(token: string | undefined) {
-  const adminToken = getAdminToken();
-
-  if (!adminToken || !token) {
-    return false;
-  }
-
-  const expected = Buffer.from(adminToken);
-  const received = Buffer.from(token);
-
-  return (
-    expected.length === received.length && timingSafeEqual(expected, received)
-  );
-}
 
 export async function getBusinessSubmissions(
   status?: SubmissionStatus,
@@ -405,7 +386,8 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
         logo_bucket,
         logo_storage_path,
         cover_image_bucket,
-        cover_image_storage_path
+        cover_image_storage_path,
+        email
       `,
     )
     .eq("id", submissionId)
@@ -434,6 +416,7 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
       submission.cover_image_storage_path,
     ) ??
     DEFAULT_APPROVED_COVER_IMAGE;
+  const ownerUser = await findAuthUserByEmail(submission.email);
 
   const { data: business, error: businessError } = await supabase
     .from("businesses")
@@ -452,6 +435,13 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
       maps_url: submission.maps_url,
       schedule: submission.schedule,
       published: true,
+      publication_status: "published",
+      verification_status: "unverified",
+      onboarding_status: ownerUser ? "complete" : "profile_pending",
+      owner_user_id: ownerUser?.id ?? null,
+      published_at: new Date().toISOString(),
+      created_by: ownerUser?.id ?? null,
+      updated_by: ownerUser?.id ?? null,
       featured: false,
       verified: false,
     })
@@ -486,9 +476,62 @@ export async function approveAndPublishSubmission(submissionId: string, notes: s
     }
   }
 
+  const { error: memberError } = await supabase.from("business_members").insert({
+    business_id: business.id,
+    user_id: ownerUser?.id ?? null,
+    invited_email: ownerUser ? null : normalizeEmail(submission.email),
+    role: "owner",
+    status: ownerUser ? "active" : "invited",
+  });
+
+  if (memberError) {
+    throw new Error(
+      `El comercio se creo, pero fallo la asignacion del propietario: ${memberError.message}`,
+    );
+  }
+
+  await logBusinessAudit({
+    action: "business_owner_assigned",
+    actorUserId: ownerUser?.id ?? null,
+    businessId: business.id,
+    metadata: {
+      invited: ownerUser ? false : true,
+      invited_email: ownerUser ? null : normalizeEmail(submission.email),
+      submission_id: submissionId,
+    },
+    supabase,
+  });
+
   await updateSubmissionStatus(submissionId, "approved", notes);
   revalidatePath("/comercios");
   revalidatePath(`/comercios/${slug}`);
+}
+
+async function findAuthUserByEmail(email: string | null) {
+  const normalizedEmail = normalizeEmail(email);
+
+  if (!normalizedEmail) {
+    return null;
+  }
+
+  const supabase = getRequiredSupabaseClient();
+  const { data, error } = await supabase.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+
+  if (error) {
+    throw new Error(`No se pudo validar el usuario propietario: ${error.message}`);
+  }
+
+  return (
+    data.users.find((user) => user.email?.toLowerCase() === normalizedEmail) ??
+    null
+  );
+}
+
+function normalizeEmail(email: string | null | undefined) {
+  return email?.trim().toLowerCase() || null;
 }
 
 function getPublicStorageUrl(bucket: string | null, path: string | null) {
