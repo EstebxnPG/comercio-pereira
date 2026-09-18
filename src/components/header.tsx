@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { FormEvent, useState } from "react";
 import {
   SITE_DESCRIPTOR,
   SITE_NAME,
@@ -15,18 +16,28 @@ const navItems = [
   { href: "/iniciativa", label: "Iniciativa" },
 ];
 
+const quickSearches = ["Restaurantes", "Ropa", "Ferreterias", "Belleza"];
+
 export function Header() {
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [headerQuery, setHeaderQuery] = useState("");
   const inclusionHref = "/registrar-comercio";
 
   function closeMenu() {
     setIsMenuOpen(false);
   }
 
+  function handleHeaderSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = headerQuery.trim();
+    router.push(trimmed ? `/comercios?q=${encodeURIComponent(trimmed)}` : "/comercios");
+  }
+
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--md-outline-variant)]/70 bg-white/95 backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-3 px-4 py-2.5 sm:px-6 sm:py-3 lg:px-8">
-        <Link href="/" className="group flex min-w-0 items-center gap-2.5" onClick={closeMenu}>
+        <Link href="/" className="group flex min-w-0 shrink-0 items-center gap-2.5 sm:min-w-fit" onClick={closeMenu}>
           <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
             <Image
               src="/brand/compra-en-pereira-logo.png"
@@ -36,7 +47,7 @@ export function Header() {
               className="h-8 w-8 object-contain"
             />
           </span>
-          <span className="min-w-0 leading-tight">
+          <span className="hidden min-w-0 leading-tight sm:block">
             <span className="block truncate font-display text-base font-extrabold leading-5 text-ink">
               {SITE_NAME}
             </span>
@@ -45,6 +56,19 @@ export function Header() {
             </span>
           </span>
         </Link>
+        <form
+          onSubmit={handleHeaderSearch}
+          className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] px-3 py-2 sm:hidden"
+        >
+          <SearchGlyphIcon className="size-4 shrink-0 text-stone-500" />
+          <input
+            value={headerQuery}
+            onChange={(event) => setHeaderQuery(event.target.value)}
+            placeholder="Que buscas hoy?"
+            aria-label="Buscar comercios"
+            className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink outline-none placeholder:text-stone-500"
+          />
+        </form>
         <nav
           aria-label="Navegacion principal"
           className="hidden items-center gap-1 lg:flex"
@@ -103,6 +127,17 @@ export function Header() {
           </button>
         </div>
       </div>
+      <div className="flex gap-4 overflow-x-auto px-4 pb-2.5 [scrollbar-width:none] sm:hidden">
+        {quickSearches.map((label) => (
+          <Link
+            key={label}
+            href={`/comercios?q=${encodeURIComponent(label)}`}
+            className="shrink-0 text-sm font-bold text-brand-deep underline-offset-4 hover:underline"
+          >
+            {label}
+          </Link>
+        ))}
+      </div>
       <nav
         id="mobile-navigation"
         aria-label="Navegacion movil"
@@ -131,5 +166,23 @@ export function Header() {
         </div>
       </nav>
     </header>
+  );
+}
+
+function SearchGlyphIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </svg>
   );
 }

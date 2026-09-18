@@ -1,5 +1,5 @@
+import Image from "next/image";
 import Link from "next/link";
-import { BusinessLogo } from "@/components/business-logo";
 import type { Business } from "@/types/business";
 
 export function BrandRail({ businesses }: { businesses: Business[] }) {
@@ -10,46 +10,35 @@ export function BrandRail({ businesses }: { businesses: Business[] }) {
   const marqueeBusinesses = [...businesses, ...businesses];
 
   return (
-    <section className="bg-paper py-9 sm:py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-black uppercase tracking-wide text-brand">
-              Comercios en la red
-            </p>
-            <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
-              Marcas que ya encuentras aqui
-            </h2>
-          </div>
+    <div className="brand-rail-mask overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] sm:overflow-hidden sm:pb-0">
+      <div className="brand-rail-track flex w-max gap-4 sm:gap-5">
+        {marqueeBusinesses.map((business, index) => (
           <Link
-            href="/comercios"
-            className="inline-flex min-h-10 items-center text-sm font-black text-brand underline-offset-4 hover:underline"
+            key={`${business.id}-${index}`}
+            href={`/comercios/${business.slug}`}
+            className="md-focus group flex min-w-[84px] shrink-0 snap-start flex-col items-center gap-1.5 sm:min-w-[100px]"
           >
-            Ver comercios
-          </Link>
-        </div>
-
-        <div className="brand-rail-mask mt-6 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:none] sm:overflow-hidden sm:pb-0">
-          <div className="brand-rail-track flex w-max gap-3 sm:gap-4">
-            {marqueeBusinesses.map((business, index) => (
-              <Link
-                key={`${business.id}-${index}`}
-                href={`/comercios/${business.slug}`}
-                className="md-focus group flex min-w-[128px] snap-start flex-col items-center gap-2 rounded-2xl border border-[var(--md-outline-variant)] bg-white p-3 text-center shadow-sm transition hover:border-brand/30 hover:shadow-md sm:min-w-[160px]"
-              >
-                <BusinessLogo
-                  businessName={business.name}
-                  logo={business.logo}
-                  size="rail"
+            <span className="relative size-16 shrink-0 overflow-hidden rounded-full bg-white shadow-[0_4px_14px_rgb(36_21_18/0.14)] transition group-hover:shadow-[0_6px_18px_rgb(36_21_18/0.2)] sm:size-20">
+              {business.logo ? (
+                <Image
+                  src={business.logo}
+                  alt=""
+                  fill
+                  className="object-contain p-2.5"
+                  sizes="80px"
                 />
-                <span className="line-clamp-1 max-w-32 text-xs font-black text-ink">
-                  {business.name}
+              ) : (
+                <span className="grid h-full place-items-center font-display text-sm font-bold text-brand">
+                  {business.name.slice(0, 2).toUpperCase()}
                 </span>
-              </Link>
-            ))}
-          </div>
-        </div>
+              )}
+            </span>
+            <span className="line-clamp-1 max-w-20 text-center text-xs font-bold text-ink">
+              {business.name}
+            </span>
+          </Link>
+        ))}
       </div>
-    </section>
+    </div>
   );
 }

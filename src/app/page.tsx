@@ -2,11 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 import { BrandRail } from "@/components/brand-rail";
-import { BusinessCard } from "@/components/business-card";
 import { CategoryQuickGrid } from "@/components/category-quick-grid";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { HeroSearch } from "@/components/hero-search";
+import { HomeBusinessCard } from "@/components/home-business-card";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
 import { SubmitCtaSection } from "@/components/submit-cta-section";
@@ -46,7 +46,7 @@ export default async function Home() {
       <Header />
       <main>
         <section className="relative overflow-hidden bg-[#1a1210] text-white sm:hidden">
-          <div className="relative aspect-[4/5] max-h-[30rem] w-full overflow-hidden">
+          <div className="relative h-60 w-full overflow-hidden">
             <Image
               src="/brand/imagen-pereire-hero.png"
               alt="Plaza de Bolivar de Pereira con el Bolivar Desnudo"
@@ -56,23 +56,22 @@ export default async function Home() {
               className="object-cover"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_14_11/0)_30%,rgb(20_14_11/0.55)_68%,rgb(107_26_22/0.92)_88%,rgb(107_26_22/0.97)_100%)]" />
-            <div className="absolute inset-x-0 bottom-0 px-[1.1rem] pb-[3.2rem]">
+            <div className="absolute inset-x-0 bottom-0 px-[1.1rem] pb-4">
               <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[.12em] text-gold-soft">
                 <span className="size-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
                 {SITE_SLOGAN}
               </p>
-              <h1 className="mt-[.6rem] font-display text-[1.9rem] font-extrabold leading-[1.05]">
+              <h1 className="mt-[.6rem] font-display text-[1.6rem] font-extrabold leading-[1.05]">
                 Encuentra donde comprar en Pereira.
               </h1>
-              <p className="mt-[.6rem] max-w-[24rem] text-[15px] leading-7 text-white/90">
-                Busca comercios, servicios y negocios de la ciudad. Entra a
-                sus perfiles y contacta directamente.
-              </p>
             </div>
           </div>
-          <div className="relative z-10 -mt-[1.66rem] bg-paper px-[1.1rem] pb-6 text-ink">
-            <HeroSearch categories={categories} />
-            <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
+          <div className="bg-paper px-[1.1rem] py-4 text-ink">
+            <p className="text-sm leading-6 text-stone-600">
+              Busca comercios, servicios y negocios de la ciudad. Entra a sus
+              perfiles y contacta directamente.
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
               <Link href="/categorias" className="underline-offset-4 hover:underline">
                 {categorySummaries.length} categorias
               </Link>
@@ -124,9 +123,17 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="bg-paper py-9 sm:py-14">
+        <section className="bg-paper py-6 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="sm:hidden">
+              <Link
+                href="/categorias"
+                className="inline-flex min-h-9 items-center text-sm font-black text-brand underline-offset-4 hover:underline"
+              >
+                Ver todas las categorias
+              </Link>
+            </div>
+            <div className="hidden sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-3">
               <div>
                 <p className="text-sm font-black uppercase tracking-wide text-brand">
                   Explora rapido
@@ -134,9 +141,6 @@ export default async function Home() {
                 <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
                   Que estas buscando?
                 </h2>
-                <p className="mt-1 text-sm text-stone-500 sm:hidden">
-                  Desliza para ver todas las categorias
-                </p>
               </div>
               <Link
                 href="/categorias"
@@ -145,7 +149,7 @@ export default async function Home() {
                 Ver todas las categorias
               </Link>
             </div>
-            <div className="mt-6 sm:mt-7">
+            <div className="mt-4 sm:mt-7">
               <CategoryQuickGrid categories={homeCategories} />
             </div>
           </div>
@@ -178,14 +182,16 @@ export default async function Home() {
             >
               {businessesToDiscover.map((business) => (
                 <div key={business.id} className="w-[86%] shrink-0 snap-start sm:w-auto">
-                  <BusinessCard business={business} />
+                  <HomeBusinessCard business={business} />
                 </div>
               ))}
             </AutoScrollCarousel>
+            <div className="mt-4 sm:mt-6">
+              <BrandRail businesses={businesses} />
+            </div>
           </div>
         </section>
 
-        <BrandRail businesses={businesses} />
         <HowItWorksSection />
         <InitiativeSection />
         <SubmitCtaSection />
