@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 import { BrandBubble } from "@/components/brand-bubble";
+import { BubbleSelect } from "@/components/bubble-select";
 import { BusinessCard } from "@/components/business-card";
 import { HomeBusinessCard } from "@/components/home-business-card";
 import { STATUS_LABELS } from "@/lib/constants";
@@ -43,54 +44,43 @@ export function BusinessDirectory({
   return (
     <section id="comercios" className="bg-white py-8 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <select
+        <div className="flex gap-3">
+          <BubbleSelect
+            placeholder="Todas las categorias"
             value={initialCategory}
-            onChange={(event) => {
+            options={[
+              { value: "all", label: "Todas las categorias" },
+              ...categories.map((category) => ({ value: category, label: category })),
+            ]}
+            onChange={(category) => {
               router.push(
                 getDirectoryHref({
-                  category: event.target.value,
+                  category,
                   limit: PAGE_SIZE,
                   query: initialQuery,
                   status: initialStatus,
                 }),
               );
             }}
-            aria-label="Filtrar por tipo de comercio"
-            className="md-field w-full sm:w-auto"
-          >
-            <option value="all">Todas las categorias</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
-            <StatusPill
-              label="Todos"
-              active={initialStatus === "all"}
-              href={getDirectoryHref({
-                category: initialCategory,
-                limit: PAGE_SIZE,
-                query: initialQuery,
-                status: "all",
-              })}
-            />
-            {Object.entries(STATUS_LABELS).map(([value, label]) => (
-              <StatusPill
-                key={value}
-                label={label}
-                active={initialStatus === value}
-                href={getDirectoryHref({
+          />
+          <BubbleSelect
+            placeholder="Todos"
+            value={initialStatus}
+            options={[
+              { value: "all", label: "Todos" },
+              ...Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label })),
+            ]}
+            onChange={(status) => {
+              router.push(
+                getDirectoryHref({
                   category: initialCategory,
                   limit: PAGE_SIZE,
                   query: initialQuery,
-                  status: value as BusinessStatus,
-                })}
-              />
-            ))}
-          </div>
+                  status: status as BusinessStatus | "all",
+                }),
+              );
+            }}
+          />
         </div>
 
         {businesses.length > 0 ? (
@@ -167,30 +157,6 @@ export function BusinessDirectory({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function StatusPill({
-  label,
-  active,
-  href,
-}: {
-  label: string;
-  active: boolean;
-  href: string;
-}) {
-  return (
-    <Link
-      href={href}
-      scroll={false}
-      className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-bold transition ${
-        active
-          ? "bg-brand text-white"
-          : "bg-[var(--md-surface-container)] text-stone-600 hover:bg-brand-soft hover:text-brand-deep"
-      }`}
-    >
-      {label}
-    </Link>
   );
 }
 
