@@ -6,15 +6,13 @@ import {
   BusinessProfileViewTracker,
   TrackedBusinessLink,
 } from "@/components/business-event-tracker";
-import { BusinessCover } from "@/components/business-cover";
-import { BusinessLogo } from "@/components/business-logo";
 import { BusinessStatusBadge } from "@/components/business-status";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ShareButtons } from "@/components/share-buttons";
 import { SocialLinks } from "@/components/social-links";
 import { getBusinessBySlug } from "@/lib/businesses";
-import { DEFAULT_BUSINESS_COVER_IMAGE, SITE_NAME, STATUS_LABELS } from "@/lib/constants";
+import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
 import {
   formatProductPrice,
   getPublishedProductsForBusiness,
@@ -73,7 +71,6 @@ export default async function BusinessPage(
   }
 
   const products = await getPublishedProductsForBusiness(business.id);
-  const hasCoverImage = business.coverImage !== DEFAULT_BUSINESS_COVER_IMAGE;
   const profileUrl = absoluteUrl(`/comercios/${business.slug}`);
   const shareText = `El centro sigue latiendo\n\nConoce a ${business.name}, comercio aliado de ${SITE_NAME}:`;
   const whatsappContactMessage =
@@ -89,49 +86,30 @@ export default async function BusinessPage(
       <Header />
       <BusinessProfileViewTracker businessId={business.id} />
       <main className="bg-paper">
-        <section className="relative bg-brand-deep text-white">
+        <section className="relative bg-ink text-white">
           <div className="relative h-[280px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
-            {hasCoverImage ? (
-              <>
-                <BusinessCover
-                  businessName={business.name}
-                  logo={business.logo}
-                  coverImage={business.coverImage}
-                  priority
-                  imageClassName="object-cover object-center opacity-55"
-                  sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/35 to-transparent" />
-              </>
-            ) : business.logo ? (
-              <>
-                <Image
-                  src={business.logo}
-                  alt=""
-                  fill
-                  priority
-                  className="scale-110 object-cover object-center blur-xl"
-                  sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/70 to-brand-deep/40" />
-              </>
+            {business.logo ? (
+              <Image
+                src={business.logo}
+                alt=""
+                fill
+                priority
+                className="scale-110 object-cover object-center blur-xl"
+                sizes="100vw"
+              />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-brand-deep to-brand" />
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
           </div>
           <div className="absolute inset-x-0 bottom-0">
-            <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
-              {hasCoverImage ? (
-                <BusinessLogo businessName={business.name} logo={business.logo} size="profile" />
-              ) : null}
-              <div className="min-w-0 pb-1">
-                <p className="text-xs font-black uppercase tracking-wide text-gold sm:text-sm">
-                  {business.category}
-                </p>
-                <h1 className="mt-1 font-display text-2xl font-extrabold leading-tight sm:text-5xl">
-                  {business.name}
-                </h1>
-              </div>
+            <div className="mx-auto max-w-6xl px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+              <p className="text-sm font-black uppercase tracking-wide text-gold sm:text-base">
+                {business.category}
+              </p>
+              <h1 className="mt-2 font-display text-3xl font-extrabold leading-tight sm:text-6xl">
+                {business.name}
+              </h1>
             </div>
           </div>
         </section>
