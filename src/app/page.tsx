@@ -70,7 +70,7 @@ export default async function Home() {
               </p>
             </div>
           </div>
-          <div className="relative z-10 -mt-8 bg-paper px-4 pb-6 text-ink">
+          <div className="relative z-10 -mt-7 bg-paper px-4 pb-6 text-ink">
             <HeroSearch categories={categories} />
             <div className="mt-5 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
               <Link href="/categorias" className="underline-offset-4 hover:underline">
