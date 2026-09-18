@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 import { BrandBubble } from "@/components/brand-bubble";
 import { BusinessCard } from "@/components/business-card";
@@ -14,6 +15,7 @@ const BRAND_CAROUSEL_LIMIT = 10;
 
 export function BusinessDirectory({
   businesses,
+  categories,
   initialCategory = "all",
   initialLimit = PAGE_SIZE,
   initialQuery = "",
@@ -28,6 +30,7 @@ export function BusinessDirectory({
   initialStatus?: BusinessStatus | "all";
   totalBusinesses: number;
 }) {
+  const router = useRouter();
   const hasMore = businesses.length < totalBusinesses;
   const nextLimit = Math.min(initialLimit + PAGE_SIZE, totalBusinesses);
   const isFilteredByCategory = initialCategory !== "all";
@@ -40,30 +43,54 @@ export function BusinessDirectory({
   return (
     <section id="comercios" className="bg-white py-8 sm:py-16">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
-          <StatusPill
-            label="Todos"
-            active={initialStatus === "all"}
-            href={getDirectoryHref({
-              category: initialCategory,
-              limit: PAGE_SIZE,
-              query: initialQuery,
-              status: "all",
-            })}
-          />
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <select
+            value={initialCategory}
+            onChange={(event) => {
+              router.push(
+                getDirectoryHref({
+                  category: event.target.value,
+                  limit: PAGE_SIZE,
+                  query: initialQuery,
+                  status: initialStatus,
+                }),
+              );
+            }}
+            aria-label="Filtrar por tipo de comercio"
+            className="md-field w-full sm:w-auto"
+          >
+            <option value="all">Todas las categorias</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
+          <div className="flex flex-wrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
             <StatusPill
-              key={value}
-              label={label}
-              active={initialStatus === value}
+              label="Todos"
+              active={initialStatus === "all"}
               href={getDirectoryHref({
                 category: initialCategory,
                 limit: PAGE_SIZE,
                 query: initialQuery,
-                status: value as BusinessStatus,
+                status: "all",
               })}
             />
-          ))}
+            {Object.entries(STATUS_LABELS).map(([value, label]) => (
+              <StatusPill
+                key={value}
+                label={label}
+                active={initialStatus === value}
+                href={getDirectoryHref({
+                  category: initialCategory,
+                  limit: PAGE_SIZE,
+                  query: initialQuery,
+                  status: value as BusinessStatus,
+                })}
+              />
+            ))}
+          </div>
         </div>
 
         {businesses.length > 0 ? (

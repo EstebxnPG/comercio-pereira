@@ -31,12 +31,19 @@ export function HomeBusinessCard({ business }: { business: Business }) {
           <h3 className="mt-2 font-display text-lg font-bold leading-tight text-ink">
             {business.name}
           </h3>
-          {business.address ? (
-            <p className="mt-2 flex items-center gap-1.5 text-sm text-stone-600">
-              <PinIcon className="size-4 shrink-0 text-stone-400" />
-              <span className="truncate">{business.address}</span>
-            </p>
-          ) : null}
+          <p className="mt-2 flex min-h-5 items-center gap-1.5 text-sm text-stone-600">
+            {business.address ? (
+              <>
+                <PinIcon className="size-4 shrink-0 text-stone-400" />
+                <span className="truncate">{business.address}</span>
+              </>
+            ) : business.status === "remote_attention" ? (
+              <>
+                <PinIcon className="size-4 shrink-0 text-stone-400" />
+                <span className="truncate">Atencion remota</span>
+              </>
+            ) : null}
+          </p>
           <p className="mt-3 flex items-center gap-1.5 text-sm font-black text-brand">
             Ver perfil
             <ArrowRightIcon className="size-4" />
