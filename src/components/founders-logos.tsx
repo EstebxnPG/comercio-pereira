@@ -16,7 +16,7 @@ const founders = [
     src: fenalcoLogo,
     width: 1043,
     height: 834,
-    imageClassName: "h-20 max-w-full object-contain sm:h-20",
+    imageClassName: "h-20 w-auto max-w-full object-contain sm:h-20",
   },
   {
     name: "RAP Eje Cafetero",
@@ -24,7 +24,7 @@ const founders = [
     src: "/brand/LOGO_RAP-web.png",
     width: 3110,
     height: 1461,
-    imageClassName: "h-16 max-w-full object-contain sm:h-20",
+    imageClassName: "h-16 w-auto max-w-full object-contain sm:h-20",
   },
   {
     name: "DPG Consultora",
@@ -63,10 +63,10 @@ export function FoundersLogos({ compact = false, variant = "light" }: FoundersLo
         {founders.map((founder) => (
           <div
             key={founder.name}
-            className={`flex min-w-0 items-center rounded-lg border bg-white text-ink ${
+            className={`flex min-w-0 rounded-lg border bg-white text-ink ${
               compact
-                ? "min-h-20 gap-4 px-4 py-3"
-                : "min-h-32 flex-col items-start justify-center gap-3 px-4 py-3"
+                ? "items-center min-h-20 gap-4 px-4 py-3"
+                : "items-start min-h-32 flex-col justify-center gap-3 px-4 py-3"
             } ${
               isDark
                 ? "border-white/20"
