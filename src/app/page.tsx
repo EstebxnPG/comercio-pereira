@@ -55,7 +55,7 @@ export default async function Home() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_14_11/0)_30%,rgb(20_14_11/0.55)_68%,rgb(107_26_22/0.88)_100%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_14_11/0)_30%,rgb(20_14_11/0.55)_68%,rgb(107_26_22/0.92)_88%,rgb(107_26_22/0.97)_100%)]" />
             <div className="absolute inset-x-0 bottom-0 px-[1.1rem] pb-[3.2rem]">
               <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[.12em] text-gold-soft">
                 <span className="size-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
