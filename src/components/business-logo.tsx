@@ -21,11 +21,6 @@ const SIZE_CLASSES = {
     image: "p-3",
     sizes: "128px",
   },
-  "profile-lg": {
-    frame: "size-32 rounded-2xl border shadow-lg ring-1 ring-black/5 sm:size-40",
-    image: "p-4",
-    sizes: "160px",
-  },
 } as const;
 
 export function BusinessLogo({

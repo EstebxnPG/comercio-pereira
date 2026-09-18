@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -102,17 +103,27 @@ export default async function BusinessPage(
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/35 to-transparent" />
               </>
+            ) : business.logo ? (
+              <>
+                <Image
+                  src={business.logo}
+                  alt=""
+                  fill
+                  priority
+                  className="scale-110 object-cover object-center blur-xl"
+                  sizes="100vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-brand-deep via-brand-deep/70 to-brand-deep/40" />
+              </>
             ) : (
               <div className="absolute inset-0 bg-gradient-to-br from-brand-deep to-brand" />
             )}
           </div>
           <div className="absolute inset-x-0 bottom-0">
             <div className="mx-auto flex max-w-6xl items-end gap-4 px-4 pb-5 sm:px-6 sm:pb-6 lg:px-8">
-              <BusinessLogo
-                businessName={business.name}
-                logo={business.logo}
-                size={hasCoverImage ? "profile" : "profile-lg"}
-              />
+              {hasCoverImage ? (
+                <BusinessLogo businessName={business.name} logo={business.logo} size="profile" />
+              ) : null}
               <div className="min-w-0 pb-1">
                 <p className="text-xs font-black uppercase tracking-wide text-gold sm:text-sm">
                   {business.category}

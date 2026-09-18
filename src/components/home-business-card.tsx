@@ -26,7 +26,9 @@ export function HomeBusinessCard({ business }: { business: Business }) {
             <p className="min-w-0 truncate font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
               {business.category}
             </p>
-            <BusinessStatusBadge status={business.status} />
+            {business.status !== "remote_attention" ? (
+              <BusinessStatusBadge status={business.status} />
+            ) : null}
           </div>
           <h3 className="mt-2 font-display text-lg font-bold leading-tight text-ink">
             {business.name}
@@ -39,7 +41,7 @@ export function HomeBusinessCard({ business }: { business: Business }) {
               </>
             ) : business.status === "remote_attention" ? (
               <>
-                <PinIcon className="size-4 shrink-0 text-stone-400" />
+                <MonitorIcon className="size-4 shrink-0 text-stone-400" />
                 <span className="truncate">Atencion remota</span>
               </>
             ) : null}
@@ -68,6 +70,25 @@ function PinIcon({ className }: { className?: string }) {
     >
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
       <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function MonitorIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="2" y="4" width="20" height="13" rx="2" />
+      <line x1="8" y1="21" x2="16" y2="21" />
+      <line x1="12" y1="17" x2="12" y2="21" />
     </svg>
   );
 }
