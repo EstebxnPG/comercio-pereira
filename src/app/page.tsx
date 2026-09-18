@@ -45,7 +45,46 @@ export default async function Home() {
     <>
       <Header />
       <main>
-        <section className="relative overflow-hidden bg-[#1a1210] text-white">
+        <section className="relative overflow-hidden bg-[#1a1210] text-white sm:hidden">
+          <div className="relative aspect-[4/5] max-h-[30rem] w-full overflow-hidden">
+            <Image
+              src="/brand/imagen-pereire-hero.png"
+              alt="Plaza de Bolivar de Pereira con el Bolivar Desnudo"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_18_16/0.15),rgb(26_18_16/0.55)_68%,rgb(168_19_24/0.88))]" />
+            <div className="absolute inset-x-0 bottom-0 px-4 pb-9">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold ring-1 ring-white/18">
+                <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
+                {SITE_SLOGAN}
+              </p>
+              <h1 className="mt-3 font-display text-[2.1rem] font-extrabold leading-[1.05]">
+                Encuentra donde comprar en Pereira.
+              </h1>
+              <p className="mt-3 text-base leading-7 text-white/90">
+                Busca comercios, servicios y negocios de la ciudad. Entra a
+                sus perfiles y contacta directamente.
+              </p>
+            </div>
+          </div>
+          <div className="relative z-10 -mt-8 bg-paper px-4 pb-6 text-ink">
+            <HeroSearch categories={categories} />
+            <div className="mt-5 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
+              <Link href="/categorias" className="underline-offset-4 hover:underline">
+                {categorySummaries.length} categorias
+              </Link>
+              <span aria-hidden="true" className="text-stone-300">/</span>
+              <Link href="/comercios" className="underline-offset-4 hover:underline">
+                {businesses.length} comercios publicados
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative hidden overflow-hidden bg-[#1a1210] text-white sm:block">
           <div className="absolute inset-0">
             <Image
               src="/brand/imagen-pereire-hero.png"
@@ -55,25 +94,25 @@ export default async function Home() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_18_16/0.35),rgb(26_18_16/0.72)_62%,rgb(168_19_24/0.88))] sm:bg-[linear-gradient(90deg,rgb(26_18_16/0.9),rgb(168_19_24/0.55)_55%,rgb(26_18_16/0.2))]" />
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#fffefb] via-[#fffefb]/25 to-transparent sm:h-32" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(26_18_16/0.9),rgb(168_19_24/0.55)_55%,rgb(26_18_16/0.2))]" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#fffefb] via-[#fffefb]/25 to-transparent" />
           </div>
-          <div className="relative mx-auto max-w-7xl px-4 pb-8 pt-7 sm:px-6 sm:py-18 lg:px-8 lg:py-20">
+          <div className="relative mx-auto max-w-7xl px-6 py-18 lg:px-8 lg:py-20">
             <div className="max-w-3xl">
-              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold ring-1 ring-white/18 sm:text-xs">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gold ring-1 ring-white/18">
                 <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
                 {SITE_SLOGAN}
               </p>
-              <h1 className="mt-3 max-w-3xl font-display text-[2.1rem] font-extrabold leading-[1.05] sm:mt-5 sm:text-6xl">
+              <h1 className="mt-5 max-w-3xl font-display text-6xl font-extrabold leading-[1.05]">
                 Encuentra donde comprar en Pereira.
               </h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-white/90 sm:mt-5 sm:text-xl sm:leading-8">
+              <p className="mt-5 max-w-2xl text-xl leading-8 text-white/90">
                 Busca comercios, servicios y negocios de la ciudad. Entra a sus
                 perfiles y contacta directamente.
               </p>
             </div>
             <HeroSearch categories={categories} />
-            <div className="mt-5 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-white/85 sm:gap-3 sm:text-sm">
+            <div className="mt-5 flex flex-wrap items-center gap-3 font-mono text-sm font-bold text-white/85">
               <Link href="/categorias" className="underline-offset-4 hover:underline">
                 {categorySummaries.length} categorias
               </Link>
