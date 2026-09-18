@@ -109,7 +109,7 @@ export function HeroSearch({ categories }: { categories: string[] }) {
         </div>
       </form>
       <div
-        className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:hidden"
+        className="mt-4 flex flex-wrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:hidden"
         aria-label="Busquedas sugeridas"
       >
         {suggestedSearches.map((suggestion) => (
@@ -117,7 +117,7 @@ export function HeroSearch({ categories }: { categories: string[] }) {
             key={suggestion}
             type="button"
             onClick={() => setQuery(suggestion)}
-            className="md-focus shrink-0 rounded-full border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] px-3 py-2 text-xs font-black text-ink transition hover:border-brand/50 active:translate-y-px"
+            className="md-focus shrink-0 rounded-full border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] px-3 py-[.35rem] text-xs font-bold text-ink transition hover:border-brand/50 active:translate-y-px"
           >
             {suggestion}
           </button>

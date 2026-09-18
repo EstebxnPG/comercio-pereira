@@ -55,24 +55,24 @@ export default async function Home() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(26_18_16/0.15),rgb(26_18_16/0.55)_68%,rgb(168_19_24/0.88))]" />
-            <div className="absolute inset-x-0 bottom-0 px-4 pb-9">
-              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold ring-1 ring-white/18">
-                <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_14_11/0)_30%,rgb(20_14_11/0.55)_68%,rgb(107_26_22/0.88)_100%)]" />
+            <div className="absolute inset-x-0 bottom-0 px-[1.1rem] pb-[3.2rem]">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[.12em] text-gold-soft">
+                <span className="size-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
                 {SITE_SLOGAN}
               </p>
-              <h1 className="mt-3 font-display text-[2.1rem] font-extrabold leading-[1.05]">
+              <h1 className="mt-[.6rem] font-display text-[1.9rem] font-extrabold leading-[1.05]">
                 Encuentra donde comprar en Pereira.
               </h1>
-              <p className="mt-3 text-base leading-7 text-white/90">
+              <p className="mt-[.6rem] max-w-[24rem] text-[15px] leading-7 text-white/90">
                 Busca comercios, servicios y negocios de la ciudad. Entra a
                 sus perfiles y contacta directamente.
               </p>
             </div>
           </div>
-          <div className="relative z-10 -mt-7 bg-paper px-4 pb-6 text-ink">
+          <div className="relative z-10 -mt-7 bg-paper px-[1.1rem] pb-6 text-ink">
             <HeroSearch categories={categories} />
-            <div className="mt-5 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
+            <div className="mt-4 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
               <Link href="/categorias" className="underline-offset-4 hover:underline">
                 {categorySummaries.length} categorias
               </Link>
