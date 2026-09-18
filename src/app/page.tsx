@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 import { BrandRail } from "@/components/brand-rail";
 import { BusinessCard } from "@/components/business-card";
-import { CategoryGrid } from "@/components/category-grid";
+import { CategoryQuickGrid } from "@/components/category-quick-grid";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { HeroSearch } from "@/components/hero-search";
@@ -94,6 +94,9 @@ export default async function Home() {
                 <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
                   Que estas buscando?
                 </h2>
+                <p className="mt-1 text-sm text-stone-500 sm:hidden">
+                  Desliza para ver todas las categorias
+                </p>
               </div>
               <Link
                 href="/categorias"
@@ -103,7 +106,7 @@ export default async function Home() {
               </Link>
             </div>
             <div className="mt-6 sm:mt-7">
-              <CategoryGrid categories={homeCategories} />
+              <CategoryQuickGrid categories={homeCategories} />
             </div>
           </div>
         </section>

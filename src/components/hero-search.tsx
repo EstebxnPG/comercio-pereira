@@ -38,9 +38,28 @@ export function HeroSearch({ categories }: { categories: string[] }) {
           Explora comercios reales de Pereira
         </p>
       </div>
+      <form onSubmit={handleSubmit} className="sm:hidden">
+        <div className="flex items-center gap-2 rounded-full border border-gold/70 bg-white py-1.5 pl-4 pr-1.5 shadow-[0_20px_50px_rgb(20_12_10/0.4)] ring-4 ring-white/15">
+          <SearchIcon className="size-5 shrink-0 text-stone-400" />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Que buscas hoy?"
+            className="min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-ink outline-none placeholder:text-stone-500"
+          />
+          <button
+            type="submit"
+            aria-label="Buscar"
+            className="grid size-11 shrink-0 place-items-center rounded-full bg-brand text-white shadow-md transition hover:bg-brand-hover active:translate-y-px focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
+          >
+            <ArrowRightIcon className="size-5" />
+          </button>
+        </div>
+      </form>
+
       <form
         onSubmit={handleSubmit}
-        className="overflow-hidden rounded-[1.35rem] border border-gold/80 bg-white shadow-[0_28px_80px_rgb(20_12_10/0.45)] ring-4 ring-white/18"
+        className="hidden overflow-hidden rounded-[1.35rem] border border-gold/80 bg-white shadow-[0_28px_80px_rgb(20_12_10/0.45)] ring-4 ring-white/18 sm:block"
       >
         <div className="grid lg:grid-cols-[minmax(340px,1fr)_minmax(240px,320px)_154px]">
           <label className="group flex min-h-[58px] items-center gap-3 border-b border-[var(--md-outline-variant)] px-4 transition focus-within:bg-paper sm:min-h-[76px] sm:px-5 lg:border-b-0 lg:border-r">
@@ -105,11 +124,11 @@ export function HeroSearch({ categories }: { categories: string[] }) {
   );
 }
 
-function SearchIcon() {
+function SearchIcon({ className = "size-5 shrink-0 text-stone-400" }: { className?: string }) {
   return (
     <svg
       aria-hidden="true"
-      className="size-5 shrink-0 text-stone-400"
+      className={className}
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
@@ -117,6 +136,24 @@ function SearchIcon() {
     >
       <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.3-4.3" />
       <circle cx="11" cy="11" r="7" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
     </svg>
   );
 }
