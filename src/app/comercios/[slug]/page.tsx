@@ -94,7 +94,7 @@ export default async function BusinessPage(
                 alt=""
                 fill
                 priority
-                className="scale-110 object-cover object-center blur-xl"
+                className="scale-110 object-cover object-center blur-md"
                 sizes="100vw"
               />
             ) : (
