@@ -29,7 +29,7 @@ export function HeroSearch({ categories }: { categories: string[] }) {
 
   return (
     <div className="mt-5 max-w-5xl sm:mt-7">
-      <div className="mb-2 flex flex-wrap items-center gap-2 sm:mb-3">
+      <div className="mb-2 hidden flex-wrap items-center gap-2 sm:mb-3 sm:flex">
         <p className="text-sm font-black text-white drop-shadow-sm sm:text-base">
           Busca por negocio, categoria o servicio
         </p>
@@ -39,8 +39,8 @@ export function HeroSearch({ categories }: { categories: string[] }) {
         </p>
       </div>
       <form onSubmit={handleSubmit} className="sm:hidden">
-        <div className="flex items-center gap-2 rounded-full border border-gold/70 bg-white py-1.5 pl-4 pr-1.5 shadow-[0_20px_50px_rgb(20_12_10/0.4)] ring-4 ring-white/15">
-          <SearchIcon className="size-5 shrink-0 text-stone-400" />
+        <div className="flex items-center gap-2.5 rounded-full border border-[var(--md-outline-variant)] bg-white py-[.3rem] pl-[1.05rem] pr-[.3rem] shadow-[0_24px_48px_-18px_rgba(36,26,22,0.38)]">
+          <SearchIcon className="size-[1.1rem] shrink-0 text-[var(--md-outline)]" />
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -50,9 +50,9 @@ export function HeroSearch({ categories }: { categories: string[] }) {
           <button
             type="submit"
             aria-label="Buscar"
-            className="grid size-11 shrink-0 place-items-center rounded-full bg-brand text-white shadow-md transition hover:bg-brand-hover active:translate-y-px focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
+            className="grid size-[2.6rem] shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:translate-y-px focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2"
           >
-            <ArrowRightIcon className="size-5" />
+            <ArrowRightIcon className="size-[1.1rem]" />
           </button>
         </div>
       </form>
