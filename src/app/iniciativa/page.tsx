@@ -3,6 +3,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { InitiativeSection } from "@/components/initiative-section";
 import { PageHero } from "@/components/page-hero";
+import { SubmitCtaSection } from "@/components/submit-cta-section";
 
 export const metadata: Metadata = {
   title: "Iniciativa",
@@ -23,6 +24,7 @@ export default function InitiativePage() {
           primaryLabel="Ver comercios"
         />
         <InitiativeSection />
+        <SubmitCtaSection />
       </main>
       <Footer />
     </>

@@ -9,6 +9,7 @@ import { Header } from "@/components/header";
 import { HeroSearch } from "@/components/hero-search";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
+import { SubmitCtaSection } from "@/components/submit-cta-section";
 import {
   getCategories,
   getCategorySummaries,
@@ -148,6 +149,7 @@ export default async function Home() {
         <BrandRail businesses={businesses} />
         <HowItWorksSection />
         <InitiativeSection />
+        <SubmitCtaSection />
       </main>
       <Footer />
     </>

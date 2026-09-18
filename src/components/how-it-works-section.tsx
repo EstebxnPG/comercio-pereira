@@ -1,16 +1,13 @@
 const steps = [
   {
-    step: "01",
     title: "Encuentra",
     text: "Busca por nombre, categoria o descripcion y filtra por estado de atencion.",
   },
   {
-    step: "02",
     title: "Revisa",
     text: "Abre el perfil para confirmar ubicacion, horario, redes y canales disponibles.",
   },
   {
-    step: "03",
     title: "Contacta",
     text: "Escribe por WhatsApp, llama o comparte el perfil con alguien que pueda comprar.",
   },
@@ -29,19 +26,42 @@ export function HowItWorksSection() {
               Encuentra, revisa y contacta directo.
             </h2>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
-          {steps.map((item) => (
-            <article
-              key={item.step}
-              className="rounded-2xl border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] p-4"
-            >
-              <p className="font-mono text-xs font-bold text-brand-deep">{item.step}</p>
-              <h3 className="mt-2 font-display text-lg font-bold text-ink">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-sm leading-6 text-stone-600">{item.text}</p>
-            </article>
-          ))}
+
+          <div className="flex flex-col sm:hidden">
+            {steps.map((item, index) => (
+              <div key={item.title} className="relative flex gap-4 pb-8 last:pb-0">
+                {index < steps.length - 1 ? (
+                  <span
+                    aria-hidden="true"
+                    className="absolute left-[1.375rem] top-[2.9rem] bottom-0 w-px bg-[var(--md-outline-variant)]"
+                  />
+                ) : null}
+                <span className="relative z-10 grid size-11 shrink-0 place-items-center rounded-full bg-brand font-display text-lg font-extrabold text-white shadow-sm">
+                  {index + 1}
+                </span>
+                <div className="pt-1">
+                  <h3 className="font-display text-lg font-bold text-ink">{item.title}</h3>
+                  <p className="mt-1 text-sm leading-6 text-stone-600">{item.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden gap-3 sm:grid sm:grid-cols-3">
+            {steps.map((item, index) => (
+              <article
+                key={item.title}
+                className="rounded-2xl border border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] p-4"
+              >
+                <p className="font-mono text-xs font-bold text-brand-deep">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-2 font-display text-lg font-bold text-ink">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-stone-600">{item.text}</p>
+              </article>
+            ))}
           </div>
         </div>
       </div>
