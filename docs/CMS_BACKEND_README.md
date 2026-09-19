@@ -327,6 +327,7 @@ Eventos iniciales:
 ```text
 business_profile_view
 product_view
+discounted_product_view
 click_whatsapp
 click_phone
 click_maps
@@ -335,6 +336,8 @@ click_social
 share_business
 share_product
 search_result_view
+promotion_view
+promotion_click
 ```
 
 Para dashboard no consultar eventos crudos en cada request. Crear agregados diarios.
@@ -343,6 +346,8 @@ Metricas MVP:
 
 - Vistas del perfil.
 - Vistas de productos.
+- Vistas de productos con descuento.
+- Vistas y clics de promociones.
 - Clics a WhatsApp.
 - Clics a telefono.
 - Productos mas vistos.
@@ -423,6 +428,7 @@ Rutas privadas empresa:
 /dashboard/negocios/[businessId]/productos
 /dashboard/negocios/[businessId]/productos/nuevo
 /dashboard/negocios/[businessId]/productos/[productId]
+/dashboard/negocios/[businessId]/promociones
 /dashboard/estadisticas
 ```
 
@@ -483,6 +489,7 @@ Empresa puede:
 
 - Crear producto.
 - Editar producto.
+- Marcar producto con descuento porcentual.
 - Subir imagen principal.
 - Agregar galeria.
 - Cambiar disponibilidad.
@@ -514,10 +521,27 @@ Empresa puede ver:
 
 - Vistas del negocio.
 - Vistas por producto.
+- Vistas de productos con descuento.
+- Vistas y clics de promociones.
 - Clics a WhatsApp.
 - Clics por canal.
 - Productos con mejor rendimiento.
 - Comparacion ultimos 7/30 dias.
+
+### 8.7 Promociones
+
+Empresa puede crear beneficios simples para simular dinamicas tipo marketplace sin
+convertir el producto en e-commerce:
+
+- Envio gratis.
+- Cupon en pesos.
+- Descuento general de tienda.
+- Mensaje promocional.
+
+Estas promociones viven en `business_promotions`, separadas de `businesses`,
+porque tienen ciclo de vida propio: estado, ventana de vigencia, valor,
+auditoria y metricas. En produccion esto permite pausar, medir y evolucionar
+campanas sin contaminar el perfil base del comercio.
 
 ## 9. Requerimientos no funcionales
 
@@ -687,6 +711,7 @@ Criterio de salida:
 
 - [x] Crear producto.
 - [x] Editar producto.
+- [x] Marcar producto con descuento.
 - [x] Ocultar producto.
 - [x] Enviar producto a revision.
 - [x] Subir imagen principal.
@@ -698,12 +723,22 @@ Criterio de salida:
 ### Analytics
 
 - [x] Crear eventos para producto.
+- [x] Crear eventos para promociones.
 - [ ] Agregar rate limit a eventos.
 - [x] Crear session anonima.
 - [x] Guardar `ip_hash` y `user_agent_hash` sin datos crudos.
 - [x] Crear query de metricas por negocio.
 - [x] Crear query de metricas por producto.
 - [x] Crear agregados diarios.
+
+### Promociones
+
+- [x] Crear tabla `business_promotions`.
+- [x] Crear RLS para lectura publica solo de promociones activas.
+- [x] Permitir gestion privada a `owner` y `manager`.
+- [x] Mostrar promociones en perfil publico del comercio.
+- [x] Medir `promotion_view` y `promotion_click`.
+- [x] Agregar metricas base en dashboard.
 
 ### Calidad
 
@@ -723,6 +758,8 @@ Criterio de salida:
 - Si categorias de negocio y categorias de producto seran la misma entidad.
 - Si se usara busqueda Postgres full-text o proveedor externo mas adelante.
 - Si los precios seran obligatorios, opcionales o texto libre para servicios.
+- Si las promociones tendran reglas avanzadas por producto, categoria, horario
+  o cupos. Por ahora se mantiene simple a nivel comercio.
 
 ## 13. Criterios de exito del CMS MVP
 

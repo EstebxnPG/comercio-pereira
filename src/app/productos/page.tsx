@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { formatProductPrice, getPublishedProducts } from "@/lib/products";
+import {
+  getProductPriceDisplay,
+  getPublishedProducts,
+} from "@/lib/products";
 
 type ProductsCatalogPageProps = {
   searchParams: Promise<{ q?: string | string[] }>;
@@ -51,40 +54,7 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
           ) : (
             <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {products.map((product) => (
-                <Link
-                  className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                  href={`/productos/${product.slug}`}
-                  key={product.id}
-                >
-                  <div className="grid aspect-[4/3] place-items-center bg-stone-100">
-                    {product.primaryImageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        alt=""
-                        className="h-full w-full object-cover"
-                        src={product.primaryImageUrl}
-                      />
-                    ) : (
-                      <span className="text-xs font-black uppercase text-stone-500">
-                        Producto local
-                      </span>
-                    )}
-                  </div>
-                  <div className="grid gap-2 p-4">
-                    <p className="text-xs font-black uppercase text-[#B3262E]">
-                      {product.businessName}
-                    </p>
-                    <h2 className="text-xl font-black group-hover:underline">
-                      {product.name}
-                    </h2>
-                    <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
-                      {product.shortDescription}
-                    </p>
-                    <p className="text-sm font-black text-[#22211f]">
-                      {formatProductPrice(product)}
-                    </p>
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product} />
               ))}
             </section>
           )}
@@ -92,6 +62,60 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
       </main>
       <Footer />
     </>
+  );
+}
+
+function ProductCard({
+  product,
+}: {
+  product: Awaited<ReturnType<typeof getPublishedProducts>>[number];
+}) {
+  const price = getProductPriceDisplay(product);
+
+  return (
+    <Link
+      className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      href={`/productos/${product.slug}`}
+    >
+      <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
+        {price.badge ? (
+          <span className="absolute left-3 top-3 rounded-full bg-[#B3262E] px-3 py-1 text-xs font-black text-white shadow-sm">
+            {price.badge}
+          </span>
+        ) : null}
+        {product.primaryImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            alt=""
+            className="h-full w-full object-cover"
+            src={product.primaryImageUrl}
+          />
+        ) : (
+          <span className="text-xs font-black uppercase text-stone-500">
+            Producto local
+          </span>
+        )}
+      </div>
+      <div className="grid gap-2 p-4">
+        <p className="text-xs font-black uppercase text-[#B3262E]">
+          {product.businessName}
+        </p>
+        <h2 className="text-xl font-black group-hover:underline">
+          {product.name}
+        </h2>
+        <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+          {product.shortDescription}
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-sm font-black text-[#22211f]">{price.current}</p>
+          {price.original ? (
+            <p className="text-xs font-bold text-stone-500 line-through">
+              {price.original}
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </Link>
   );
 }
 

@@ -36,6 +36,12 @@ export async function createProductAction(formData: FormData) {
       created_by: user.id,
       currency: "COP",
       description: getOptionalString(formData.get("description")),
+      discount_ends_at: parseOptionalDateTime(formData.get("discountEndsAt")),
+      discount_label: getOptionalString(formData.get("discountLabel")),
+      discount_percentage: parseDiscountPercentage(
+        formData.get("discountPercentage"),
+      ),
+      discount_starts_at: parseOptionalDateTime(formData.get("discountStartsAt")),
       moderation_status: status === "pending_review" ? "pending" : "draft",
       name,
       price_cents: parsePriceCents(formData.get("price")),
@@ -79,6 +85,12 @@ export async function updateProductAction(formData: FormData) {
     .update({
       availability: parseAvailability(formData.get("availability")),
       description: getOptionalString(formData.get("description")),
+      discount_ends_at: parseOptionalDateTime(formData.get("discountEndsAt")),
+      discount_label: getOptionalString(formData.get("discountLabel")),
+      discount_percentage: parseDiscountPercentage(
+        formData.get("discountPercentage"),
+      ),
+      discount_starts_at: parseOptionalDateTime(formData.get("discountStartsAt")),
       moderation_status: status === "pending_review" ? "pending" : "draft",
       name: getRequiredString(formData.get("name"), "Nombre"),
       price_cents: parsePriceCents(formData.get("price")),
@@ -275,6 +287,34 @@ function parsePriceCents(value: FormDataEntryValue | null) {
   }
 
   return normalized * 100;
+}
+
+function parseDiscountPercentage(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 90) {
+    throw new Error("El descuento debe ser un porcentaje entero entre 1 y 90.");
+  }
+
+  return parsed;
+}
+
+function parseOptionalDateTime(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("La fecha de promocion no es valida.");
+  }
+
+  return parsed.toISOString();
 }
 
 function getRequiredString(value: FormDataEntryValue | null, field: string) {

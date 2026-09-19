@@ -66,6 +66,41 @@ function ProductForm({ businessId }: { businessId: string }) {
           </select>
         </Field>
       </div>
+      <section className="grid gap-4 border-t border-stone-200 pt-4">
+        <div>
+          <h2 className="text-base font-black">Descuento del producto</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-stone-600">
+            Usa esto para mostrar badges como 10% OFF o 15% OFF en el catalogo.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Porcentaje de descuento">
+            <input
+              className="md-field"
+              inputMode="numeric"
+              max={90}
+              min={1}
+              name="discountPercentage"
+              placeholder="15"
+              type="number"
+            />
+          </Field>
+          <Field label="Etiqueta visible">
+            <input
+              className="md-field"
+              maxLength={40}
+              name="discountLabel"
+              placeholder="15% OFF"
+            />
+          </Field>
+          <Field label="Inicio">
+            <input className="md-field" name="discountStartsAt" type="datetime-local" />
+          </Field>
+          <Field label="Fin">
+            <input className="md-field" name="discountEndsAt" type="datetime-local" />
+          </Field>
+        </div>
+      </section>
       <div className="flex flex-wrap justify-end gap-3 border-t border-stone-200 pt-4">
         <button className="md-outlined-button px-5" name="intent" type="submit" value="draft">
           Guardar borrador

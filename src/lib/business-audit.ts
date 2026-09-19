@@ -14,7 +14,10 @@ export type BusinessAuditAction =
   | "product_approved"
   | "product_rejected"
   | "product_hidden"
-  | "product_featured";
+  | "product_featured"
+  | "promotion_created"
+  | "promotion_updated"
+  | "promotion_deleted";
 
 export async function logBusinessAudit({
   action,

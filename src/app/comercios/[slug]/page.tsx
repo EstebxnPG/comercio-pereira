@@ -10,12 +10,16 @@ import { BusinessLogo } from "@/components/business-logo";
 import { BusinessStatusBadge } from "@/components/business-status";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { PromotionViewTracker } from "@/components/promotion-event-tracker";
 import { ShareButtons } from "@/components/share-buttons";
 import { SocialLinks } from "@/components/social-links";
 import { getBusinessBySlug } from "@/lib/businesses";
 import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
 import {
-  formatProductPrice,
+  BUSINESS_PROMOTION_TYPE_LABELS,
+  formatPromotionValue,
+  getActiveBusinessPromotions,
+  getProductPriceDisplay,
   getPublishedProductsForBusiness,
 } from "@/lib/products";
 import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
@@ -69,7 +73,10 @@ export default async function BusinessPage(
     notFound();
   }
 
-  const products = await getPublishedProductsForBusiness(business.id);
+  const [products, promotions] = await Promise.all([
+    getPublishedProductsForBusiness(business.id),
+    getActiveBusinessPromotions(business.id),
+  ]);
   const profileUrl = absoluteUrl(`/comercios/${business.slug}`);
   const shareText = `El centro sigue latiendo\n\nConoce a ${business.name}, comercio aliado de ${SITE_NAME}:`;
   const whatsappContactMessage =
@@ -84,6 +91,12 @@ export default async function BusinessPage(
     <>
       <Header />
       <BusinessProfileViewTracker businessId={business.id} />
+      {promotions.length > 0 ? (
+        <PromotionViewTracker
+          businessId={business.id}
+          promotionIds={promotions.map((promotion) => promotion.id)}
+        />
+      ) : null}
       <main className="bg-[#fbfaf7]">
         <section className="relative bg-[#7F1D1D] text-white">
           <div className="relative h-[320px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
@@ -129,6 +142,38 @@ export default async function BusinessPage(
               {business.fullDescription ?? business.shortDescription}
             </p>
 
+            {promotions.length > 0 ? (
+              <section className="mt-8 grid gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase text-[#B3262E]">
+                    Promociones activas
+                  </p>
+                  <h2 className="mt-1 text-2xl font-black">Beneficios del comercio</h2>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {promotions.map((promotion) => (
+                    <article
+                      className="rounded-2xl border border-[#ffdad8] bg-[#fff7f6] p-4"
+                      key={promotion.id}
+                    >
+                      <p className="text-xs font-black uppercase text-[#B3262E]">
+                        {BUSINESS_PROMOTION_TYPE_LABELS[promotion.type]}
+                      </p>
+                      <h3 className="mt-2 text-lg font-black">{promotion.title}</h3>
+                      <p className="mt-1 text-sm font-black text-[#B3262E]">
+                        {formatPromotionValue(promotion)}
+                      </p>
+                      {promotion.description ? (
+                        <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
+                          {promotion.description}
+                        </p>
+                      ) : null}
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             <dl className="mt-8 grid gap-4">
               {business.address ? (
                 <InfoRow label="Direccion" value={business.address} />
@@ -161,39 +206,55 @@ export default async function BusinessPage(
                   </Link>
                 </div>
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {products.map((product) => (
-                    <Link
-                      className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                      href={`/productos/${product.slug}`}
-                      key={product.id}
-                    >
-                      <div className="grid aspect-[4/3] place-items-center bg-stone-100">
-                        {product.primaryImageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            alt=""
-                            className="h-full w-full object-cover"
-                            src={product.primaryImageUrl}
-                          />
-                        ) : (
-                          <span className="text-xs font-black uppercase text-stone-500">
-                            Producto local
-                          </span>
-                        )}
-                      </div>
-                      <div className="grid gap-2 p-4">
-                        <h3 className="text-lg font-black group-hover:underline">
-                          {product.name}
-                        </h3>
-                        <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
-                          {product.shortDescription}
-                        </p>
-                        <p className="text-sm font-black text-[#B3262E]">
-                          {formatProductPrice(product)}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+                  {products.map((product) => {
+                    const price = getProductPriceDisplay(product);
+
+                    return (
+                      <Link
+                        className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                        href={`/productos/${product.slug}`}
+                        key={product.id}
+                      >
+                        <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
+                          {price.badge ? (
+                            <span className="absolute left-3 top-3 rounded-full bg-[#B3262E] px-3 py-1 text-xs font-black text-white shadow-sm">
+                              {price.badge}
+                            </span>
+                          ) : null}
+                          {product.primaryImageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              alt=""
+                              className="h-full w-full object-cover"
+                              src={product.primaryImageUrl}
+                            />
+                          ) : (
+                            <span className="text-xs font-black uppercase text-stone-500">
+                              Producto local
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid gap-2 p-4">
+                          <h3 className="text-lg font-black group-hover:underline">
+                            {product.name}
+                          </h3>
+                          <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+                            {product.shortDescription}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-black text-[#B3262E]">
+                              {price.current}
+                            </p>
+                            {price.original ? (
+                              <p className="text-xs font-bold text-stone-500 line-through">
+                                {price.original}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               </section>
             ) : null}

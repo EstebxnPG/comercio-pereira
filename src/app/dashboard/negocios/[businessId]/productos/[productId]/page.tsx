@@ -115,6 +115,54 @@ export default async function EditProductPage(props: EditProductPageProps) {
               </select>
             </Field>
           </div>
+          <section className="grid gap-4 border-t border-stone-200 pt-4">
+            <div>
+              <h2 className="text-base font-black">Descuento del producto</h2>
+              <p className="mt-1 text-sm font-semibold leading-6 text-stone-600">
+                Si el producto tiene precio numerico, se mostrara precio anterior,
+                precio con descuento y badge publico.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Porcentaje de descuento">
+                <input
+                  className="md-field"
+                  defaultValue={product.discount_percentage ?? ""}
+                  inputMode="numeric"
+                  max={90}
+                  min={1}
+                  name="discountPercentage"
+                  placeholder="15"
+                  type="number"
+                />
+              </Field>
+              <Field label="Etiqueta visible">
+                <input
+                  className="md-field"
+                  defaultValue={product.discount_label ?? ""}
+                  maxLength={40}
+                  name="discountLabel"
+                  placeholder="15% OFF"
+                />
+              </Field>
+              <Field label="Inicio">
+                <input
+                  className="md-field"
+                  defaultValue={toDateTimeLocal(product.discount_starts_at)}
+                  name="discountStartsAt"
+                  type="datetime-local"
+                />
+              </Field>
+              <Field label="Fin">
+                <input
+                  className="md-field"
+                  defaultValue={toDateTimeLocal(product.discount_ends_at)}
+                  name="discountEndsAt"
+                  type="datetime-local"
+                />
+              </Field>
+            </div>
+          </section>
           <div className="flex flex-wrap justify-end gap-3 border-t border-stone-200 pt-4">
             <button className="md-outlined-button px-5" name="intent" type="submit" value="draft">
               Guardar borrador
@@ -189,6 +237,10 @@ async function getEditableProduct(businessId: string, productId: string) {
         price_cents,
         currency,
         price_label,
+        discount_percentage,
+        discount_label,
+        discount_starts_at,
+        discount_ends_at,
         status,
         moderation_status,
         availability,
@@ -208,4 +260,18 @@ async function getEditableProduct(businessId: string, productId: string) {
 
 function getSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function toDateTimeLocal(value: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toISOString().slice(0, 16);
 }

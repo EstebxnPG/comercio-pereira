@@ -16,6 +16,17 @@ export type ProductAvailability =
   | "out_of_stock"
   | "on_request"
   | "discontinued";
+export type BusinessPromotionType =
+  | "coupon_amount"
+  | "custom_message"
+  | "free_shipping"
+  | "store_percentage";
+export type BusinessPromotionStatus =
+  | "active"
+  | "draft"
+  | "expired"
+  | "paused"
+  | "rejected";
 
 export type PublicProduct = {
   id: string;
@@ -29,11 +40,27 @@ export type PublicProduct = {
   description: string | null;
   priceCents: number | null;
   currency: string;
+  discountEndsAt: string | null;
+  discountLabel: string | null;
+  discountPercentage: number | null;
+  discountStartsAt: string | null;
   priceLabel: string | null;
   availability: ProductAvailability;
   primaryImageUrl: string | null;
   featured: boolean;
   updatedAt: string;
+};
+
+export type PublicBusinessPromotion = {
+  id: string;
+  businessId: string;
+  description: string | null;
+  endsAt: string | null;
+  minimumOrderAmount: number | null;
+  startsAt: string | null;
+  title: string;
+  type: BusinessPromotionType;
+  value: number | null;
 };
 
 type ProductRow = {
@@ -45,6 +72,10 @@ type ProductRow = {
   description: string | null;
   price_cents: number | null;
   currency: string;
+  discount_ends_at: string | null;
+  discount_label: string | null;
+  discount_percentage: number | null;
+  discount_starts_at: string | null;
   price_label: string | null;
   availability: ProductAvailability;
   primary_image_url: string | null;
@@ -64,6 +95,18 @@ type ProductRow = {
     | null;
 };
 
+type BusinessPromotionRow = {
+  id: string;
+  business_id: string;
+  description: string | null;
+  ends_at: string | null;
+  minimum_order_amount: number | null;
+  starts_at: string | null;
+  title: string;
+  type: BusinessPromotionType;
+  value: number | null;
+};
+
 export const PRODUCT_STATUS_LABELS: Record<ProductStatus, string> = {
   archived: "Archivado",
   draft: "Borrador",
@@ -80,8 +123,18 @@ export const PRODUCT_AVAILABILITY_LABELS: Record<ProductAvailability, string> = 
   out_of_stock: "Agotado",
 };
 
+export const BUSINESS_PROMOTION_TYPE_LABELS: Record<BusinessPromotionType, string> = {
+  coupon_amount: "Cupon",
+  custom_message: "Promocion",
+  free_shipping: "Envio gratis",
+  store_percentage: "Descuento tienda",
+};
+
 export function formatProductPrice(product: {
   currency: string;
+  discountEndsAt?: string | null;
+  discountPercentage?: number | null;
+  discountStartsAt?: string | null;
   priceCents: number | null;
   priceLabel: string | null;
 }) {
@@ -98,6 +151,89 @@ export function formatProductPrice(product: {
     maximumFractionDigits: 0,
     style: "currency",
   }).format(product.priceCents / 100);
+}
+
+export function getProductPriceDisplay(product: {
+  currency: string;
+  discountEndsAt?: string | null;
+  discountLabel?: string | null;
+  discountPercentage?: number | null;
+  discountStartsAt?: string | null;
+  priceCents: number | null;
+  priceLabel: string | null;
+}) {
+  const baseLabel = formatProductPrice(product);
+  const activeDiscount = getActiveDiscountPercentage(product);
+
+  if (!activeDiscount || product.priceCents === null || product.priceLabel) {
+    return {
+      badge: null,
+      current: baseLabel,
+      hasDiscount: false,
+      original: null,
+    };
+  }
+
+  const discountedCents = Math.round(
+    product.priceCents * ((100 - activeDiscount) / 100),
+  );
+
+  return {
+    badge: product.discountLabel || `${activeDiscount}% OFF`,
+    current: formatCurrency(discountedCents, product.currency),
+    hasDiscount: true,
+    original: formatCurrency(product.priceCents, product.currency),
+  };
+}
+
+export function getActiveDiscountPercentage(product: {
+  discountEndsAt?: string | null;
+  discountPercentage?: number | null;
+  discountStartsAt?: string | null;
+}) {
+  const percentage = product.discountPercentage ?? null;
+
+  if (!percentage) {
+    return null;
+  }
+
+  const now = Date.now();
+  const startsAt = product.discountStartsAt
+    ? Date.parse(product.discountStartsAt)
+    : null;
+  const endsAt = product.discountEndsAt ? Date.parse(product.discountEndsAt) : null;
+
+  if (startsAt !== null && Number.isFinite(startsAt) && startsAt > now) {
+    return null;
+  }
+
+  if (endsAt !== null && Number.isFinite(endsAt) && endsAt < now) {
+    return null;
+  }
+
+  return percentage;
+}
+
+export function formatPromotionValue(promotion: {
+  minimumOrderAmount: number | null;
+  type: BusinessPromotionType;
+  value: number | null;
+}) {
+  if (promotion.type === "free_shipping") {
+    return promotion.minimumOrderAmount
+      ? `Desde ${formatCurrency(promotion.minimumOrderAmount, "COP")}`
+      : "Sin minimo";
+  }
+
+  if (promotion.type === "coupon_amount" && promotion.value) {
+    return `${formatCurrency(promotion.value, "COP")} OFF`;
+  }
+
+  if (promotion.type === "store_percentage" && promotion.value) {
+    return `${promotion.value}% OFF`;
+  }
+
+  return "Activo";
 }
 
 export async function getPublishedProducts({
@@ -126,6 +262,10 @@ export async function getPublishedProducts({
         description,
         price_cents,
         currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
         price_label,
         availability,
         primary_image_url,
@@ -184,6 +324,10 @@ export async function getPublishedProductBySlug(slug: string) {
         description,
         price_cents,
         currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
         price_label,
         availability,
         primary_image_url,
@@ -225,6 +369,10 @@ export async function getPublishedProductsForBusiness(businessId: string, limit 
         description,
         price_cents,
         currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
         price_label,
         availability,
         primary_image_url,
@@ -246,6 +394,43 @@ export async function getPublishedProductsForBusiness(businessId: string, limit 
   }
 
   return data.map(mapProductRow);
+}
+
+export async function getActiveBusinessPromotions(businessId: string, limit = 6) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("business_promotions")
+    .select(
+      `
+        id,
+        business_id,
+        type,
+        title,
+        description,
+        value,
+        minimum_order_amount,
+        starts_at,
+        ends_at
+      `,
+    )
+    .eq("business_id", businessId)
+    .eq("status", "active")
+    .or(`starts_at.is.null,starts_at.lte.${new Date().toISOString()}`)
+    .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`)
+    .order("updated_at", { ascending: false })
+    .limit(Math.max(1, Math.min(limit, 12)));
+
+  if (error) {
+    console.error("Business promotions query failed", error);
+    return [];
+  }
+
+  return data.map(mapBusinessPromotionRow);
 }
 
 export function slugifyProduct(value: string) {
@@ -273,12 +458,40 @@ function mapProductRow(row: ProductRow): PublicProduct {
     description: row.description,
     priceCents: row.price_cents,
     currency: row.currency,
+    discountEndsAt: row.discount_ends_at,
+    discountLabel: row.discount_label,
+    discountPercentage: row.discount_percentage,
+    discountStartsAt: row.discount_starts_at,
     priceLabel: row.price_label,
     availability: row.availability,
     primaryImageUrl: row.primary_image_url,
     featured: row.featured,
     updatedAt: row.updated_at,
   };
+}
+
+function mapBusinessPromotionRow(
+  row: BusinessPromotionRow,
+): PublicBusinessPromotion {
+  return {
+    businessId: row.business_id,
+    description: row.description,
+    endsAt: row.ends_at,
+    id: row.id,
+    minimumOrderAmount: row.minimum_order_amount,
+    startsAt: row.starts_at,
+    title: row.title,
+    type: row.type,
+    value: row.value,
+  };
+}
+
+function formatCurrency(cents: number, currency: string) {
+  return new Intl.NumberFormat("es-CO", {
+    currency,
+    maximumFractionDigits: 0,
+    style: "currency",
+  }).format(cents / 100);
 }
 
 function normalizeProductSearch(value: string) {

@@ -10,14 +10,18 @@ import {
 import { SITE_NAME } from "@/lib/constants";
 import {
   PRODUCT_AVAILABILITY_LABELS,
-  formatProductPrice,
+  getProductPriceDisplay,
   getPublishedProductBySlug,
 } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
 
+type ProductDetailPageProps = {
+  params: Promise<{ slug: string }>;
+};
+
 export async function generateMetadata(
-  props: PageProps<"/productos/[slug]">,
+  props: ProductDetailPageProps,
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const product = await getPublishedProductBySlug(slug);
@@ -38,9 +42,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProductDetailPage(
-  props: PageProps<"/productos/[slug]">,
-) {
+export default async function ProductDetailPage(props: ProductDetailPageProps) {
   const { slug } = await props.params;
   const product = await getPublishedProductBySlug(slug);
 
@@ -53,11 +55,16 @@ export default async function ProductDetailPage(
         `Hola, vi ${product.name} en COMPRAENPEREIRA.COM y quiero mas informacion.`,
       )}`
     : null;
+  const price = getProductPriceDisplay(product);
 
   return (
     <>
       <Header />
-      <ProductViewTracker businessId={product.businessId} productId={product.id} />
+      <ProductViewTracker
+        businessId={product.businessId}
+        isDiscounted={price.hasDiscount}
+        productId={product.id}
+      />
       <main className="bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
         <article className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
           <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
@@ -83,9 +90,21 @@ export default async function ProductDetailPage(
                 {product.businessName}
               </Link>
               <h1 className="mt-2 text-4xl font-black">{product.name}</h1>
-              <p className="mt-3 text-lg font-black text-[#B3262E]">
-                {formatProductPrice(product)}
-              </p>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <p className="text-lg font-black text-[#B3262E]">
+                  {price.current}
+                </p>
+                {price.original ? (
+                  <p className="text-sm font-bold text-stone-500 line-through">
+                    {price.original}
+                  </p>
+                ) : null}
+                {price.badge ? (
+                  <span className="rounded-full bg-[#B3262E] px-3 py-1 text-xs font-black uppercase text-white">
+                    {price.badge}
+                  </span>
+                ) : null}
+              </div>
             </div>
             <span className="w-fit rounded-full bg-[#ffdad8] px-3 py-1 text-xs font-black uppercase text-[#410006]">
               {PRODUCT_AVAILABILITY_LABELS[product.availability]}
