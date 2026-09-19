@@ -1,6 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BusinessCover } from "@/components/business-cover";
-import { BusinessLogo } from "@/components/business-logo";
 import { BusinessStatusBadge } from "@/components/business-status";
 import type { Business } from "@/types/business";
 
@@ -18,7 +18,21 @@ export function HomeBusinessCard({ business }: { business: Business }) {
           />
           <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/40 to-transparent" />
           <div className="absolute bottom-2 left-2">
-            <BusinessLogo businessName={business.name} logo={business.logo} size="card" />
+            {business.logo ? (
+              <div className="relative size-16 shrink-0 drop-shadow-[0_3px_6px_rgba(0,0,0,0.35)] sm:size-[72px]">
+                <Image
+                  src={business.logo}
+                  alt={`Logo de ${business.name}`}
+                  fill
+                  className="object-contain"
+                  sizes="72px"
+                />
+              </div>
+            ) : (
+              <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-paper text-center font-display text-sm font-bold text-brand shadow-sm sm:size-[72px]">
+                {business.name.slice(0, 2).toUpperCase()}
+              </span>
+            )}
           </div>
         </div>
         <div className="p-4">
