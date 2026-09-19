@@ -1,6 +1,6 @@
 begin;
 
-select plan(35);
+select plan(36);
 
 insert into auth.users (
   id,
@@ -411,6 +411,34 @@ select lives_ok(
     )
   $$,
   'business editors can create products for their business'
+);
+
+select lives_ok(
+  $$
+    insert into public.products (
+      id,
+      business_id,
+      slug,
+      name,
+      short_description,
+      status,
+      moderation_status,
+      created_by,
+      updated_by
+    )
+    values (
+      '00000000-0000-0000-0000-000000000929',
+      '00000000-0000-0000-0000-000000000404',
+      'rls-owned-business-second-test-product',
+      'Second Test Product',
+      'Second owned test product',
+      'draft',
+      'draft',
+      '00000000-0000-0000-0000-000000000101',
+      '00000000-0000-0000-0000-000000000101'
+    )
+  $$,
+  'business editors can create multiple products for the same business'
 );
 
 select lives_ok(

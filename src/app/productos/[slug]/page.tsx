@@ -56,6 +56,20 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
       )}`
     : null;
   const price = getProductPriceDisplay(product);
+  const galleryImages =
+    product.images.length > 0
+      ? product.images
+      : product.primaryImageUrl
+        ? [
+            {
+              altText: product.name,
+              id: "primary-image",
+              isPrimary: true,
+              publicUrl: product.primaryImageUrl,
+              sortOrder: 0,
+            },
+          ]
+        : [];
 
   return (
     <>
@@ -67,19 +81,38 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
       />
       <main className="bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
         <article className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-            {product.primaryImageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                alt=""
-                className="aspect-[4/3] w-full object-cover"
-                src={product.primaryImageUrl}
-              />
-            ) : (
-              <div className="grid aspect-[4/3] place-items-center bg-stone-100 text-sm font-black uppercase text-stone-500">
-                Producto local
+          <div className="grid gap-3">
+            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+              {galleryImages[0] ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  alt={galleryImages[0].altText ?? product.name}
+                  className="aspect-[4/3] w-full object-cover"
+                  src={galleryImages[0].publicUrl}
+                />
+              ) : (
+                <div className="grid aspect-[4/3] place-items-center bg-stone-100 text-sm font-black uppercase text-stone-500">
+                  Producto local
+                </div>
+              )}
+            </div>
+            {galleryImages.length > 1 ? (
+              <div className="grid grid-cols-4 gap-3">
+                {galleryImages.slice(1, 5).map((image) => (
+                  <div
+                    className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"
+                    key={image.id}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      alt={image.altText ?? product.name}
+                      className="aspect-square w-full object-cover"
+                      src={image.publicUrl}
+                    />
+                  </div>
+                ))}
               </div>
-            )}
+            ) : null}
           </div>
           <section className="grid content-start gap-5">
             <div>
