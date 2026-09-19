@@ -290,6 +290,7 @@ Reglas:
 - Limitar tamano.
 - Guardar ruta y bucket en base de datos.
 - Separar imagen principal de galeria.
+- Limitar galeria MVP a 5 imagenes por producto: 1 principal + 4 de apoyo.
 - Definir politicas de storage por ownership.
 
 ### 5.5 Analytics
@@ -715,7 +716,7 @@ Criterio de salida:
 - [x] Ocultar producto.
 - [x] Enviar producto a revision.
 - [x] Subir imagen principal.
-- [ ] Administrar galeria.
+- [x] Administrar galeria basica.
 - [x] Aprobar/rechazar producto desde admin.
 - [x] Publicar pagina `/productos/[slug]`.
 - [x] Mostrar productos en `/comercios/[slug]`.

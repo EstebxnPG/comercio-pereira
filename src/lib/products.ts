@@ -47,8 +47,17 @@ export type PublicProduct = {
   priceLabel: string | null;
   availability: ProductAvailability;
   primaryImageUrl: string | null;
+  images: PublicProductImage[];
   featured: boolean;
   updatedAt: string;
+};
+
+export type PublicProductImage = {
+  altText: string | null;
+  id: string;
+  isPrimary: boolean;
+  publicUrl: string;
+  sortOrder: number;
 };
 
 export type PublicBusinessPromotion = {
@@ -79,6 +88,7 @@ type ProductRow = {
   price_label: string | null;
   availability: ProductAvailability;
   primary_image_url: string | null;
+  product_images?: ProductImageRow[] | null;
   featured: boolean;
   updated_at: string;
   businesses:
@@ -93,6 +103,14 @@ type ProductRow = {
         whatsapp: string | null;
       }>
     | null;
+};
+
+type ProductImageRow = {
+  alt_text: string | null;
+  id: string;
+  is_primary: boolean;
+  public_url: string;
+  sort_order: number;
 };
 
 type BusinessPromotionRow = {
@@ -269,6 +287,13 @@ export async function getPublishedProducts({
         price_label,
         availability,
         primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
         featured,
         updated_at,
         businesses!inner(name, slug, whatsapp)
@@ -331,6 +356,13 @@ export async function getPublishedProductBySlug(slug: string) {
         price_label,
         availability,
         primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
         featured,
         updated_at,
         businesses!inner(name, slug, whatsapp)
@@ -376,6 +408,13 @@ export async function getPublishedProductsForBusiness(businessId: string, limit 
         price_label,
         availability,
         primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
         featured,
         updated_at,
         businesses!inner(name, slug, whatsapp)
@@ -465,9 +504,49 @@ function mapProductRow(row: ProductRow): PublicProduct {
     priceLabel: row.price_label,
     availability: row.availability,
     primaryImageUrl: row.primary_image_url,
+    images: mapProductImages(row.product_images, row.primary_image_url),
     featured: row.featured,
     updatedAt: row.updated_at,
   };
+}
+
+function mapProductImages(
+  images: ProductImageRow[] | null | undefined,
+  primaryImageUrl: string | null,
+) {
+  const mapped = (images ?? [])
+    .map((image) => ({
+      altText: image.alt_text,
+      id: image.id,
+      isPrimary: image.is_primary,
+      publicUrl: image.public_url,
+      sortOrder: image.sort_order,
+    }))
+    .sort((a, b) => {
+      if (a.isPrimary !== b.isPrimary) {
+        return a.isPrimary ? -1 : 1;
+      }
+
+      return a.sortOrder - b.sortOrder;
+    });
+
+  if (
+    primaryImageUrl &&
+    !mapped.some((image) => image.publicUrl === primaryImageUrl)
+  ) {
+    return [
+      {
+        altText: null,
+        id: "primary-image",
+        isPrimary: true,
+        publicUrl: primaryImageUrl,
+        sortOrder: -1,
+      },
+      ...mapped,
+    ];
+  }
+
+  return mapped;
 }
 
 function mapBusinessPromotionRow(
