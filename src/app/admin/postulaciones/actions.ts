@@ -1,42 +1,18 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import {
   approveAndPublishSubmission,
-  isValidAdminToken,
   updateBusinessSubmission,
   updateSubmissionStatus,
   type SubmissionStatus,
 } from "@/lib/admin-submissions";
-import { ADMIN_SESSION_COOKIE } from "@/lib/admin-auth";
+import { requireAdmin } from "@/lib/auth";
+import { signOutAction } from "@/app/login/actions";
 
 const MANUAL_STATUSES = new Set<SubmissionStatus>(["rejected", "needs_info", "pending"]);
 
-export async function authenticateAdminAction(formData: FormData) {
-  const token = getString(formData.get("token"));
-
-  if (!isValidAdminToken(token)) {
-    throw new Error("Token admin invalido.");
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.set(ADMIN_SESSION_COOKIE, token, {
-    httpOnly: true,
-    maxAge: 60 * 60 * 8,
-    path: "/admin/postulaciones",
-    sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
-  });
-
-  redirect("/admin/postulaciones");
-}
-
 export async function signOutAdminAction() {
-  const cookieStore = await cookies();
-  cookieStore.delete(ADMIN_SESSION_COOKIE);
-
-  redirect("/admin/postulaciones");
+  await signOutAction();
 }
 
 export async function approveSubmissionAction(formData: FormData) {
@@ -81,12 +57,7 @@ export async function updateAndApproveBusinessSubmissionAction(
 }
 
 async function assertAdminSession() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
-
-  if (!isValidAdminToken(token)) {
-    throw new Error("Sesion admin invalida.");
-  }
+  await requireAdmin();
 }
 
 function getString(value: FormDataEntryValue | null) {

@@ -323,7 +323,6 @@ function getRateLimitIdentifier(request: NextRequest) {
 function getRateLimitSecret() {
   return (
     process.env.RATE_LIMIT_SECRET ||
-    process.env.ADMIN_ACCESS_TOKEN ||
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     "local-development-rate-limit-secret"
   );
