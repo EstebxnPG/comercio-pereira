@@ -36,14 +36,9 @@ export function HomeBusinessCard({ business }: { business: Business }) {
           </div>
         </div>
         <div className="p-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="min-w-0 truncate font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
-              {business.category}
-            </p>
-            {business.status !== "remote_attention" ? (
-              <BusinessStatusBadge status={business.status} />
-            ) : null}
-          </div>
+          <p className="min-w-0 truncate font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
+            {business.category}
+          </p>
           <h3 className="mt-2 font-display text-lg font-bold leading-tight text-ink">
             {business.name}
           </h3>
@@ -53,17 +48,15 @@ export function HomeBusinessCard({ business }: { business: Business }) {
                 <PinIcon className="size-4 shrink-0 text-stone-400" />
                 <span className="truncate">{business.address}</span>
               </>
-            ) : business.status === "remote_attention" ? (
-              <>
-                <MonitorIcon className="size-4 shrink-0 text-stone-400" />
-                <span className="truncate">Atencion remota</span>
-              </>
             ) : null}
           </p>
-          <p className="mt-3 flex items-center gap-1.5 text-sm font-black text-brand">
-            Ver perfil
-            <ArrowRightIcon className="size-4" />
-          </p>
+          <div className="mt-3 flex items-center justify-between gap-2">
+            <p className="flex items-center gap-1.5 text-sm font-black text-brand">
+              Ver perfil
+              <ArrowRightIcon className="size-4" />
+            </p>
+            <BusinessStatusBadge status={business.status} />
+          </div>
         </div>
       </Link>
     </article>
@@ -84,25 +77,6 @@ function PinIcon({ className }: { className?: string }) {
     >
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
       <circle cx="12" cy="10" r="3" />
-    </svg>
-  );
-}
-
-function MonitorIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      aria-hidden="true"
-      className={className}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="4" width="20" height="13" rx="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
     </svg>
   );
 }
