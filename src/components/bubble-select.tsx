@@ -7,11 +7,13 @@ export function BubbleSelect({
   options,
   value,
   onChange,
+  align = "left",
 }: {
   placeholder: string;
   options: Array<{ value: string; label: string }>;
   value: string;
   onChange: (value: string) => void;
+  align?: "left" | "right";
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const selected = options.find((option) => option.value === value);
@@ -39,7 +41,11 @@ export function BubbleSelect({
             className="fixed inset-0 z-10 cursor-default"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute left-0 right-0 z-20 mt-2 grid max-h-80 grid-cols-2 gap-2 overflow-y-auto rounded-2xl border border-[var(--md-outline-variant)] bg-white p-3 shadow-lg">
+          <div
+            className={`absolute z-20 mt-2 grid max-h-80 w-72 max-w-[calc(100vw-2rem)] grid-cols-2 gap-2 overflow-y-auto rounded-2xl border border-[var(--md-outline-variant)] bg-white p-3 shadow-lg ${
+              align === "right" ? "right-0" : "left-0"
+            }`}
+          >
             {options.map((option) => (
               <button
                 key={option.value}
@@ -49,6 +55,8 @@ export function BubbleSelect({
                   setIsOpen(false);
                 }}
                 className={`rounded-full px-3 py-2 text-center text-xs font-bold transition ${
+                  option.label.length > 11 ? "col-span-2" : ""
+                } ${
                   option.value === value
                     ? "bg-brand text-white"
                     : "bg-[var(--md-surface-container)] text-stone-600 hover:bg-brand-soft hover:text-brand-deep"

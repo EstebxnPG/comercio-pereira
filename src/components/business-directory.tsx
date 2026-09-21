@@ -7,6 +7,7 @@ import { BrandBubble } from "@/components/brand-bubble";
 import { BubbleSelect } from "@/components/bubble-select";
 import { BusinessCard } from "@/components/business-card";
 import { HomeBusinessCard } from "@/components/home-business-card";
+import { getShortCategoryLabel } from "@/lib/category-labels";
 import { STATUS_LABELS } from "@/lib/constants";
 import type { Business, BusinessStatus } from "@/types/business";
 
@@ -50,7 +51,10 @@ export function BusinessDirectory({
             value={initialCategory}
             options={[
               { value: "all", label: "Todas las categorias" },
-              ...categories.map((category) => ({ value: category, label: category })),
+              ...categories.map((category) => ({
+                value: category,
+                label: getShortCategoryLabel(category),
+              })),
             ]}
             onChange={(category) => {
               router.push(
@@ -65,6 +69,7 @@ export function BusinessDirectory({
           />
           <BubbleSelect
             placeholder="Todos"
+            align="right"
             value={initialStatus}
             options={[
               { value: "all", label: "Todos" },

@@ -3,17 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CategoryIcon } from "@/components/icons/category-icons";
-
-const SHORT_LABELS: Record<string, string> = {
-  "Moda y Ropa": "Ropa",
-  "Calzado y Marroquineria": "Calzado",
-  "Belleza y Cuidado Personal": "Belleza",
-  "Tecnologia y Electronica": "Tecnologia",
-  "Hogar y Decoracion": "Hogar",
-  "Ferreteria y Construccion": "Ferreteria",
-  "Servicios Profesionales": "Servicios",
-  "Comida y Restaurantes": "Restaurantes",
-};
+import { getShortCategoryLabel } from "@/lib/category-labels";
 
 type CategorySummary = {
   name: string;
@@ -80,7 +70,7 @@ export function CategoryQuickGrid({ categories }: { categories: CategorySummary[
               <CategoryIcon name={category.name} className="size-8" />
             </span>
             <span className="line-clamp-1 text-center text-xs font-bold text-ink">
-              {SHORT_LABELS[category.name] ?? category.name}
+              {getShortCategoryLabel(category.name)}
             </span>
           </Link>
         ))}
