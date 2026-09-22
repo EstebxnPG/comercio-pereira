@@ -117,7 +117,7 @@ export function BusinessSubmissionForm({
     () => ({
       id: "preview",
       slug: "vista-previa",
-      name: form.businessName.trim() || "Nombre de tu comercio",
+      name: form.businessName.trim() || "Tu comercio",
       category: form.category || "Categoria",
       shortDescription:
         form.description.trim() ||
