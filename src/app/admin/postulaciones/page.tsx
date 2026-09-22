@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
+import { CopyToClipboardButton } from "@/components/copy-to-clipboard-button";
 import {
   getAdminSubmissionCategories,
   getBusinessSubmissions,
@@ -283,42 +284,120 @@ function SubmissionPanel({
             {formatDate(submission.created_at)}
           </span>
         </div>
-        <h2 className="mt-3 font-display text-2xl font-bold">{submission.business_name}</h2>
+        <h2 className="mt-3 font-display text-2xl font-bold text-ink lg:text-3xl">
+          {submission.business_name}
+        </h2>
         <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
           {category ?? "Sin categoria"}
         </p>
-        <p className="mt-4 text-sm font-semibold leading-6 text-stone-700">
+        <p className="mt-4 text-sm font-semibold leading-6 text-stone-700 lg:text-base">
           {submission.description ?? "Sin descripcion"}
         </p>
 
-        <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-          <Info label="Propietario" value={submission.owner_name} />
-          <Info label="Numero propietario" value={submission.owner_phone} />
-          <Info label="Contacto visible" value={submission.contact_name} />
-          <Info label="WhatsApp" value={submission.whatsapp} />
-          <Info label="Telefono" value={submission.phone} />
-          <Info label="Email" value={submission.email} />
-          <Info label="Descripcion perfil" value={submission.full_description} />
-          <Info
-            label="Direccion"
-            value={[submission.address, submission.neighborhood]
-              .filter(Boolean)
-              .join(", ")}
-          />
-          <Info label="Horario" value={submission.schedule} />
-          <Info label="Maps" value={submission.maps_url} />
-          <Info
-            label="Domicilios"
-            value={deliveryLabel(submission.delivery_available)}
-          />
-          <Info label="Pagos" value={submission.payment_methods} />
-          <Info label="Productos" value={submission.products_or_services} />
-          <Info label="Instagram" value={submission.instagram_url} />
-          <Info label="Facebook" value={submission.facebook_url} />
-          <Info label="TikTok" value={submission.tiktok_url} />
-          <Info label="Web" value={submission.website_url} />
-          <Info label="Notas usuario" value={submission.additional_notes} />
-        </dl>
+        <div className="mt-6 grid gap-6 lg:gap-7">
+          <InfoSection
+            hasContent={Boolean(
+              submission.owner_name ||
+                submission.owner_phone ||
+                submission.contact_name ||
+                submission.whatsapp ||
+                submission.phone ||
+                submission.email,
+            )}
+            title="Contacto"
+          >
+            <Info label="Propietario" value={submission.owner_name} />
+            <Info label="Numero propietario" value={submission.owner_phone} />
+            <Info label="Contacto visible" value={submission.contact_name} />
+            <Info
+              href={
+                submission.whatsapp
+                  ? `https://wa.me/${submission.whatsapp}`
+                  : undefined
+              }
+              icon={<WhatsAppIcon className="size-4 text-emerald-600" />}
+              label="WhatsApp"
+              value={submission.whatsapp}
+            />
+            <Info
+              href={submission.phone ? `tel:${submission.phone.replace(/\D/g, "")}` : undefined}
+              icon={<PhoneIcon className="size-4 text-stone-400" />}
+              label="Telefono"
+              value={submission.phone}
+            />
+            <Info
+              action={
+                submission.email ? (
+                  <CopyToClipboardButton value={submission.email} />
+                ) : undefined
+              }
+              href={submission.email ? `mailto:${submission.email}` : undefined}
+              icon={<EmailIcon className="size-4 text-stone-400" />}
+              label="Email"
+              value={submission.email}
+            />
+          </InfoSection>
+
+          <InfoSection
+            hasContent={Boolean(
+              submission.address ||
+                submission.neighborhood ||
+                submission.schedule,
+            )}
+            title="Ubicacion y horario"
+          >
+            <Info
+              href={submission.maps_url ?? undefined}
+              icon={<PinIcon className="size-4 text-stone-400" />}
+              label="Direccion"
+              value={[submission.address, submission.neighborhood]
+                .filter(Boolean)
+                .join(", ")}
+            />
+            <Info label="Horario" value={submission.schedule} />
+          </InfoSection>
+
+          <InfoSection
+            hasContent={Boolean(
+              submission.delivery_available ||
+                submission.payment_methods ||
+                submission.products_or_services,
+            )}
+            title="Operacion"
+          >
+            <Info
+              label="Domicilios"
+              value={deliveryLabel(submission.delivery_available)}
+            />
+            <PaymentMethodsInfo value={submission.payment_methods} />
+            <Info label="Productos" value={submission.products_or_services} />
+          </InfoSection>
+
+          <InfoSection
+            hasContent={Boolean(
+              submission.instagram_url ||
+                submission.facebook_url ||
+                submission.tiktok_url ||
+                submission.website_url,
+            )}
+            title="Redes y web"
+          >
+            <Info label="Instagram" value={submission.instagram_url} />
+            <Info label="Facebook" value={submission.facebook_url} />
+            <Info label="TikTok" value={submission.tiktok_url} />
+            <Info label="Web" value={submission.website_url} />
+          </InfoSection>
+
+          <InfoSection
+            hasContent={Boolean(
+              submission.full_description || submission.additional_notes,
+            )}
+            title="Notas"
+          >
+            <Info label="Descripcion perfil" value={submission.full_description} />
+            <Info label="Notas usuario" value={submission.additional_notes} />
+          </InfoSection>
+        </div>
         </div>
 
         <aside className="grid gap-4">
@@ -703,16 +782,279 @@ function EditSection({
   );
 }
 
-function Info({ label, value }: { label: string; value?: string | null }) {
-  if (!value) {
+function InfoSection({
+  children,
+  hasContent,
+  title,
+}: {
+  children: ReactNode;
+  hasContent: boolean;
+  title: string;
+}) {
+  if (!hasContent) {
     return null;
   }
 
   return (
+    <div className="border-t border-stone-200 pt-5 first:border-t-0 first:pt-0 lg:pt-6 lg:first:pt-0">
+      <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
+        {title}
+      </p>
+      <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:gap-x-6 lg:gap-y-4">
+        {children}
+      </dl>
+    </div>
+  );
+}
+
+function Info({
+  action,
+  href,
+  icon,
+  label,
+  value,
+}: {
+  action?: ReactNode;
+  href?: string;
+  icon?: ReactNode;
+  label: string;
+  value?: string | null;
+}) {
+  if (!value) {
+    return null;
+  }
+
+  const content = (
+    <span className="flex items-center gap-1.5 break-words font-semibold text-stone-800 lg:text-base">
+      {icon}
+      {value}
+    </span>
+  );
+
+  return (
     <div>
       <dt className="text-xs font-black uppercase text-stone-500">{label}</dt>
-      <dd className="mt-1 break-words font-semibold text-stone-800">{value}</dd>
+      <dd className="mt-1 flex items-center gap-1.5">
+        {href ? (
+          <a
+            className="flex min-w-0 items-center gap-1.5 hover:underline"
+            href={href}
+            rel={href.startsWith("http") ? "noreferrer" : undefined}
+            target={href.startsWith("http") ? "_blank" : undefined}
+          >
+            {content}
+          </a>
+        ) : (
+          content
+        )}
+        {action}
+      </dd>
     </div>
+  );
+}
+
+const PAYMENT_METHOD_MATCHERS: Array<{
+  icon: (className: string) => ReactNode;
+  keywords: string[];
+  label: string;
+}> = [
+  {
+    icon: (className) => <CashIcon className={className} />,
+    keywords: ["efectivo", "cash"],
+    label: "Efectivo",
+  },
+  {
+    icon: (className) => <WalletIcon className={className} />,
+    keywords: ["nequi"],
+    label: "Nequi",
+  },
+  {
+    icon: (className) => <WalletIcon className={className} />,
+    keywords: ["daviplata"],
+    label: "Daviplata",
+  },
+  {
+    icon: (className) => <BankIcon className={className} />,
+    keywords: ["transferencia", "trasferencia", "consignacion"],
+    label: "Transferencia",
+  },
+  {
+    icon: (className) => <CardIcon className={className} />,
+    keywords: ["tarjeta", "datafono", "dataphono", "pos"],
+    label: "Tarjeta",
+  },
+];
+
+function PaymentMethodsInfo({ value }: { value?: string | null }) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "");
+  const matches = PAYMENT_METHOD_MATCHERS.filter((matcher) =>
+    matcher.keywords.some((keyword) => normalized.includes(keyword)),
+  );
+
+  return (
+    <div>
+      <dt className="text-xs font-black uppercase text-stone-500">Pagos</dt>
+      <dd className="mt-1.5">
+        {matches.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {matches.map((matcher) => (
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--md-surface-container)] px-2.5 py-1 text-xs font-bold text-stone-700"
+                key={matcher.label}
+              >
+                {matcher.icon("size-3.5 text-stone-500")}
+                {matcher.label}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <span className="break-words font-semibold text-stone-800 lg:text-base">
+            {value}
+          </span>
+        )}
+      </dd>
+    </div>
+  );
+}
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" className={className} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.73.45 3.42 1.32 4.9L2 22l5.31-1.39a9.9 9.9 0 0 0 4.72 1.2h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2Zm5.83 14.13c-.25.7-1.24 1.28-2.03 1.45-.55.12-1.26.21-3.67-.79-3.08-1.27-5.06-4.39-5.21-4.6-.15-.2-1.25-1.66-1.25-3.17 0-1.5.79-2.24 1.07-2.55.28-.31.61-.38.81-.38.2 0 .41 0 .59.01.19.01.44-.07.69.53.25.6.86 2.08.94 2.23.08.15.13.33.03.53-.1.2-.15.33-.3.51-.15.18-.31.4-.44.54-.15.15-.3.31-.13.61.17.3.76 1.25 1.63 2.02 1.12 1 2.06 1.31 2.36 1.46.3.15.48.13.66-.08.18-.2.76-.89.97-1.19.2-.3.41-.25.68-.15.28.1 1.75.83 2.05.98.3.15.5.23.58.36.08.13.08.74-.17 1.44Z" />
+    </svg>
+  );
+}
+
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+    </svg>
+  );
+}
+
+function EmailIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      viewBox="0 0 24 24"
+    >
+      <rect height="16" rx="2" width="20" x="2" y="4" />
+      <path d="m22 7-10 7L2 7" />
+    </svg>
+  );
+}
+
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+      <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+function CashIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <rect height="12" rx="2" width="20" x="2" y="6" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M6 6v0M18 18v0" />
+    </svg>
+  );
+}
+
+function WalletIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" />
+      <path d="M3 5v14a2 2 0 0 0 2 2h16v-5" />
+      <path d="M18 12a2 2 0 0 0 0 4h3v-4Z" />
+    </svg>
+  );
+}
+
+function BankIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M16 10v11" />
+    </svg>
+  );
+}
+
+function CardIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.8"
+      viewBox="0 0 24 24"
+    >
+      <rect height="14" rx="2" width="20" x="2" y="5" />
+      <path d="M2 10h20" />
+    </svg>
   );
 }
 
