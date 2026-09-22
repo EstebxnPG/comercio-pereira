@@ -1,6 +1,6 @@
 begin;
 
-select plan(26);
+select plan(36);
 
 insert into auth.users (
   id,
@@ -413,10 +413,89 @@ select lives_ok(
   'business editors can create products for their business'
 );
 
+select lives_ok(
+  $$
+    insert into public.products (
+      id,
+      business_id,
+      slug,
+      name,
+      short_description,
+      status,
+      moderation_status,
+      created_by,
+      updated_by
+    )
+    values (
+      '00000000-0000-0000-0000-000000000929',
+      '00000000-0000-0000-0000-000000000404',
+      'rls-owned-business-second-test-product',
+      'Second Test Product',
+      'Second owned test product',
+      'draft',
+      'draft',
+      '00000000-0000-0000-0000-000000000101',
+      '00000000-0000-0000-0000-000000000101'
+    )
+  $$,
+  'business editors can create multiple products for the same business'
+);
+
+select lives_ok(
+  $$
+    update public.products
+    set
+      discount_percentage = 15,
+      discount_label = '15% OFF',
+      discount_starts_at = now() - interval '1 hour',
+      discount_ends_at = now() + interval '1 day'
+    where id = '00000000-0000-0000-0000-000000000909'
+  $$,
+  'business editors can configure product discounts for their business'
+);
+
 select is(
   (select count(*) from public.products where id = '00000000-0000-0000-0000-000000000909'),
   1::bigint,
   'business editors can read products for their business'
+);
+
+select lives_ok(
+  $$
+    insert into public.business_promotions (
+      id,
+      business_id,
+      type,
+      title,
+      value,
+      minimum_order_amount,
+      status,
+      starts_at,
+      ends_at,
+      created_by,
+      updated_by
+    )
+    values (
+      '00000000-0000-0000-0000-000000000919',
+      '00000000-0000-0000-0000-000000000404',
+      'coupon_amount',
+      'Cupon RLS',
+      600000,
+      3000000,
+      'active',
+      now() - interval '1 hour',
+      now() + interval '1 day',
+      '00000000-0000-0000-0000-000000000101',
+      '00000000-0000-0000-0000-000000000101'
+    )
+  $$,
+  'business managers can create promotions for their business'
+);
+
+select is(
+  (select count(*) from public.business_promotions where id = '00000000-0000-0000-0000-000000000919'),
+  1::bigint,
+  'business managers can read promotions for their business'
 );
 
 select throws_ok(
@@ -440,6 +519,12 @@ select is(
   (select count(*) from public.products where id = '00000000-0000-0000-0000-000000000909'),
   0::bigint,
   'outsiders cannot read unpublished products from another business'
+);
+
+select is(
+  (select count(*) from public.business_promotions where id = '00000000-0000-0000-0000-000000000919'),
+  0::bigint,
+  'outsiders cannot read private promotions from another business'
 );
 
 select throws_ok(
@@ -491,6 +576,12 @@ select is(
   'anon users can read published approved products from published businesses'
 );
 
+select is(
+  (select count(*) from public.business_promotions where id = '00000000-0000-0000-0000-000000000919'),
+  1::bigint,
+  'anon users can read active promotions from published businesses'
+);
+
 select lives_ok(
   $$
     insert into public.analytics_events (
@@ -509,6 +600,42 @@ select lives_ok(
   'anon users can insert product analytics events'
 );
 
+select lives_ok(
+  $$
+    insert into public.analytics_events (
+      business_id,
+      product_id,
+      event_type,
+      anonymous_session_id
+    )
+    values (
+      '00000000-0000-0000-0000-000000000404',
+      '00000000-0000-0000-0000-000000000909',
+      'discounted_product_view',
+      'test-session'
+    )
+  $$,
+  'anon users can insert discounted product analytics events'
+);
+
+select lives_ok(
+  $$
+    insert into public.analytics_events (
+      business_id,
+      promotion_id,
+      event_type,
+      anonymous_session_id
+    )
+    values (
+      '00000000-0000-0000-0000-000000000404',
+      '00000000-0000-0000-0000-000000000919',
+      'promotion_view',
+      'test-session'
+    )
+  $$,
+  'anon users can insert promotion analytics events'
+);
+
 reset role;
 
 select is(
@@ -520,6 +647,28 @@ select is(
   ),
   1,
   'analytics events roll up into daily product metrics'
+);
+
+select is(
+  (
+    select discounted_product_views
+    from public.analytics_daily_product
+    where product_id = '00000000-0000-0000-0000-000000000909'
+      and event_date = current_date
+  ),
+  1,
+  'discounted product events roll up into daily product metrics'
+);
+
+select is(
+  (
+    select promotion_views
+    from public.analytics_daily_business
+    where business_id = '00000000-0000-0000-0000-000000000404'
+      and event_date = current_date
+  ),
+  1,
+  'promotion events roll up into daily business metrics'
 );
 
 select *

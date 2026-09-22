@@ -9,12 +9,16 @@ import {
 import { BusinessStatusBadge } from "@/components/business-status";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
+import { PromotionViewTracker } from "@/components/promotion-event-tracker";
 import { ShareButtons } from "@/components/share-buttons";
 import { SocialLinks } from "@/components/social-links";
 import { getBusinessBySlug } from "@/lib/businesses";
 import { SITE_NAME, STATUS_LABELS } from "@/lib/constants";
 import {
-  formatProductPrice,
+  BUSINESS_PROMOTION_TYPE_LABELS,
+  formatPromotionValue,
+  getActiveBusinessPromotions,
+  getProductPriceDisplay,
   getPublishedProductsForBusiness,
 } from "@/lib/products";
 import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
@@ -70,7 +74,10 @@ export default async function BusinessPage(
     notFound();
   }
 
-  const products = await getPublishedProductsForBusiness(business.id);
+  const [products, promotions] = await Promise.all([
+    getPublishedProductsForBusiness(business.id),
+    getActiveBusinessPromotions(business.id),
+  ]);
   const profileUrl = absoluteUrl(`/comercios/${business.slug}`);
   const shareText = `El centro sigue latiendo\n\nConoce a ${business.name}, comercio aliado de ${SITE_NAME}:`;
   const whatsappContactMessage =
@@ -85,6 +92,12 @@ export default async function BusinessPage(
     <>
       <Header />
       <BusinessProfileViewTracker businessId={business.id} />
+      {promotions.length > 0 ? (
+        <PromotionViewTracker
+          businessId={business.id}
+          promotionIds={promotions.map((promotion) => promotion.id)}
+        />
+      ) : null}
       <main className="bg-paper">
         <section className="relative bg-ink text-white">
           <div className="relative h-[280px] w-full overflow-hidden sm:h-[380px] lg:h-[420px]">
@@ -127,6 +140,42 @@ export default async function BusinessPage(
               {business.fullDescription ?? business.shortDescription}
             </p>
 
+            {promotions.length > 0 ? (
+              <section className="mt-8 grid gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase text-brand">
+                    Promociones activas
+                  </p>
+                  <h2 className="mt-1 font-display text-2xl font-extrabold">
+                    Beneficios del comercio
+                  </h2>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {promotions.map((promotion) => (
+                    <article
+                      className="rounded-2xl border border-brand-soft bg-brand-soft p-4"
+                      key={promotion.id}
+                    >
+                      <p className="text-xs font-black uppercase text-brand">
+                        {BUSINESS_PROMOTION_TYPE_LABELS[promotion.type]}
+                      </p>
+                      <h3 className="mt-2 font-display text-lg font-bold">
+                        {promotion.title}
+                      </h3>
+                      <p className="mt-1 text-sm font-black text-brand">
+                        {formatPromotionValue(promotion)}
+                      </p>
+                      {promotion.description ? (
+                        <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
+                          {promotion.description}
+                        </p>
+                      ) : null}
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             <dl className="mt-8 grid gap-4">
               {business.address ? (
                 <InfoRow label="Direccion" value={business.address} />
@@ -159,39 +208,55 @@ export default async function BusinessPage(
                   </Link>
                 </div>
                 <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0">
-                  {products.slice(0, PRODUCT_CAROUSEL_LIMIT).map((product) => (
-                    <Link
-                      className="group w-[65%] shrink-0 snap-start overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-52"
-                      href={`/productos/${product.slug}`}
-                      key={product.id}
-                    >
-                      <div className="grid aspect-[4/3] place-items-center bg-stone-100">
-                        {product.primaryImageUrl ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            alt=""
-                            className="h-full w-full object-cover"
-                            src={product.primaryImageUrl}
-                          />
-                        ) : (
-                          <span className="text-xs font-black uppercase text-stone-500">
-                            Producto local
-                          </span>
-                        )}
-                      </div>
-                      <div className="grid gap-2 p-4">
-                        <h3 className="text-lg font-black group-hover:underline">
-                          {product.name}
-                        </h3>
-                        <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
-                          {product.shortDescription}
-                        </p>
-                        <p className="text-sm font-black text-brand">
-                          {formatProductPrice(product)}
-                        </p>
-                      </div>
-                    </Link>
-                  ))}
+                  {products.slice(0, PRODUCT_CAROUSEL_LIMIT).map((product) => {
+                    const price = getProductPriceDisplay(product);
+
+                    return (
+                      <Link
+                        className="group w-[65%] shrink-0 snap-start overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:w-52"
+                        href={`/productos/${product.slug}`}
+                        key={product.id}
+                      >
+                        <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
+                          {price.badge ? (
+                            <span className="absolute left-3 top-3 rounded-full bg-brand px-3 py-1 text-xs font-black text-white shadow-sm">
+                              {price.badge}
+                            </span>
+                          ) : null}
+                          {product.primaryImageUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              alt=""
+                              className="h-full w-full object-cover"
+                              src={product.primaryImageUrl}
+                            />
+                          ) : (
+                            <span className="text-xs font-black uppercase text-stone-500">
+                              Producto local
+                            </span>
+                          )}
+                        </div>
+                        <div className="grid gap-2 p-4">
+                          <h3 className="text-lg font-black group-hover:underline">
+                            {product.name}
+                          </h3>
+                          <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+                            {product.shortDescription}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-black text-brand">
+                              {price.current}
+                            </p>
+                            {price.original ? (
+                              <p className="text-xs font-bold text-stone-500 line-through">
+                                {price.original}
+                              </p>
+                            ) : null}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
                   <Link
                     href={`/comercios/${business.slug}/productos`}
                     className="flex w-[65%] shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[var(--md-outline-variant)] bg-[var(--md-surface-container)] sm:w-52"

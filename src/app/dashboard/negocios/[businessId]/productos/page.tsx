@@ -5,7 +5,7 @@ import {
   PRODUCT_STATUS_LABELS,
   type ProductAvailability,
   type ProductStatus,
-  formatProductPrice,
+  getProductPriceDisplay,
 } from "@/lib/products";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -53,58 +53,76 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
           </section>
         ) : (
           <section className="grid gap-3">
-            {products.map((product) => (
-              <article
-                className="grid gap-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:grid-cols-[112px_1fr_auto]"
-                key={product.id}
-              >
-                <div className="grid aspect-square place-items-center overflow-hidden rounded-xl bg-stone-100">
-                  {product.primary_image_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      alt=""
-                      className="h-full w-full object-cover"
-                      src={product.primary_image_url}
-                    />
-                  ) : (
-                    <span className="px-3 text-center text-xs font-black uppercase text-stone-500">
-                      Sin imagen
-                    </span>
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap gap-2">
-                    <Badge>{PRODUCT_STATUS_LABELS[product.status as ProductStatus]}</Badge>
-                    <Badge>
-                      {
-                        PRODUCT_AVAILABILITY_LABELS[
-                          product.availability as ProductAvailability
-                        ]
-                      }
-                    </Badge>
+            {products.map((product) => {
+              const price = getProductPriceDisplay({
+                currency: product.currency,
+                discountEndsAt: product.discount_ends_at,
+                discountLabel: product.discount_label,
+                discountPercentage: product.discount_percentage,
+                discountStartsAt: product.discount_starts_at,
+                priceCents: product.price_cents,
+                priceLabel: product.price_label,
+              });
+
+              return (
+                <article
+                  className="grid gap-4 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm sm:grid-cols-[112px_1fr_auto]"
+                  key={product.id}
+                >
+                  <div className="grid aspect-square place-items-center overflow-hidden rounded-xl bg-stone-100">
+                    {product.primary_image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        alt=""
+                        className="h-full w-full object-cover"
+                        src={product.primary_image_url}
+                      />
+                    ) : (
+                      <span className="px-3 text-center text-xs font-black uppercase text-stone-500">
+                        Sin imagen
+                      </span>
+                    )}
                   </div>
-                  <h2 className="mt-3 text-xl font-black">{product.name}</h2>
-                  <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
-                    {product.short_description}
-                  </p>
-                  <p className="mt-2 text-sm font-black text-[#B3262E]">
-                    {formatProductPrice({
-                      currency: product.currency,
-                      priceCents: product.price_cents,
-                      priceLabel: product.price_label,
-                    })}
-                  </p>
-                </div>
-                <div className="flex items-center sm:justify-end">
-                  <Link
-                    className="md-outlined-button px-4"
-                    href={`/dashboard/negocios/${businessId}/productos/${product.id}`}
-                  >
-                    Editar
-                  </Link>
-                </div>
-              </article>
-            ))}
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge>
+                        {PRODUCT_STATUS_LABELS[product.status as ProductStatus]}
+                      </Badge>
+                      <Badge>
+                        {
+                          PRODUCT_AVAILABILITY_LABELS[
+                            product.availability as ProductAvailability
+                          ]
+                        }
+                      </Badge>
+                      {price.hasDiscount ? <Badge>{price.badge}</Badge> : null}
+                    </div>
+                    <h2 className="mt-3 text-xl font-black">{product.name}</h2>
+                    <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+                      {product.short_description}
+                    </p>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-black text-[#B3262E]">
+                        {price.current}
+                      </p>
+                      {price.original ? (
+                        <p className="text-xs font-black text-stone-400 line-through">
+                          {price.original}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="flex items-center sm:justify-end">
+                    <Link
+                      className="md-outlined-button px-4"
+                      href={`/dashboard/negocios/${businessId}/productos/${product.id}`}
+                    >
+                      Editar
+                    </Link>
+                  </div>
+                </article>
+              );
+            })}
           </section>
         )}
       </div>
@@ -138,6 +156,10 @@ async function getBusinessProducts(businessId: string) {
           short_description,
           price_cents,
           currency,
+          discount_ends_at,
+          discount_label,
+          discount_percentage,
+          discount_starts_at,
           price_label,
           status,
           availability,

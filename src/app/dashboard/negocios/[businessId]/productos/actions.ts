@@ -11,6 +11,7 @@ const EDITABLE_ROLES = ["owner", "manager", "editor"] as const;
 const PRODUCT_IMAGE_BUCKET =
   process.env.SUPABASE_PRODUCT_IMAGES_BUCKET ?? "product-images";
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_PRODUCT_IMAGES = 5;
 const ALLOWED_IMAGE_TYPES = [
   "image/heic",
   "image/heif",
@@ -36,6 +37,12 @@ export async function createProductAction(formData: FormData) {
       created_by: user.id,
       currency: "COP",
       description: getOptionalString(formData.get("description")),
+      discount_ends_at: parseOptionalDateTime(formData.get("discountEndsAt")),
+      discount_label: getOptionalString(formData.get("discountLabel")),
+      discount_percentage: parseDiscountPercentage(
+        formData.get("discountPercentage"),
+      ),
+      discount_starts_at: parseOptionalDateTime(formData.get("discountStartsAt")),
       moderation_status: status === "pending_review" ? "pending" : "draft",
       name,
       price_cents: parsePriceCents(formData.get("price")),
@@ -79,6 +86,12 @@ export async function updateProductAction(formData: FormData) {
     .update({
       availability: parseAvailability(formData.get("availability")),
       description: getOptionalString(formData.get("description")),
+      discount_ends_at: parseOptionalDateTime(formData.get("discountEndsAt")),
+      discount_label: getOptionalString(formData.get("discountLabel")),
+      discount_percentage: parseDiscountPercentage(
+        formData.get("discountPercentage"),
+      ),
+      discount_starts_at: parseOptionalDateTime(formData.get("discountStartsAt")),
       moderation_status: status === "pending_review" ? "pending" : "draft",
       name: getRequiredString(formData.get("name"), "Nombre"),
       price_cents: parsePriceCents(formData.get("price")),
@@ -115,14 +128,17 @@ export async function updateProductAction(formData: FormData) {
 export async function uploadProductImageAction(formData: FormData) {
   const businessId = getRequiredString(formData.get("businessId"), "businessId");
   const productId = getRequiredString(formData.get("productId"), "productId");
-  const file = getRequiredFile(formData.get("image"));
+  const files = getRequiredFiles(formData.getAll("images"), formData.get("image"));
+  const imageRole = formData.get("imageRole") === "gallery" ? "gallery" : "primary";
   const { user } = await requireBusinessRole(businessId, [...EDITABLE_ROLES]);
   const supabase = await getAuthedClient();
 
-  validateImageFile(file);
+  for (const file of files) {
+    validateImageFile(file);
 
-  if (!(await hasValidImageSignature(file))) {
-    throw new Error("El archivo no coincide con un tipo de imagen permitido.");
+    if (!(await hasValidImageSignature(file))) {
+      throw new Error("El archivo no coincide con un tipo de imagen permitido.");
+    }
   }
 
   const { data: product, error: productError } = await supabase
@@ -136,50 +152,232 @@ export async function uploadProductImageAction(formData: FormData) {
     throw new Error("No se encontro el producto para subir imagen.");
   }
 
-  const path = `${businessId}/${productId}/main-${Date.now()}.${getImageExtension(file)}`;
-  const { error: uploadError } = await supabase.storage
-    .from(PRODUCT_IMAGE_BUCKET)
-    .upload(path, file, {
-      cacheControl: "31536000",
-      contentType: file.type,
-      upsert: false,
+  const { count: currentImageCount, error: countError } = await supabase
+    .from("product_images")
+    .select("id", { count: "exact", head: true })
+    .eq("product_id", productId);
+
+  if (countError) {
+    throw new Error(`No se pudo validar la galeria: ${countError.message}`);
+  }
+
+  const availableSlots = MAX_PRODUCT_IMAGES - (currentImageCount ?? 0);
+
+  if (availableSlots <= 0 || files.length > availableSlots) {
+    throw new Error(`Cada producto puede tener maximo ${MAX_PRODUCT_IMAGES} imagenes.`);
+  }
+
+  const { data: orderRows, error: orderError } = await supabase
+    .from("product_images")
+    .select("sort_order")
+    .eq("product_id", productId)
+    .order("sort_order", { ascending: false })
+    .limit(1);
+
+  if (orderError) {
+    throw new Error(`No se pudo preparar la galeria: ${orderError.message}`);
+  }
+
+  const firstSortOrder = (orderRows?.[0]?.sort_order ?? -1) + 1;
+  const insertedImages: Array<{
+    isPrimary: boolean;
+    path: string;
+    publicUrl: string;
+  }> = [];
+
+  for (const [index, file] of files.entries()) {
+    const shouldBePrimary =
+      (imageRole === "primary" && index === 0) ||
+      (currentImageCount === 0 && index === 0);
+    const path = `${businessId}/${productId}/${Date.now()}-${index}.${getImageExtension(file)}`;
+    const { error: uploadError } = await supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .upload(path, file, {
+        cacheControl: "31536000",
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(`No se pudo subir la imagen: ${uploadError.message}`);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
+
+    if (shouldBePrimary) {
+      const { error: clearPrimaryError } = await supabase
+        .from("product_images")
+        .update({ is_primary: false })
+        .eq("product_id", productId);
+
+      if (clearPrimaryError) {
+        throw new Error(
+          `No se pudo actualizar la imagen principal: ${clearPrimaryError.message}`,
+        );
+      }
+    }
+
+    const { error: insertError } = await supabase.from("product_images").insert({
+      alt_text: `Imagen de ${product.slug}`,
+      bucket: PRODUCT_IMAGE_BUCKET,
+      is_primary: shouldBePrimary,
+      product_id: productId,
+      public_url: publicUrl,
+      sort_order: firstSortOrder + index,
+      storage_path: path,
     });
 
-  if (uploadError) {
-    throw new Error(`No se pudo subir la imagen: ${uploadError.message}`);
+    if (insertError) {
+      throw new Error(`No se pudo registrar la imagen: ${insertError.message}`);
+    }
+
+    if (shouldBePrimary) {
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({
+          primary_image_url: publicUrl,
+          updated_by: user.id,
+        })
+        .eq("id", productId)
+        .eq("business_id", businessId);
+
+      if (updateError) {
+        throw new Error(`No se pudo actualizar la imagen: ${updateError.message}`);
+      }
+    }
+
+    insertedImages.push({ isPrimary: shouldBePrimary, path, publicUrl });
   }
-
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from(PRODUCT_IMAGE_BUCKET).getPublicUrl(path);
-
-  const { error: updateError } = await supabase
-    .from("products")
-    .update({
-      primary_image_url: publicUrl,
-      updated_by: user.id,
-    })
-    .eq("id", productId)
-    .eq("business_id", businessId);
-
-  if (updateError) {
-    throw new Error(`No se pudo actualizar la imagen: ${updateError.message}`);
-  }
-
-  await supabase.from("product_images").insert({
-    alt_text: `Imagen de ${product.slug}`,
-    bucket: PRODUCT_IMAGE_BUCKET,
-    is_primary: true,
-    product_id: productId,
-    public_url: publicUrl,
-    storage_path: path,
-  });
 
   await logBusinessAudit({
     action: "product_image_updated",
     actorUserId: user.id,
     businessId,
-    metadata: { bucket: PRODUCT_IMAGE_BUCKET, path, product_id: productId },
+    metadata: {
+      bucket: PRODUCT_IMAGE_BUCKET,
+      count: insertedImages.length,
+      product_id: productId,
+      role: imageRole,
+    },
+    supabase,
+  });
+
+  revalidateProductPaths(businessId, getJoinedSlug(product.businesses), product.slug);
+  redirect(`/dashboard/negocios/${businessId}/productos/${productId}?saved=1`);
+}
+
+export async function setPrimaryProductImageAction(formData: FormData) {
+  const businessId = getRequiredString(formData.get("businessId"), "businessId");
+  const productId = getRequiredString(formData.get("productId"), "productId");
+  const imageId = getRequiredString(formData.get("imageId"), "imageId");
+  const { user } = await requireBusinessRole(businessId, [...EDITABLE_ROLES]);
+  const supabase = await getAuthedClient();
+  const product = await getEditableProductForImageAction(supabase, businessId, productId);
+
+  const { data: image, error: imageError } = await supabase
+    .from("product_images")
+    .select("public_url")
+    .eq("id", imageId)
+    .eq("product_id", productId)
+    .single();
+
+  if (imageError || !image) {
+    throw new Error("No se encontro la imagen.");
+  }
+
+  const { error: clearError } = await supabase
+    .from("product_images")
+    .update({ is_primary: false })
+    .eq("product_id", productId);
+
+  if (clearError) {
+    throw new Error(`No se pudo limpiar la imagen principal: ${clearError.message}`);
+  }
+
+  const { error: markError } = await supabase
+    .from("product_images")
+    .update({ is_primary: true })
+    .eq("id", imageId)
+    .eq("product_id", productId);
+
+  if (markError) {
+    throw new Error(`No se pudo marcar la imagen principal: ${markError.message}`);
+  }
+
+  const { error: productUpdateError } = await supabase
+    .from("products")
+    .update({
+      primary_image_url: image.public_url,
+      updated_by: user.id,
+    })
+    .eq("id", productId)
+    .eq("business_id", businessId);
+
+  if (productUpdateError) {
+    throw new Error(
+      `No se pudo actualizar la imagen principal: ${productUpdateError.message}`,
+    );
+  }
+
+  await logBusinessAudit({
+    action: "product_image_updated",
+    actorUserId: user.id,
+    businessId,
+    metadata: { image_id: imageId, product_id: productId, role: "primary" },
+    supabase,
+  });
+
+  revalidateProductPaths(businessId, getJoinedSlug(product.businesses), product.slug);
+  redirect(`/dashboard/negocios/${businessId}/productos/${productId}?saved=1`);
+}
+
+export async function deleteProductImageAction(formData: FormData) {
+  const businessId = getRequiredString(formData.get("businessId"), "businessId");
+  const productId = getRequiredString(formData.get("productId"), "productId");
+  const imageId = getRequiredString(formData.get("imageId"), "imageId");
+  const { user } = await requireBusinessRole(businessId, [...EDITABLE_ROLES]);
+  const supabase = await getAuthedClient();
+  const product = await getEditableProductForImageAction(supabase, businessId, productId);
+
+  const { data: image, error: imageError } = await supabase
+    .from("product_images")
+    .select("is_primary, storage_path")
+    .eq("id", imageId)
+    .eq("product_id", productId)
+    .single();
+
+  if (imageError || !image) {
+    throw new Error("No se encontro la imagen.");
+  }
+
+  const { error: deleteRowError } = await supabase
+    .from("product_images")
+    .delete()
+    .eq("id", imageId)
+    .eq("product_id", productId);
+
+  if (deleteRowError) {
+    throw new Error(`No se pudo eliminar la imagen: ${deleteRowError.message}`);
+  }
+
+  await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove([image.storage_path]);
+
+  if (image.is_primary) {
+    await promoteFallbackPrimaryImage({
+      businessId,
+      productId,
+      supabase,
+      userId: user.id,
+    });
+  }
+
+  await logBusinessAudit({
+    action: "product_image_updated",
+    actorUserId: user.id,
+    businessId,
+    metadata: { deleted_image_id: imageId, product_id: productId },
     supabase,
   });
 
@@ -195,6 +393,79 @@ async function getAuthedClient() {
   }
 
   return supabase;
+}
+
+async function getEditableProductForImageAction(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  businessId: string,
+  productId: string,
+) {
+  if (!supabase) {
+    throw new Error("Supabase Auth no esta configurado.");
+  }
+
+  const { data: product, error } = await supabase
+    .from("products")
+    .select("slug, business_id, businesses(slug)")
+    .eq("id", productId)
+    .eq("business_id", businessId)
+    .single();
+
+  if (error || !product) {
+    throw new Error("No se encontro el producto.");
+  }
+
+  return product;
+}
+
+async function promoteFallbackPrimaryImage({
+  businessId,
+  productId,
+  supabase,
+  userId,
+}: {
+  businessId: string;
+  productId: string;
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
+  userId: string;
+}) {
+  const { data: fallback, error } = await supabase
+    .from("product_images")
+    .select("id, public_url")
+    .eq("product_id", productId)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`No se pudo buscar imagen de respaldo: ${error.message}`);
+  }
+
+  if (fallback) {
+    const { error: markError } = await supabase
+      .from("product_images")
+      .update({ is_primary: true })
+      .eq("id", fallback.id)
+      .eq("product_id", productId);
+
+    if (markError) {
+      throw new Error(`No se pudo promover la imagen: ${markError.message}`);
+    }
+  }
+
+  const { error: productError } = await supabase
+    .from("products")
+    .update({
+      primary_image_url: fallback?.public_url ?? null,
+      updated_by: userId,
+    })
+    .eq("id", productId)
+    .eq("business_id", businessId);
+
+  if (productError) {
+    throw new Error(`No se pudo actualizar el producto: ${productError.message}`);
+  }
 }
 
 async function getBusinessSlug(
@@ -277,6 +548,34 @@ function parsePriceCents(value: FormDataEntryValue | null) {
   return normalized * 100;
 }
 
+function parseDiscountPercentage(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 1 || parsed > 90) {
+    throw new Error("El descuento debe ser un porcentaje entero entre 1 y 90.");
+  }
+
+  return parsed;
+}
+
+function parseOptionalDateTime(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.trim()) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("La fecha de promocion no es valida.");
+  }
+
+  return parsed.toISOString();
+}
+
 function getRequiredString(value: FormDataEntryValue | null, field: string) {
   if (typeof value !== "string" || !value.trim()) {
     throw new Error(`${field} es obligatorio.`);
@@ -289,12 +588,23 @@ function getOptionalString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() || null : null;
 }
 
-function getRequiredFile(value: FormDataEntryValue | null) {
-  if (!(value instanceof File) || value.size === 0) {
-    throw new Error("Selecciona una imagen.");
+function getRequiredFiles(
+  values: FormDataEntryValue[],
+  fallback: FormDataEntryValue | null,
+) {
+  const files = values.filter(
+    (value): value is File => value instanceof File && value.size > 0,
+  );
+
+  if (files.length === 0 && fallback instanceof File && fallback.size > 0) {
+    files.push(fallback);
   }
 
-  return value;
+  if (files.length === 0) {
+    throw new Error("Selecciona al menos una imagen.");
+  }
+
+  return files;
 }
 
 function validateImageFile(file: File) {

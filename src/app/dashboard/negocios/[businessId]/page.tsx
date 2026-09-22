@@ -88,6 +88,12 @@ export default async function BusinessProfilePage(props: BusinessProfilePageProp
           </Link>
           <Link
             className="md-outlined-button px-4"
+            href={`/dashboard/negocios/${business.id}/promociones`}
+          >
+            Promociones
+          </Link>
+          <Link
+            className="md-outlined-button px-4"
             href={`/dashboard/negocios/${business.id}/estadisticas`}
           >
             Estadisticas

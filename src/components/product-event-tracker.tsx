@@ -2,18 +2,32 @@
 
 import { useEffect } from "react";
 
-type ProductEventType = "product_view" | "click_whatsapp" | "share_product";
+type ProductEventType =
+  | "click_whatsapp"
+  | "discounted_product_view"
+  | "product_view"
+  | "share_product";
 
 export function ProductViewTracker({
   businessId,
+  isDiscounted = false,
   productId,
 }: {
   businessId: string;
+  isDiscounted?: boolean;
   productId: string;
 }) {
   useEffect(() => {
     void trackProductEvent({ businessId, eventType: "product_view", productId });
-  }, [businessId, productId]);
+
+    if (isDiscounted) {
+      void trackProductEvent({
+        businessId,
+        eventType: "discounted_product_view",
+        productId,
+      });
+    }
+  }, [businessId, isDiscounted, productId]);
 
   return null;
 }

@@ -30,8 +30,11 @@ export default async function BusinessStatsPage(props: StatsPageProps) {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Metric label="Vistas perfil" value={stats.profileViews} />
           <Metric label="Vistas productos" value={stats.productViews} />
+          <Metric label="Productos con descuento" value={stats.discountedProductViews} />
           <Metric label="WhatsApp" value={stats.whatsappClicks} />
           <Metric label="Otros clics" value={stats.otherClicks} />
+          <Metric label="Vistas promos" value={stats.promotionViews} />
+          <Metric label="Clics promos" value={stats.promotionClicks} />
         </section>
 
         <section className="md-surface p-5">
@@ -84,13 +87,13 @@ async function getBusinessStats(businessId: string) {
     supabase
       .from("analytics_daily_business")
       .select(
-        "profile_views, product_views, whatsapp_clicks, phone_clicks, website_clicks, social_clicks, share_events",
+        "profile_views, product_views, discounted_product_views, whatsapp_clicks, phone_clicks, website_clicks, social_clicks, share_events, promotion_views, promotion_clicks",
       )
       .eq("business_id", businessId)
       .gte("event_date", fromDate.toISOString().slice(0, 10)),
     supabase
       .from("analytics_daily_product")
-      .select("product_id, product_views, products(name)")
+      .select("product_id, product_views, discounted_product_views, products(name)")
       .eq("business_id", businessId)
       .gte("event_date", fromDate.toISOString().slice(0, 10))
       .order("product_views", { ascending: false })
@@ -98,24 +101,31 @@ async function getBusinessStats(businessId: string) {
   ]);
 
   return {
+    discountedProductViews: sum(daily, "discounted_product_views"),
     otherClicks: sum(daily, "phone_clicks") + sum(daily, "website_clicks") + sum(daily, "social_clicks"),
     productViews: sum(daily, "product_views"),
     products: (products ?? []).map((product) => ({
+      discounted_product_views: product.discounted_product_views,
       name: getProductName(product.products),
       product_id: product.product_id,
       product_views: product.product_views,
     })),
     profileViews: sum(daily, "profile_views"),
+    promotionClicks: sum(daily, "promotion_clicks"),
+    promotionViews: sum(daily, "promotion_views"),
     whatsappClicks: sum(daily, "whatsapp_clicks"),
   };
 }
 
 function emptyStats() {
   return {
+    discountedProductViews: 0,
     otherClicks: 0,
     productViews: 0,
     products: [],
     profileViews: 0,
+    promotionClicks: 0,
+    promotionViews: 0,
     whatsappClicks: 0,
   };
 }
