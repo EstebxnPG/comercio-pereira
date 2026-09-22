@@ -79,9 +79,9 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
         isDiscounted={price.hasDiscount}
         productId={product.id}
       />
-      <main className="bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
-        <article className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
-          <div className="grid gap-3">
+      <main className="bg-paper px-4 py-6 text-ink sm:px-6 sm:py-10 lg:px-8">
+        <article className="mx-auto grid max-w-6xl gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_420px]">
+          <div className="grid gap-2.5 sm:gap-3">
             <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
               {galleryImages[0] ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -97,7 +97,7 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
               )}
             </div>
             {galleryImages.length > 1 ? (
-              <div className="grid grid-cols-4 gap-3">
+              <div className="grid grid-cols-4 gap-2.5 sm:gap-3">
                 {galleryImages.slice(1, 5).map((image) => (
                   <div
                     className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-sm"
@@ -114,7 +114,7 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
               </div>
             ) : null}
           </div>
-          <section className="grid content-start gap-5">
+          <section className="grid content-start gap-4 sm:gap-5">
             <div>
               <Link
                 className="text-sm font-black text-brand hover:underline"
@@ -122,10 +122,10 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
               >
                 {product.businessName}
               </Link>
-              <h1 className="mt-2 font-display text-4xl font-extrabold">
+              <h1 className="mt-1.5 font-display text-2xl font-extrabold leading-tight sm:mt-2 sm:text-4xl">
                 {product.name}
               </h1>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
+              <div className="mt-2.5 flex flex-wrap items-center gap-2.5 sm:mt-3 sm:gap-3">
                 <p className="text-lg font-black text-brand">{price.current}</p>
                 {price.original ? (
                   <p className="text-sm font-bold text-stone-500 line-through">
@@ -142,7 +142,7 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
             <span className="w-fit rounded-full bg-brand-soft px-3 py-1 text-xs font-black uppercase text-brand-deep">
               {PRODUCT_AVAILABILITY_LABELS[product.availability]}
             </span>
-            <p className="text-base font-semibold leading-7 text-stone-700">
+            <p className="text-sm font-semibold leading-6 text-stone-700 sm:text-base sm:leading-7">
               {product.description ?? product.shortDescription}
             </p>
             {whatsappUrl ? (
