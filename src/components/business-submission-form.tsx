@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { BubbleSelect } from "@/components/bubble-select";
 import { BusinessCard } from "@/components/business-card";
 import {
   DEFAULT_BUSINESS_COVER_IMAGE,
@@ -62,14 +63,120 @@ const INITIAL_STATE: FormState = {
   acceptsPublication: false,
 };
 
-const STEPS: Array<{ eyebrow: string; title: string }> = [
-  { eyebrow: "Informacion Basica", title: "Informacion principal" },
-  { eyebrow: "Contacto", title: "Contacto comercial" },
-  { eyebrow: "Ubicacion", title: "Ubicacion y horarios" },
-  { eyebrow: "Canales", title: "Redes e imagenes" },
-  { eyebrow: "Operacion", title: "Operacion" },
-  { eyebrow: "Final", title: "Revision final" },
+const STEPS: Array<{ eyebrow: string; encouragement: string; title: string }> = [
+  {
+    eyebrow: "Informacion Basica",
+    encouragement: "Empecemos con lo esencial de tu comercio.",
+    title: "Informacion principal",
+  },
+  {
+    eyebrow: "Contacto",
+    encouragement: "Vas muy bien. Ahora, como te contactan tus clientes.",
+    title: "Contacto comercial",
+  },
+  {
+    eyebrow: "Ubicacion",
+    encouragement: "Vamos por la mitad. Dinos donde te encuentran.",
+    title: "Ubicacion y horarios",
+  },
+  {
+    eyebrow: "Canales",
+    encouragement: "Ya casi. Suma tus redes y las fotos de tu comercio.",
+    title: "Redes e imagenes",
+  },
+  {
+    eyebrow: "Operacion",
+    encouragement: "Un ultimo tramo: domicilios y formas de pago.",
+    title: "Operacion",
+  },
+  {
+    eyebrow: "Final",
+    encouragement: "Llegaste al final. Revisa todo y envialo.",
+    title: "Revision final",
+  },
 ] as const;
+
+type ScheduleDay = "lun" | "mar" | "mie" | "jue" | "vie" | "sab" | "dom";
+
+type ScheduleEntry = {
+  close: string;
+  days: ScheduleDay[];
+  id: string;
+  open: string;
+};
+
+const SCHEDULE_DAYS: Array<{ key: ScheduleDay; label: string }> = [
+  { key: "lun", label: "L" },
+  { key: "mar", label: "M" },
+  { key: "mie", label: "X" },
+  { key: "jue", label: "J" },
+  { key: "vie", label: "V" },
+  { key: "sab", label: "S" },
+  { key: "dom", label: "D" },
+];
+
+const SCHEDULE_DAY_SHORT: Record<ScheduleDay, string> = {
+  dom: "Dom",
+  jue: "Jue",
+  lun: "Lun",
+  mar: "Mar",
+  mie: "Mie",
+  sab: "Sab",
+  vie: "Vie",
+};
+
+function formatScheduleDays(days: ScheduleDay[]) {
+  const set = new Set(days);
+  const weekdays: ScheduleDay[] = ["lun", "mar", "mie", "jue", "vie"];
+
+  if (SCHEDULE_DAYS.every((day) => set.has(day.key))) {
+    return "Todos los dias";
+  }
+
+  if (weekdays.every((day) => set.has(day)) && days.length === 5) {
+    return "Lun a Vie";
+  }
+
+  if (set.has("sab") && set.has("dom") && days.length === 2) {
+    return "Fin de semana";
+  }
+
+  return SCHEDULE_DAYS.filter((day) => set.has(day.key))
+    .map((day) => SCHEDULE_DAY_SHORT[day.key])
+    .join(", ");
+}
+
+function formatScheduleTime(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  const [hoursRaw, minutes] = value.split(":");
+  const hours = Number(hoursRaw);
+  const suffix = hours >= 12 ? "p.m." : "a.m.";
+  const hours12 = hours % 12 === 0 ? 12 : hours % 12;
+
+  return `${hours12}:${minutes} ${suffix}`;
+}
+
+function formatScheduleEntries(entries: ScheduleEntry[]) {
+  return entries
+    .filter((entry) => entry.days.length > 0 && entry.open && entry.close)
+    .map(
+      (entry) =>
+        `${formatScheduleDays(entry.days)}: ${formatScheduleTime(entry.open)} - ${formatScheduleTime(entry.close)}`,
+    )
+    .join(" · ");
+}
+
+function createScheduleEntry(): ScheduleEntry {
+  return {
+    close: "",
+    days: [],
+    id: Math.random().toString(36).slice(2),
+    open: "",
+  };
+}
 
 const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 const MAX_COVER_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -101,6 +208,8 @@ export function BusinessSubmissionForm({
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
   const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
   const [stepError, setStepError] = useState("");
+  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
+  const [customSchedule, setCustomSchedule] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const hasChangedStep = useRef(false);
 
@@ -112,6 +221,19 @@ export function BusinessSubmissionForm({
 
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentStep]);
+
+  function handleScheduleEntriesChange(nextEntries: ScheduleEntry[]) {
+    setScheduleEntries(nextEntries);
+    updateField("schedule", formatScheduleEntries(nextEntries));
+  }
+
+  function handleCustomScheduleChange(next: boolean) {
+    setCustomSchedule(next);
+
+    if (!next) {
+      updateField("schedule", formatScheduleEntries(scheduleEntries));
+    }
+  }
 
   const previewBusiness = useMemo<Business>(
     () => ({
@@ -279,6 +401,8 @@ export function BusinessSubmissionForm({
       setForm(INITIAL_STATE);
       updateLogoFile(null);
       updateCoverFile(null);
+      setScheduleEntries([]);
+      setCustomSchedule(false);
       setCurrentStep(0);
     } catch (error) {
       setSubmitState({
@@ -315,6 +439,9 @@ export function BusinessSubmissionForm({
                 {currentStep + 1}/{STEPS.length}
               </span>
             </div>
+            <p className="-mt-1 text-sm font-bold text-brand-deep">
+              {STEPS[currentStep].encouragement}
+            </p>
             <StepProgress currentStep={currentStep} onStepChange={requestStep} />
           </div>
 
@@ -339,29 +466,23 @@ export function BusinessSubmissionForm({
                   />
                 </Field>
                 <Field label="Categoria" required>
-                  <select
-                    className="md-field"
-                    name="category"
-                    required
+                  <BubbleSelect
+                    onChange={(category) => updateField("category", category)}
+                    options={categories.map((category) => ({
+                      label: category,
+                      value: category,
+                    }))}
+                    placeholder="Seleccionar categoria"
                     value={form.category}
-                    onChange={(event) =>
-                      updateField("category", event.target.value)
-                    }
-                  >
-                    <option value="">Seleccionar categoria</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </Field>
               </div>
-              <Field label="Descripcion corta para la vista previa en la web" required>
+              <Field label="Frase corta para la tarjeta (ve al punto)" required>
                 <textarea
-                  className="md-field min-h-32 py-3 leading-6"
-                  maxLength={420}
+                  className="md-field min-h-20 py-3 leading-6"
+                  maxLength={140}
                   name="description"
+                  placeholder="Ej: Jeans y ropa colombiana para mujer y hombre, tallas 6 a 22."
                   required
                   value={form.description}
                   onChange={(event) =>
@@ -369,7 +490,8 @@ export function BusinessSubmissionForm({
                   }
                 />
                 <p className="mt-1 text-xs font-semibold text-stone-500">
-                  {form.description.length}/420 caracteres
+                  {form.description.length}/140 caracteres · una frase corta se
+                  lee mejor en la tarjeta que un parrafo largo.
                 </p>
               </Field>
               <Field label="Descripcion completa del perfil" required>
@@ -483,31 +605,27 @@ export function BusinessSubmissionForm({
                   }
                 />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Barrio o zona">
-                  <input
-                    className="md-field"
-                    maxLength={80}
-                    name="neighborhood"
-                    value={form.neighborhood}
-                    onChange={(event) =>
-                      updateField("neighborhood", event.target.value)
-                    }
-                  />
-                </Field>
-                <Field label="Horario">
-                  <input
-                    className="md-field"
-                    maxLength={160}
-                    name="schedule"
-                    placeholder="Lun a sab, 8:00 a.m. - 6:00 p.m."
-                    value={form.schedule}
-                    onChange={(event) =>
-                      updateField("schedule", event.target.value)
-                    }
-                  />
-                </Field>
-              </div>
+              <Field label="Barrio o zona">
+                <input
+                  className="md-field"
+                  maxLength={80}
+                  name="neighborhood"
+                  value={form.neighborhood}
+                  onChange={(event) =>
+                    updateField("neighborhood", event.target.value)
+                  }
+                />
+              </Field>
+              <Field label="Horario">
+                <ScheduleBuilder
+                  custom={customSchedule}
+                  entries={scheduleEntries}
+                  onCustomChange={handleCustomScheduleChange}
+                  onEntriesChange={handleScheduleEntriesChange}
+                  schedule={form.schedule}
+                  onScheduleChange={(value) => updateField("schedule", value)}
+                />
+              </Field>
               <Field label="Link de Google Maps">
                 <input
                   className="md-field"
@@ -879,6 +997,146 @@ function StepBubble({
         </span>
       </span>
     </button>
+  );
+}
+
+function ScheduleBuilder({
+  custom,
+  entries,
+  onCustomChange,
+  onEntriesChange,
+  onScheduleChange,
+  schedule,
+}: {
+  custom: boolean;
+  entries: ScheduleEntry[];
+  onCustomChange: (custom: boolean) => void;
+  onEntriesChange: (entries: ScheduleEntry[]) => void;
+  onScheduleChange: (value: string) => void;
+  schedule: string;
+}) {
+  function updateEntry(id: string, patch: Partial<ScheduleEntry>) {
+    onEntriesChange(
+      entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
+    );
+  }
+
+  function toggleDay(id: string, day: ScheduleDay) {
+    const entry = entries.find((item) => item.id === id);
+
+    if (!entry) {
+      return;
+    }
+
+    const days = entry.days.includes(day)
+      ? entry.days.filter((item) => item !== day)
+      : [...entry.days, day];
+
+    updateEntry(id, { days });
+  }
+
+  if (custom) {
+    return (
+      <div className="grid gap-2">
+        <input
+          className="md-field"
+          maxLength={160}
+          name="schedule"
+          placeholder="Lun a sab, 8:00 a.m. - 6:00 p.m."
+          value={schedule}
+          onChange={(event) => onScheduleChange(event.target.value)}
+        />
+        <button
+          className="w-fit text-xs font-black text-brand hover:underline"
+          onClick={() => onCustomChange(false)}
+          type="button"
+        >
+          Usar el armador de horarios
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3">
+      {entries.map((entry) => (
+        <div
+          className="grid gap-3 rounded-xl border border-stone-200 bg-paper p-3"
+          key={entry.id}
+        >
+          <div className="flex flex-wrap items-center gap-1.5">
+            {SCHEDULE_DAYS.map((day) => (
+              <button
+                className={`grid size-8 place-items-center rounded-full text-xs font-black transition ${
+                  entry.days.includes(day.key)
+                    ? "bg-brand text-white"
+                    : "bg-white text-stone-500 ring-1 ring-stone-200"
+                }`}
+                key={day.key}
+                onClick={() => toggleDay(entry.id, day.key)}
+                type="button"
+              >
+                {day.label}
+              </button>
+            ))}
+            <button
+              className="ml-auto text-xs font-black text-stone-400 hover:text-brand"
+              onClick={() =>
+                onEntriesChange(entries.filter((item) => item.id !== entry.id))
+              }
+              type="button"
+            >
+              Quitar
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="grid gap-1 text-xs font-black text-stone-600">
+              Abre
+              <input
+                className="md-field"
+                type="time"
+                value={entry.open}
+                onChange={(event) =>
+                  updateEntry(entry.id, { open: event.target.value })
+                }
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-black text-stone-600">
+              Cierra
+              <input
+                className="md-field"
+                type="time"
+                value={entry.close}
+                onChange={(event) =>
+                  updateEntry(entry.id, { close: event.target.value })
+                }
+              />
+            </label>
+          </div>
+        </div>
+      ))}
+      {schedule ? (
+        <p className="text-xs font-semibold text-stone-500">
+          Se vera asi: <span className="font-bold text-ink">{schedule}</span>
+        </p>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          className="w-fit text-sm font-black text-brand hover:underline"
+          onClick={() => onEntriesChange([...entries, createScheduleEntry()])}
+          type="button"
+        >
+          + Agregar horario
+        </button>
+        <button
+          className="w-fit text-xs font-black text-stone-400 hover:text-brand"
+          onClick={() => onCustomChange(true)}
+          type="button"
+        >
+          Prefiero escribirlo yo
+        </button>
+      </div>
+    </div>
   );
 }
 
