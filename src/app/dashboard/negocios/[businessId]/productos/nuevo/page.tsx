@@ -11,16 +11,16 @@ export default async function NewProductPage(props: NewProductPageProps) {
   await requireBusinessRole(businessId, ["owner", "manager", "editor"]);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-3xl gap-6">
         <header className="border-b border-stone-200 pb-6">
           <Link
-            className="text-sm font-black text-[#B3262E] hover:underline"
+            className="text-sm font-black text-brand hover:underline"
             href={`/dashboard/negocios/${businessId}/productos`}
           >
             Volver a productos
           </Link>
-          <h1 className="mt-3 text-3xl font-black">Nuevo producto</h1>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Nuevo producto</h1>
         </header>
         <ProductForm businessId={businessId} />
       </div>

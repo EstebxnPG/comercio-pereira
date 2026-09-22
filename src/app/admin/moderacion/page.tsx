@@ -8,13 +8,13 @@ export default async function AdminModerationPage() {
   const products = await getPendingProducts();
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <header className="border-b border-stone-200 pb-6">
-          <Link className="text-sm font-black text-[#B3262E] hover:underline" href="/admin">
+          <Link className="text-sm font-black text-brand hover:underline" href="/admin">
             Volver al admin
           </Link>
-          <h1 className="mt-3 text-3xl font-black">Moderacion</h1>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Moderacion</h1>
           <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
             Productos enviados por comercios y pendientes de decision editorial.
           </p>
@@ -22,7 +22,7 @@ export default async function AdminModerationPage() {
 
         {products.length === 0 ? (
           <section className="md-surface p-6">
-            <h2 className="text-xl font-black">No hay pendientes</h2>
+            <h2 className="font-display text-xl font-bold">No hay pendientes</h2>
             <p className="mt-2 text-sm font-semibold text-stone-600">
               La cola de revision esta limpia.
             </p>
@@ -50,10 +50,10 @@ export default async function AdminModerationPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-xs font-black uppercase text-[#B3262E]">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
                       {getBusinessName(product.businesses)}
                     </p>
-                    <h2 className="mt-1 text-xl font-black">{product.name}</h2>
+                    <h2 className="mt-1 font-display text-xl font-bold">{product.name}</h2>
                     <p className="mt-1 text-sm font-semibold leading-6 text-stone-600">
                       {product.short_description}
                     </p>

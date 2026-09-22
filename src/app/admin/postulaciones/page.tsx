@@ -60,14 +60,14 @@ export default async function AdminSubmissionsPage(
   const currentPage = page;
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <header className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase text-[#B3262E]">
+            <p className="text-sm font-black uppercase tracking-wide text-brand">
               Admin local
             </p>
-            <h1 className="mt-2 text-3xl font-black">Postulaciones</h1>
+            <h1 className="mt-2 font-display text-3xl font-extrabold">Postulaciones</h1>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-stone-600">
               Revisa comercios enviados desde el formulario y publica los que ya
               esten listos.
@@ -78,7 +78,7 @@ export default async function AdminSubmissionsPage(
               <a
                 className={`rounded-full px-4 py-2 text-sm font-black ${
                   value === status
-                    ? "bg-[#B3262E] text-white"
+                    ? "bg-brand text-white"
                     : "bg-white text-stone-700 ring-1 ring-stone-200"
                 }`}
                 href={getPageHref({
@@ -115,7 +115,7 @@ export default async function AdminSubmissionsPage(
 
           {submissions.length === 0 ? (
             <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center">
-              <h2 className="text-xl font-black">No hay postulaciones</h2>
+              <h2 className="font-display text-xl font-bold">No hay postulaciones</h2>
               <p className="mt-2 text-sm font-semibold text-stone-600">
                 Cuando alguien envie el formulario, aparecera aqui.
               </p>
@@ -250,8 +250,8 @@ function PaginationLink({
       aria-current={active ? "page" : undefined}
       className={`rounded-full px-4 py-2 text-sm font-black ${
         active
-          ? "bg-[#B3262E] text-white"
-          : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-[#f7f0e8]"
+          ? "bg-brand text-white"
+          : "bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-[var(--md-surface-container)]"
       }`}
       href={href}
     >
@@ -276,15 +276,15 @@ function SubmissionPanel({
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-[#fff3bd] px-3 py-1 text-xs font-black text-[#5b1b00]">
+          <span className="rounded-full bg-gold-soft px-3 py-1 text-xs font-black text-gold-ink">
             {STATUS_LABELS[submission.status]}
           </span>
           <span className="text-xs font-bold text-stone-500">
             {formatDate(submission.created_at)}
           </span>
         </div>
-        <h2 className="mt-3 text-2xl font-black">{submission.business_name}</h2>
-        <p className="mt-1 text-sm font-black uppercase text-[#B3262E]">
+        <h2 className="mt-3 font-display text-2xl font-bold">{submission.business_name}</h2>
+        <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
           {category ?? "Sin categoria"}
         </p>
         <p className="mt-4 text-sm font-semibold leading-6 text-stone-700">
@@ -353,13 +353,13 @@ function SubmissionPanel({
       </aside>
       </div>
 
-      <details className="group rounded-xl border border-stone-200 bg-[#fffdf8]">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-black text-stone-800 transition hover:bg-[#f7f0e8]">
+      <details className="group rounded-xl border border-stone-200 bg-paper">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-black text-stone-800 transition hover:bg-[var(--md-surface-container)]">
           <span>Editar informacion de la solicitud</span>
-          <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-[#B3262E] ring-1 ring-stone-200 group-open:hidden">
+          <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-brand ring-1 ring-stone-200 group-open:hidden">
             Editar
           </span>
-          <span className="hidden rounded-full bg-[#ffdad8] px-3 py-1 text-xs font-black text-[#410006] group-open:inline">
+          <span className="hidden rounded-full bg-brand-soft px-3 py-1 text-xs font-black text-brand-deep group-open:inline">
             Cerrar
           </span>
         </summary>
@@ -624,7 +624,7 @@ function EditSubmissionForm({
           <EditField label="Reemplazar logo">
             <input
               accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
-              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
               name="logo"
               type="file"
             />
@@ -632,7 +632,7 @@ function EditSubmissionForm({
           <EditField label="Reemplazar portada">
             <input
               accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
-              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
               name="coverImage"
               type="file"
             />
@@ -661,7 +661,7 @@ function EditSubmissionForm({
         </div>
         <label className="flex gap-3 rounded-xl border border-stone-200 bg-white p-3 text-sm font-bold leading-6 text-stone-800">
           <input
-            className="mt-1 size-5 accent-[#B3262E]"
+            className="mt-1 size-5 accent-brand"
             defaultChecked={submission.accepts_publication}
             name="acceptsPublication"
             type="checkbox"
@@ -729,7 +729,7 @@ function EditField({
     <label className="grid gap-2 text-sm font-black text-stone-800">
       <span>
         {label}
-        {required ? <span className="text-[#B3262E]"> *</span> : null}
+        {required ? <span className="text-brand"> *</span> : null}
       </span>
       {children}
     </label>
@@ -738,7 +738,7 @@ function EditField({
 
 function ImagePreview({ label, src }: { label: string; src?: string }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-stone-200 bg-[#f4ede7]">
+    <div className="overflow-hidden rounded-xl border border-stone-200 bg-[var(--md-surface-container)]">
       <div className="border-b border-stone-200 px-3 py-2 text-xs font-black uppercase text-stone-600">
         {label}
       </div>
