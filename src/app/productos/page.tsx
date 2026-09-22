@@ -18,51 +18,61 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
   return (
     <>
       <Header />
-      <main className="bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8">
-          <header className="grid gap-4 border-b border-stone-200 pb-6 md:grid-cols-[1fr_320px] md:items-end">
-            <div>
-              <p className="text-sm font-black uppercase tracking-wide text-brand">
-                Catalogo local
-              </p>
-              <h1 className="mt-2 font-display text-4xl font-extrabold">
-                Productos en Pereira
-              </h1>
-              <p className="mt-3 max-w-2xl text-base font-semibold leading-7 text-stone-600">
-                Descubre productos publicados por comercios aliados y contacta
-                directamente con cada negocio.
-              </p>
-            </div>
-            <form className="flex gap-2">
-              <input
-                className="md-field"
-                defaultValue={query}
-                name="q"
-                placeholder="Buscar producto"
-              />
-              <button className="md-filled-button px-5" type="submit">
-                Buscar
-              </button>
-            </form>
-          </header>
+      <main className="bg-paper">
+        <section className="px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-black uppercase tracking-wide text-brand sm:text-sm">
+              Catalogo local
+            </p>
+            <h1 className="mt-1.5 font-display text-2xl font-extrabold text-ink sm:mt-2 sm:text-4xl">
+              Productos en Pereira
+            </h1>
+            <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-stone-600 sm:mt-3 sm:text-base sm:leading-7">
+              Descubre productos publicados por comercios aliados y contacta
+              directamente con cada negocio.
+            </p>
 
-          {products.length === 0 ? (
-            <section className="md-surface p-6">
-              <h2 className="font-display text-xl font-bold">
-                Sin productos publicados
-              </h2>
-              <p className="mt-2 text-sm font-semibold text-stone-600">
-                Cuando admin apruebe productos, apareceran en este catalogo.
-              </p>
-            </section>
-          ) : (
-            <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </section>
-          )}
-        </div>
+            <form className="mt-5 sm:mt-6" action="/productos">
+              <div className="flex items-center gap-2.5 rounded-full border border-[var(--md-outline-variant)] bg-white py-[.3rem] pl-[1.05rem] pr-[.3rem] shadow-sm">
+                <SearchIcon className="size-[1.1rem] shrink-0 text-stone-400" />
+                <input
+                  className="min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-ink outline-none placeholder:text-stone-500"
+                  defaultValue={query}
+                  name="q"
+                  placeholder="Que producto buscas?"
+                />
+                <button
+                  type="submit"
+                  aria-label="Buscar"
+                  className="grid size-[2.6rem] shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:translate-y-px"
+                >
+                  <ArrowRightIcon className="size-[1.1rem]" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section className="px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            {products.length === 0 ? (
+              <div className="md-surface p-6 text-center">
+                <h2 className="font-display text-lg font-bold sm:text-xl">
+                  Sin productos publicados
+                </h2>
+                <p className="mt-2 text-sm font-semibold text-stone-600">
+                  Cuando admin apruebe productos, apareceran en este catalogo.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </main>
       <Footer />
     </>
@@ -83,7 +93,7 @@ function ProductCard({
     >
       <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
         {price.badge ? (
-          <span className="absolute left-3 top-3 rounded-full bg-brand px-3 py-1 text-xs font-black text-white shadow-sm">
+          <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
             {price.badge}
           </span>
         ) : null}
@@ -100,17 +110,17 @@ function ProductCard({
           </span>
         )}
       </div>
-      <div className="grid gap-2 p-4">
-        <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
+      <div className="grid gap-1 p-3 sm:gap-2 sm:p-4">
+        <p className="truncate font-mono text-[10px] font-bold uppercase tracking-wide text-brand-deep sm:text-[11px]">
           {product.businessName}
         </p>
-        <h2 className="font-display text-xl font-bold group-hover:underline">
+        <h2 className="font-display text-sm font-bold leading-tight group-hover:underline sm:text-xl">
           {product.name}
         </h2>
-        <p className="line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
+        <p className="line-clamp-2 hidden text-sm font-semibold leading-6 text-stone-600 sm:block">
           {product.shortDescription}
         </p>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <p className="text-sm font-black text-ink">{price.current}</p>
           {price.original ? (
             <p className="text-xs font-bold text-stone-500 line-through">
@@ -120,6 +130,40 @@ function ProductCard({
         </div>
       </div>
     </Link>
+  );
+}
+
+function SearchIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.3-4.3" />
+      <circle cx="11" cy="11" r="7" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 12h14" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
   );
 }
 
