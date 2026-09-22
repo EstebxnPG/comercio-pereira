@@ -60,7 +60,7 @@ export function CategoryQuickGrid({ categories }: { categories: CategorySummary[
             ref={(element) => {
               cardRefs.current[index] = element;
             }}
-            href={`/comercios?categoria=${encodeURIComponent(category.name)}`}
+            href={`/productos?categoria=${encodeURIComponent(category.name)}`}
             className="md-focus flex w-20 shrink-0 snap-start flex-col items-center gap-2"
           >
             <span
@@ -104,7 +104,7 @@ export function CategoryQuickGrid({ categories }: { categories: CategorySummary[
         {categories.map((category) => (
           <Link
             key={category.name}
-            href={`/comercios?categoria=${encodeURIComponent(category.name)}`}
+            href={`/productos?categoria=${encodeURIComponent(category.name)}`}
             className="md-focus flex flex-col gap-2 rounded-2xl border border-[var(--md-outline-variant)] bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-md active:translate-y-0"
           >
             <span

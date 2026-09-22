@@ -148,111 +148,12 @@ export const BUSINESS_PROMOTION_TYPE_LABELS: Record<BusinessPromotionType, strin
   store_percentage: "Descuento tienda",
 };
 
-export function formatProductPrice(product: {
-  currency: string;
-  discountEndsAt?: string | null;
-  discountPercentage?: number | null;
-  discountStartsAt?: string | null;
-  priceCents: number | null;
-  priceLabel: string | null;
-}) {
-  if (product.priceLabel) {
-    return product.priceLabel;
-  }
-
-  if (product.priceCents === null) {
-    return "Consultar precio";
-  }
-
-  return new Intl.NumberFormat("es-CO", {
-    currency: product.currency,
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(product.priceCents / 100);
-}
-
-export function getProductPriceDisplay(product: {
-  currency: string;
-  discountEndsAt?: string | null;
-  discountLabel?: string | null;
-  discountPercentage?: number | null;
-  discountStartsAt?: string | null;
-  priceCents: number | null;
-  priceLabel: string | null;
-}) {
-  const baseLabel = formatProductPrice(product);
-  const activeDiscount = getActiveDiscountPercentage(product);
-
-  if (!activeDiscount || product.priceCents === null || product.priceLabel) {
-    return {
-      badge: null,
-      current: baseLabel,
-      hasDiscount: false,
-      original: null,
-    };
-  }
-
-  const discountedCents = Math.round(
-    product.priceCents * ((100 - activeDiscount) / 100),
-  );
-
-  return {
-    badge: product.discountLabel || `${activeDiscount}% OFF`,
-    current: formatCurrency(discountedCents, product.currency),
-    hasDiscount: true,
-    original: formatCurrency(product.priceCents, product.currency),
-  };
-}
-
-export function getActiveDiscountPercentage(product: {
-  discountEndsAt?: string | null;
-  discountPercentage?: number | null;
-  discountStartsAt?: string | null;
-}) {
-  const percentage = product.discountPercentage ?? null;
-
-  if (!percentage) {
-    return null;
-  }
-
-  const now = Date.now();
-  const startsAt = product.discountStartsAt
-    ? Date.parse(product.discountStartsAt)
-    : null;
-  const endsAt = product.discountEndsAt ? Date.parse(product.discountEndsAt) : null;
-
-  if (startsAt !== null && Number.isFinite(startsAt) && startsAt > now) {
-    return null;
-  }
-
-  if (endsAt !== null && Number.isFinite(endsAt) && endsAt < now) {
-    return null;
-  }
-
-  return percentage;
-}
-
-export function formatPromotionValue(promotion: {
-  minimumOrderAmount: number | null;
-  type: BusinessPromotionType;
-  value: number | null;
-}) {
-  if (promotion.type === "free_shipping") {
-    return promotion.minimumOrderAmount
-      ? `Desde ${formatCurrency(promotion.minimumOrderAmount, "COP")}`
-      : "Sin minimo";
-  }
-
-  if (promotion.type === "coupon_amount" && promotion.value) {
-    return `${formatCurrency(promotion.value, "COP")} OFF`;
-  }
-
-  if (promotion.type === "store_percentage" && promotion.value) {
-    return `${promotion.value}% OFF`;
-  }
-
-  return "Activo";
-}
+export {
+  formatProductPrice,
+  getActiveDiscountPercentage,
+  getProductPriceDisplay,
+  formatPromotionValue,
+} from "@/lib/product-pricing";
 
 export async function getPublishedProducts({
   limit = 36,
@@ -328,6 +229,98 @@ export async function getPublishedProducts({
   }
 
   return data.map(mapProductRow);
+}
+
+export async function getPublishedProductsPage({
+  category = "all",
+  limit = 24,
+  query = "",
+  status = "all",
+}: {
+  category?: string;
+  limit?: number;
+  query?: string;
+  status?: string;
+} = {}) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return { products: [], total: 0 };
+  }
+
+  const normalizedLimit = Math.max(1, Math.min(limit, 96));
+  let request = supabase
+    .from("products")
+    .select(
+      `
+        id,
+        business_id,
+        slug,
+        name,
+        short_description,
+        description,
+        price_cents,
+        currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
+        price_label,
+        availability,
+        primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
+        featured,
+        updated_at,
+        businesses!inner(name, slug, whatsapp, status, categories!inner(name))
+      `,
+      { count: "exact" },
+    )
+    .eq("status", "published")
+    .eq("moderation_status", "approved")
+    .eq("businesses.published", true)
+    .order("featured", { ascending: false })
+    .order("updated_at", { ascending: false })
+    .range(0, normalizedLimit - 1);
+
+  if (category !== "all") {
+    request = request.eq("businesses.categories.name", category);
+  }
+
+  if (status !== "all") {
+    request = request.eq("businesses.status", status);
+  }
+
+  const search = normalizeProductSearch(query);
+
+  if (search) {
+    const pattern = `*${search}*`;
+
+    request = request.or(
+      [
+        `name.ilike.${pattern}`,
+        `short_description.ilike.${pattern}`,
+        `description.ilike.${pattern}`,
+      ].join(","),
+    );
+  }
+
+  const { count, data, error } = await request;
+
+  if (error) {
+    console.error("Published products page query failed", error);
+    return { products: [], total: 0 };
+  }
+
+  return {
+    products: data.map((row) => mapProductRow(row as ProductRow)),
+    total: count ?? 0,
+  };
 }
 
 export async function getPublishedProductBySlug(slug: string) {
@@ -563,14 +556,6 @@ function mapBusinessPromotionRow(
     type: row.type,
     value: row.value,
   };
-}
-
-function formatCurrency(cents: number, currency: string) {
-  return new Intl.NumberFormat("es-CO", {
-    currency,
-    maximumFractionDigits: 0,
-    style: "currency",
-  }).format(cents / 100);
 }
 
 function normalizeProductSearch(value: string) {

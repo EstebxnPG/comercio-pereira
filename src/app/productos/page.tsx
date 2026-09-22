@@ -1,19 +1,48 @@
-import Link from "next/link";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import {
-  getProductPriceDisplay,
-  getPublishedProducts,
-} from "@/lib/products";
+import { ProductDirectory } from "@/components/product-directory";
+import { getCategories, getPublishedBusinessesPage } from "@/lib/businesses";
+import { BUSINESS_STATUSES, type BusinessStatus } from "@/types/business";
+import { getPublishedProductsPage } from "@/lib/products";
+
+const BRAND_LIMIT = 10;
 
 type ProductsCatalogPageProps = {
-  searchParams: Promise<{ q?: string | string[] }>;
+  searchParams: Promise<{
+    categoria?: string | string[];
+    estado?: string | string[];
+    limite?: string | string[];
+    q?: string | string[];
+  }>;
 };
 
 export default async function ProductsCatalogPage(props: ProductsCatalogPageProps) {
+  const categories = getCategories();
   const searchParams = await props.searchParams;
-  const query = getSingleParam(searchParams.q) ?? "";
-  const products = await getPublishedProducts({ query });
+  const selectedCategory = categories.includes(
+    getSingleParam(searchParams.categoria) ?? "",
+  )
+    ? getSingleParam(searchParams.categoria) ?? "all"
+    : "all";
+  const rawStatus = getSingleParam(searchParams.estado);
+  const selectedStatus =
+    rawStatus && BUSINESS_STATUSES.includes(rawStatus as BusinessStatus)
+      ? (rawStatus as BusinessStatus)
+      : "all";
+  const query = parseSearch(getSingleParam(searchParams.q));
+  const limit = parseLimit(getSingleParam(searchParams.limite));
+
+  const [productsPage, brandsPage] = await Promise.all([
+    getPublishedProductsPage({
+      category: selectedCategory,
+      limit,
+      query,
+      status: selectedStatus,
+    }),
+    selectedCategory !== "all"
+      ? getPublishedBusinessesPage({ category: selectedCategory, limit: BRAND_LIMIT })
+      : Promise.resolve({ businesses: [], total: 0 }),
+  ]);
 
   return (
     <>
@@ -53,83 +82,19 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
           </div>
         </section>
 
-        <section className="px-4 pb-10 sm:px-6 sm:pb-16 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            {products.length === 0 ? (
-              <div className="md-surface p-6 text-center">
-                <h2 className="font-display text-lg font-bold sm:text-xl">
-                  Sin productos publicados
-                </h2>
-                <p className="mt-2 text-sm font-semibold text-stone-600">
-                  Cuando admin apruebe productos, apareceran en este catalogo.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+        <ProductDirectory
+          brands={brandsPage.businesses}
+          categories={categories}
+          initialCategory={selectedCategory}
+          initialLimit={limit}
+          initialQuery={query}
+          initialStatus={selectedStatus}
+          products={productsPage.products}
+          totalProducts={productsPage.total}
+        />
       </main>
       <Footer />
     </>
-  );
-}
-
-function ProductCard({
-  product,
-}: {
-  product: Awaited<ReturnType<typeof getPublishedProducts>>[number];
-}) {
-  const price = getProductPriceDisplay(product);
-
-  return (
-    <Link
-      className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-      href={`/productos/${product.slug}`}
-    >
-      <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
-        {price.badge ? (
-          <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
-            {price.badge}
-          </span>
-        ) : null}
-        {product.primaryImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            alt=""
-            className="h-full w-full object-cover"
-            src={product.primaryImageUrl}
-          />
-        ) : (
-          <span className="text-xs font-black uppercase text-stone-500">
-            Producto local
-          </span>
-        )}
-      </div>
-      <div className="grid gap-1 p-3 sm:gap-2 sm:p-4">
-        <p className="truncate font-mono text-[10px] font-bold uppercase tracking-wide text-brand-deep sm:text-[11px]">
-          {product.businessName}
-        </p>
-        <h2 className="font-display text-sm font-bold leading-tight group-hover:underline sm:text-xl">
-          {product.name}
-        </h2>
-        <p className="line-clamp-2 hidden text-sm font-semibold leading-6 text-stone-600 sm:block">
-          {product.shortDescription}
-        </p>
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-          <p className="text-sm font-black text-ink">{price.current}</p>
-          {price.original ? (
-            <p className="text-xs font-bold text-stone-500 line-through">
-              {price.original}
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </Link>
   );
 }
 
@@ -169,4 +134,18 @@ function ArrowRightIcon({ className }: { className?: string }) {
 
 function getSingleParam(value: string | string[] | undefined) {
   return Array.isArray(value) ? value[0] : value;
+}
+
+function parseSearch(value: string | undefined) {
+  return value?.trim().replace(/\s+/g, " ").slice(0, 80) ?? "";
+}
+
+function parseLimit(value: string | undefined) {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed < 24) {
+    return 24;
+  }
+
+  return Math.min(parsed, 96);
 }
