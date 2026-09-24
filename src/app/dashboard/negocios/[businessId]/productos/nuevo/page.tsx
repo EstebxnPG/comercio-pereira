@@ -101,6 +101,32 @@ function ProductForm({ businessId }: { businessId: string }) {
           </Field>
         </div>
       </section>
+      <section className="grid gap-4 border-t border-stone-200 pt-4">
+        <div>
+          <h2 className="text-base font-black">Imagenes (opcional)</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-stone-600">
+            Puedes agregar hasta 5 imagenes ahora mismo, o subirlas despues
+            desde la pagina de edicion.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-[1fr_220px]">
+          <Field label="Agregar imagenes">
+            <input
+              accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
+              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
+              multiple
+              name="images"
+              type="file"
+            />
+          </Field>
+          <Field label="Uso">
+            <select className="md-field" defaultValue="primary" name="imageRole">
+              <option value="primary">Usar como principal</option>
+              <option value="gallery">Agregar a galeria</option>
+            </select>
+          </Field>
+        </div>
+      </section>
       <div className="flex flex-wrap justify-end gap-3 border-t border-stone-200 pt-4">
         <button className="md-outlined-button px-5" name="intent" type="submit" value="draft">
           Guardar borrador

@@ -87,6 +87,41 @@ export async function savePromotionAction(formData: FormData) {
   redirect(`/dashboard/negocios/${businessId}/promociones?saved=1`);
 }
 
+export async function setPromotionStatusAction(formData: FormData) {
+  const businessId = getRequiredString(formData.get("businessId"), "businessId");
+  const promotionId = getRequiredString(formData.get("promotionId"), "promotionId");
+  const status = getRequiredString(formData.get("status"), "status");
+
+  if (status !== "active" && status !== "paused") {
+    throw new Error("Estado de promocion invalido.");
+  }
+
+  const { user } = await requireBusinessRole(businessId, ["owner", "manager"]);
+  const supabase = await getAuthedClient();
+  const business = await getBusinessSlug(supabase, businessId);
+
+  const { error } = await supabase
+    .from("business_promotions")
+    .update({ status, updated_by: user.id })
+    .eq("id", promotionId)
+    .eq("business_id", businessId);
+
+  if (error) {
+    throw new Error(`No se pudo actualizar la promocion: ${error.message}`);
+  }
+
+  await logBusinessAudit({
+    action: "promotion_updated",
+    actorUserId: user.id,
+    businessId,
+    metadata: { promotion_id: promotionId, status },
+    supabase,
+  });
+
+  revalidatePromotionPaths(businessId, business.slug);
+  redirect(`/dashboard/negocios/${businessId}/promociones?saved=1`);
+}
+
 export async function deletePromotionAction(formData: FormData) {
   const businessId = getRequiredString(formData.get("businessId"), "businessId");
   const promotionId = getRequiredString(formData.get("promotionId"), "promotionId");

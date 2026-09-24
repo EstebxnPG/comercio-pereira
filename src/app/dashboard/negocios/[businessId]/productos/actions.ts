@@ -28,6 +28,8 @@ export async function createProductAction(formData: FormData) {
   const name = getRequiredString(formData.get("name"), "Nombre");
   const slug = await buildUniqueProductSlug(supabase, business.slug, name);
   const status = parseRequestedStatus(formData.get("intent"));
+  const images = getOptionalFiles(formData.getAll("images"));
+  const imageRole = formData.get("imageRole") === "gallery" ? "gallery" : "primary";
 
   const { data, error } = await supabase
     .from("products")
@@ -60,6 +62,19 @@ export async function createProductAction(formData: FormData) {
 
   if (error || !data) {
     throw new Error(`No se pudo crear el producto: ${error?.message}`);
+  }
+
+  if (images.length > 0) {
+    await uploadImagesToProduct({
+      businessId,
+      currentImageCount: 0,
+      files: images,
+      imageRole,
+      productId: data.id,
+      productSlug: slug,
+      supabase,
+      userId: user.id,
+    });
   }
 
   await logBusinessAudit({
@@ -125,6 +140,35 @@ export async function updateProductAction(formData: FormData) {
   redirect(`/dashboard/negocios/${businessId}/productos/${productId}?saved=1`);
 }
 
+export async function hideProductAction(formData: FormData) {
+  const businessId = getRequiredString(formData.get("businessId"), "businessId");
+  const productId = getRequiredString(formData.get("productId"), "productId");
+  const { user } = await requireBusinessRole(businessId, [...EDITABLE_ROLES]);
+  const supabase = await getAuthedClient();
+
+  const { data: product, error } = await supabase
+    .from("products")
+    .update({ status: "hidden", updated_by: user.id })
+    .eq("id", productId)
+    .eq("business_id", businessId)
+    .select("slug, businesses(slug)")
+    .single();
+
+  if (error || !product) {
+    throw new Error(`No se pudo ocultar el producto: ${error?.message}`);
+  }
+
+  await logBusinessAudit({
+    action: "product_updated",
+    actorUserId: user.id,
+    businessId,
+    metadata: { product_id: productId, status: "hidden" },
+    supabase,
+  });
+
+  revalidateProductPaths(businessId, getJoinedSlug(product.businesses), product.slug);
+}
+
 export async function uploadProductImageAction(formData: FormData) {
   const businessId = getRequiredString(formData.get("businessId"), "businessId");
   const productId = getRequiredString(formData.get("productId"), "productId");
@@ -132,14 +176,6 @@ export async function uploadProductImageAction(formData: FormData) {
   const imageRole = formData.get("imageRole") === "gallery" ? "gallery" : "primary";
   const { user } = await requireBusinessRole(businessId, [...EDITABLE_ROLES]);
   const supabase = await getAuthedClient();
-
-  for (const file of files) {
-    validateImageFile(file);
-
-    if (!(await hasValidImageSignature(file))) {
-      throw new Error("El archivo no coincide con un tipo de imagen permitido.");
-    }
-  }
 
   const { data: product, error: productError } = await supabase
     .from("products")
@@ -161,7 +197,62 @@ export async function uploadProductImageAction(formData: FormData) {
     throw new Error(`No se pudo validar la galeria: ${countError.message}`);
   }
 
-  const availableSlots = MAX_PRODUCT_IMAGES - (currentImageCount ?? 0);
+  const insertedCount = await uploadImagesToProduct({
+    businessId,
+    currentImageCount: currentImageCount ?? 0,
+    files,
+    imageRole,
+    productId,
+    productSlug: product.slug,
+    supabase,
+    userId: user.id,
+  });
+
+  await logBusinessAudit({
+    action: "product_image_updated",
+    actorUserId: user.id,
+    businessId,
+    metadata: {
+      bucket: PRODUCT_IMAGE_BUCKET,
+      count: insertedCount,
+      product_id: productId,
+      role: imageRole,
+    },
+    supabase,
+  });
+
+  revalidateProductPaths(businessId, getJoinedSlug(product.businesses), product.slug);
+  redirect(`/dashboard/negocios/${businessId}/productos/${productId}?saved=1`);
+}
+
+async function uploadImagesToProduct({
+  businessId,
+  currentImageCount,
+  files,
+  imageRole,
+  productId,
+  productSlug,
+  supabase,
+  userId,
+}: {
+  businessId: string;
+  currentImageCount: number;
+  files: File[];
+  imageRole: "gallery" | "primary";
+  productId: string;
+  productSlug: string;
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
+  userId: string;
+}) {
+  for (const file of files) {
+    validateImageFile(file);
+
+    if (!(await hasValidImageSignature(file))) {
+      throw new Error("El archivo no coincide con un tipo de imagen permitido.");
+    }
+  }
+
+  const availableSlots = MAX_PRODUCT_IMAGES - currentImageCount;
 
   if (availableSlots <= 0 || files.length > availableSlots) {
     throw new Error(`Cada producto puede tener maximo ${MAX_PRODUCT_IMAGES} imagenes.`);
@@ -179,11 +270,6 @@ export async function uploadProductImageAction(formData: FormData) {
   }
 
   const firstSortOrder = (orderRows?.[0]?.sort_order ?? -1) + 1;
-  const insertedImages: Array<{
-    isPrimary: boolean;
-    path: string;
-    publicUrl: string;
-  }> = [];
 
   for (const [index, file] of files.entries()) {
     const shouldBePrimary =
@@ -220,7 +306,7 @@ export async function uploadProductImageAction(formData: FormData) {
     }
 
     const { error: insertError } = await supabase.from("product_images").insert({
-      alt_text: `Imagen de ${product.slug}`,
+      alt_text: `Imagen de ${productSlug}`,
       bucket: PRODUCT_IMAGE_BUCKET,
       is_primary: shouldBePrimary,
       product_id: productId,
@@ -238,7 +324,7 @@ export async function uploadProductImageAction(formData: FormData) {
         .from("products")
         .update({
           primary_image_url: publicUrl,
-          updated_by: user.id,
+          updated_by: userId,
         })
         .eq("id", productId)
         .eq("business_id", businessId);
@@ -247,25 +333,9 @@ export async function uploadProductImageAction(formData: FormData) {
         throw new Error(`No se pudo actualizar la imagen: ${updateError.message}`);
       }
     }
-
-    insertedImages.push({ isPrimary: shouldBePrimary, path, publicUrl });
   }
 
-  await logBusinessAudit({
-    action: "product_image_updated",
-    actorUserId: user.id,
-    businessId,
-    metadata: {
-      bucket: PRODUCT_IMAGE_BUCKET,
-      count: insertedImages.length,
-      product_id: productId,
-      role: imageRole,
-    },
-    supabase,
-  });
-
-  revalidateProductPaths(businessId, getJoinedSlug(product.businesses), product.slug);
-  redirect(`/dashboard/negocios/${businessId}/productos/${productId}?saved=1`);
+  return files.length;
 }
 
 export async function setPrimaryProductImageAction(formData: FormData) {
@@ -588,13 +658,17 @@ function getOptionalString(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim() || null : null;
 }
 
+function getOptionalFiles(values: FormDataEntryValue[]) {
+  return values.filter(
+    (value): value is File => value instanceof File && value.size > 0,
+  );
+}
+
 function getRequiredFiles(
   values: FormDataEntryValue[],
   fallback: FormDataEntryValue | null,
 ) {
-  const files = values.filter(
-    (value): value is File => value instanceof File && value.size > 0,
-  );
+  const files = getOptionalFiles(values);
 
   if (files.length === 0 && fallback instanceof File && fallback.size > 0) {
     files.push(fallback);

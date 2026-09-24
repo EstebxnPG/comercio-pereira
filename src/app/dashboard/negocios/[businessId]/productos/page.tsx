@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hideProductAction } from "@/app/dashboard/negocios/[businessId]/productos/actions";
 import { requireBusinessRole } from "@/lib/auth";
 import {
   PRODUCT_AVAILABILITY_LABELS,
@@ -112,13 +113,31 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
                       ) : null}
                     </div>
                   </div>
-                  <div className="flex items-center sm:justify-end">
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
                     <Link
                       className="md-outlined-button px-4"
                       href={`/dashboard/negocios/${businessId}/productos/${product.id}`}
                     >
                       Editar
                     </Link>
+                    {product.status === "published" ? (
+                      <>
+                        <Link
+                          className="md-outlined-button px-4"
+                          href={`/productos/${product.slug}`}
+                          target="_blank"
+                        >
+                          Ver publico
+                        </Link>
+                        <form action={hideProductAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="productId" type="hidden" value={product.id} />
+                          <button className="md-outlined-button px-4" type="submit">
+                            Ocultar
+                          </button>
+                        </form>
+                      </>
+                    ) : null}
                   </div>
                 </article>
               );
@@ -153,6 +172,7 @@ async function getBusinessProducts(businessId: string) {
         `
           id,
           name,
+          slug,
           short_description,
           price_cents,
           currency,

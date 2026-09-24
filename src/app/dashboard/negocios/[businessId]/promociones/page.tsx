@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   deletePromotionAction,
   savePromotionAction,
+  setPromotionStatusAction,
 } from "@/app/dashboard/negocios/[businessId]/promociones/actions";
 import { requireBusinessRole } from "@/lib/auth";
 import {
@@ -83,19 +84,36 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
                       </p>
                     ) : null}
                   </div>
-                  {promotion.status === "active" ? (
-                    <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">
-                      Pausala antes de eliminar
-                    </p>
-                  ) : (
-                    <form action={deletePromotionAction}>
-                      <input name="businessId" type="hidden" value={businessId} />
-                      <input name="promotionId" type="hidden" value={promotion.id} />
-                      <button className="md-outlined-button px-4 text-sm" type="submit">
-                        Eliminar
-                      </button>
-                    </form>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {promotion.status === "active" ? (
+                      <form action={setPromotionStatusAction}>
+                        <input name="businessId" type="hidden" value={businessId} />
+                        <input name="promotionId" type="hidden" value={promotion.id} />
+                        <input name="status" type="hidden" value="paused" />
+                        <button className="md-outlined-button px-4 text-sm" type="submit">
+                          Pausar
+                        </button>
+                      </form>
+                    ) : (
+                      <>
+                        <form action={setPromotionStatusAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="promotionId" type="hidden" value={promotion.id} />
+                          <input name="status" type="hidden" value="active" />
+                          <button className="md-outlined-button px-4 text-sm" type="submit">
+                            {promotion.status === "paused" ? "Reactivar" : "Activar"}
+                          </button>
+                        </form>
+                        <form action={deletePromotionAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="promotionId" type="hidden" value={promotion.id} />
+                          <button className="md-outlined-button px-4 text-sm" type="submit">
+                            Eliminar
+                          </button>
+                        </form>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <PromotionForm businessId={businessId} promotion={promotion} />
               </article>
