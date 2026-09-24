@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getSupabaseServerClient } from "@/lib/supabase";
+import { getSupabaseServerClient, getSupabaseServiceRoleClient } from "@/lib/supabase";
 
 export type ProductStatus =
   | "draft"
@@ -321,6 +321,203 @@ export async function getPublishedProductsPage({
     products: data.map((row) => mapProductRow(row as ProductRow)),
     total: count ?? 0,
   };
+}
+
+export type PublicProductSubcategory = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type ProductCategoryLinkRow = {
+  product_categories:
+    | { id: string; name: string; slug: string; sort_order: number }
+    | Array<{ id: string; name: string; slug: string; sort_order: number }>
+    | null;
+};
+
+export async function getProductSubcategoriesForCategory(categoryName: string) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("product_category_links")
+    .select(
+      `
+        product_categories!inner(id, name, slug, sort_order),
+        products!inner(
+          status,
+          moderation_status,
+          businesses!inner(published, categories!inner(name))
+        )
+      `,
+    )
+    .eq("products.status", "published")
+    .eq("products.moderation_status", "approved")
+    .eq("products.businesses.published", true)
+    .eq("products.businesses.categories.name", categoryName);
+
+  if (error) {
+    console.error("Product subcategories query failed", error);
+    return [];
+  }
+
+  const bySortOrder = new Map<string, PublicProductSubcategory & { sortOrder: number }>();
+
+  for (const row of data as ProductCategoryLinkRow[]) {
+    const category = Array.isArray(row.product_categories)
+      ? row.product_categories[0]
+      : row.product_categories;
+
+    if (category && !bySortOrder.has(category.id)) {
+      bySortOrder.set(category.id, {
+        id: category.id,
+        name: category.name,
+        slug: category.slug,
+        sortOrder: category.sort_order,
+      });
+    }
+  }
+
+  return [...bySortOrder.values()]
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map(({ id, name, slug }) => ({ id, name, slug }));
+}
+
+export async function getPublishedProductsForSubcategory({
+  category,
+  limit = 24,
+  query = "",
+  status = "all",
+  subcategorySlug,
+}: {
+  category: string;
+  limit?: number;
+  query?: string;
+  status?: string;
+  subcategorySlug: string;
+}) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return { products: [], total: 0 };
+  }
+
+  const normalizedLimit = Math.max(1, Math.min(limit, 96));
+  let request = supabase
+    .from("products")
+    .select(
+      `
+        id,
+        business_id,
+        slug,
+        name,
+        short_description,
+        description,
+        price_cents,
+        currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
+        price_label,
+        availability,
+        primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
+        featured,
+        updated_at,
+        businesses!inner(name, slug, whatsapp, status, categories!inner(name)),
+        product_category_links!inner(product_categories!inner(slug))
+      `,
+      { count: "exact" },
+    )
+    .eq("status", "published")
+    .eq("moderation_status", "approved")
+    .eq("businesses.published", true)
+    .eq("businesses.categories.name", category)
+    .eq("product_category_links.product_categories.slug", subcategorySlug)
+    .order("updated_at", { ascending: false })
+    .range(0, normalizedLimit - 1);
+
+  if (status !== "all") {
+    request = request.eq("businesses.status", status);
+  }
+
+  const search = normalizeProductSearch(query);
+
+  if (search) {
+    const pattern = `*${search}*`;
+
+    request = request.or(
+      [
+        `name.ilike.${pattern}`,
+        `short_description.ilike.${pattern}`,
+        `description.ilike.${pattern}`,
+      ].join(","),
+    );
+  }
+
+  const { count, data, error } = await request;
+
+  if (error) {
+    console.error("Published products for subcategory query failed", error);
+    return { products: [], total: 0 };
+  }
+
+  return {
+    products: data.map((row) => mapProductRow(row as ProductRow)),
+    total: count ?? 0,
+  };
+}
+
+/**
+ * Ranks the given products by total recorded views (analytics_daily_product),
+ * using the service-role client since that rollup table isn't publicly
+ * readable by design. Returns the top `limit` product ids, most-viewed first.
+ */
+export async function getMostViewedProductIds(productIds: string[], limit = 2) {
+  if (productIds.length === 0) {
+    return [];
+  }
+
+  const supabase = getSupabaseServiceRoleClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("analytics_daily_product")
+    .select("product_id, product_views")
+    .in("product_id", productIds);
+
+  if (error) {
+    console.error("Most viewed products query failed", error);
+    return [];
+  }
+
+  const totalsByProductId = new Map<string, number>();
+
+  for (const row of data) {
+    totalsByProductId.set(
+      row.product_id,
+      (totalsByProductId.get(row.product_id) ?? 0) + row.product_views,
+    );
+  }
+
+  return [...totalsByProductId.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([productId]) => productId);
 }
 
 export async function getPublishedProductBySlug(slug: string) {
