@@ -1,4 +1,31 @@
-import type { BusinessPromotionType } from "@/lib/products";
+import type {
+  BusinessPromotionType,
+  ProductAvailability,
+  ProductStatus,
+} from "@/lib/products";
+
+export const PRODUCT_STATUS_LABELS: Record<ProductStatus, string> = {
+  archived: "Archivado",
+  draft: "Borrador",
+  hidden: "Oculto",
+  pending_review: "En revision",
+  published: "Publicado",
+  rejected: "Rechazado",
+};
+
+export const PRODUCT_AVAILABILITY_LABELS: Record<ProductAvailability, string> = {
+  available: "Disponible",
+  discontinued: "Descontinuado",
+  on_request: "Bajo pedido",
+  out_of_stock: "Agotado",
+};
+
+export const BUSINESS_PROMOTION_TYPE_LABELS: Record<BusinessPromotionType, string> = {
+  coupon_amount: "Cupon",
+  custom_message: "Promocion",
+  free_shipping: "Envio gratis",
+  store_percentage: "Descuento tienda",
+};
 
 export function formatCurrency(cents: number, currency: string) {
   return new Intl.NumberFormat("es-CO", {

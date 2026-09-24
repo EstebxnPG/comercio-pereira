@@ -1,17 +1,28 @@
+import { BusinessCard } from "@/components/business-card";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ProductDirectory } from "@/components/product-directory";
 import { getCategories, getPublishedBusinessesPage } from "@/lib/businesses";
 import { BUSINESS_STATUSES, type BusinessStatus } from "@/types/business";
-import { getPublishedProductsPage } from "@/lib/products";
+import {
+  PRODUCT_AVAILABILITY_LABELS,
+  getPublishedProductsPage,
+  type ProductAvailability,
+  type ProductSort,
+} from "@/lib/products";
 
 const BRAND_LIMIT = 10;
+const RELATED_BUSINESSES_LIMIT = 6;
+const PRODUCT_SORTS: ProductSort[] = ["relevance", "recent", "price_asc", "price_desc"];
 
 type ProductsCatalogPageProps = {
   searchParams: Promise<{
     categoria?: string | string[];
+    descuento?: string | string[];
+    disponibilidad?: string | string[];
     estado?: string | string[];
     limite?: string | string[];
+    orden?: string | string[];
     q?: string | string[];
   }>;
 };
@@ -29,18 +40,34 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
     rawStatus && BUSINESS_STATUSES.includes(rawStatus as BusinessStatus)
       ? (rawStatus as BusinessStatus)
       : "all";
+  const rawAvailability = getSingleParam(searchParams.disponibilidad);
+  const selectedAvailability =
+    rawAvailability && rawAvailability in PRODUCT_AVAILABILITY_LABELS
+      ? (rawAvailability as ProductAvailability)
+      : "all";
+  const rawSort = getSingleParam(searchParams.orden);
+  const selectedSort = PRODUCT_SORTS.includes(rawSort as ProductSort)
+    ? (rawSort as ProductSort)
+    : "relevance";
+  const discountedOnly = getSingleParam(searchParams.descuento) === "1";
   const query = parseSearch(getSingleParam(searchParams.q));
   const limit = parseLimit(getSingleParam(searchParams.limite));
 
-  const [productsPage, brandsPage] = await Promise.all([
+  const [productsPage, brandsPage, relatedBusinesses] = await Promise.all([
     getPublishedProductsPage({
+      availability: selectedAvailability,
       category: selectedCategory,
+      discountedOnly,
       limit,
       query,
+      sort: selectedSort,
       status: selectedStatus,
     }),
     selectedCategory !== "all"
       ? getPublishedBusinessesPage({ category: selectedCategory, limit: BRAND_LIMIT })
+      : Promise.resolve({ businesses: [], total: 0 }),
+    query
+      ? getPublishedBusinessesPage({ query, limit: RELATED_BUSINESSES_LIMIT })
       : Promise.resolve({ businesses: [], total: 0 }),
   ]);
 
@@ -85,13 +112,34 @@ export default async function ProductsCatalogPage(props: ProductsCatalogPageProp
         <ProductDirectory
           brands={brandsPage.businesses}
           categories={categories}
+          initialAvailability={selectedAvailability}
           initialCategory={selectedCategory}
+          initialDiscountedOnly={discountedOnly}
           initialLimit={limit}
           initialQuery={query}
+          initialSort={selectedSort}
           initialStatus={selectedStatus}
           products={productsPage.products}
           totalProducts={productsPage.total}
         />
+
+        {query && relatedBusinesses.businesses.length > 0 ? (
+          <section className="border-t border-[var(--md-outline-variant)] bg-paper py-8 sm:py-12">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+              <p className="text-xs font-black uppercase tracking-wide text-brand sm:text-sm">
+                Tambien te puede interesar
+              </p>
+              <h2 className="mt-1.5 font-display text-xl font-extrabold text-ink sm:mt-2 sm:text-2xl">
+                Comercios relacionados
+              </h2>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {relatedBusinesses.businesses.map((business) => (
+                  <BusinessCard key={business.id} business={business} />
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
       </main>
       <Footer />
     </>

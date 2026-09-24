@@ -125,30 +125,10 @@ type BusinessPromotionRow = {
   value: number | null;
 };
 
-export const PRODUCT_STATUS_LABELS: Record<ProductStatus, string> = {
-  archived: "Archivado",
-  draft: "Borrador",
-  hidden: "Oculto",
-  pending_review: "En revision",
-  published: "Publicado",
-  rejected: "Rechazado",
-};
-
-export const PRODUCT_AVAILABILITY_LABELS: Record<ProductAvailability, string> = {
-  available: "Disponible",
-  discontinued: "Descontinuado",
-  on_request: "Bajo pedido",
-  out_of_stock: "Agotado",
-};
-
-export const BUSINESS_PROMOTION_TYPE_LABELS: Record<BusinessPromotionType, string> = {
-  coupon_amount: "Cupon",
-  custom_message: "Promocion",
-  free_shipping: "Envio gratis",
-  store_percentage: "Descuento tienda",
-};
-
 export {
+  PRODUCT_STATUS_LABELS,
+  PRODUCT_AVAILABILITY_LABELS,
+  BUSINESS_PROMOTION_TYPE_LABELS,
   formatProductPrice,
   getActiveDiscountPercentage,
   getProductPriceDisplay,
@@ -294,15 +274,23 @@ export async function getDiscountedProducts({ limit = 12 }: { limit?: number } =
   return data.map((row) => mapProductRow(row as ProductRow));
 }
 
+export type ProductSort = "recent" | "price_asc" | "price_desc" | "relevance";
+
 export async function getPublishedProductsPage({
+  availability = "all",
   category = "all",
+  discountedOnly = false,
   limit = 24,
   query = "",
+  sort = "relevance",
   status = "all",
 }: {
+  availability?: string;
   category?: string;
+  discountedOnly?: boolean;
   limit?: number;
   query?: string;
+  sort?: ProductSort;
   status?: string;
 } = {}) {
   const supabase = getSupabaseServerClient();
@@ -347,9 +335,19 @@ export async function getPublishedProductsPage({
     .eq("status", "published")
     .eq("moderation_status", "approved")
     .eq("businesses.published", true)
-    .order("featured", { ascending: false })
-    .order("updated_at", { ascending: false })
     .range(0, normalizedLimit - 1);
+
+  if (sort === "price_asc") {
+    request = request.order("price_cents", { ascending: true, nullsFirst: false });
+  } else if (sort === "price_desc") {
+    request = request.order("price_cents", { ascending: false, nullsFirst: false });
+  } else if (sort === "recent") {
+    request = request.order("updated_at", { ascending: false });
+  } else {
+    request = request
+      .order("featured", { ascending: false })
+      .order("updated_at", { ascending: false });
+  }
 
   if (category !== "all") {
     request = request.eq("businesses.categories.name", category);
@@ -357,6 +355,19 @@ export async function getPublishedProductsPage({
 
   if (status !== "all") {
     request = request.eq("businesses.status", status);
+  }
+
+  if (availability !== "all") {
+    request = request.eq("availability", availability);
+  }
+
+  if (discountedOnly) {
+    const nowIso = new Date().toISOString();
+
+    request = request
+      .not("discount_percentage", "is", null)
+      .or(`discount_starts_at.is.null,discount_starts_at.lte.${nowIso}`)
+      .or(`discount_ends_at.is.null,discount_ends_at.gte.${nowIso}`);
   }
 
   const search = normalizeProductSearch(query);

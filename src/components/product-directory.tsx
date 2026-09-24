@@ -8,28 +8,46 @@ import { BubbleSelect } from "@/components/bubble-select";
 import { ProductCard } from "@/components/product-card";
 import { getShortCategoryLabel } from "@/lib/category-labels";
 import { STATUS_LABELS } from "@/lib/constants";
-import type { PublicProduct } from "@/lib/products";
+import { PRODUCT_AVAILABILITY_LABELS } from "@/lib/product-pricing";
+import type {
+  ProductAvailability,
+  ProductSort,
+  PublicProduct,
+} from "@/lib/products";
 import type { Business, BusinessStatus } from "@/types/business";
 
 const PAGE_SIZE = 24;
 const FEATURED_COUNT = 2;
 const BRAND_CAROUSEL_LIMIT = 10;
 
+const SORT_LABELS: Record<ProductSort, string> = {
+  price_asc: "Precio: menor a mayor",
+  price_desc: "Precio: mayor a menor",
+  recent: "Mas recientes",
+  relevance: "Relevancia",
+};
+
 export function ProductDirectory({
   brands,
   categories,
+  initialAvailability = "all",
   initialCategory = "all",
+  initialDiscountedOnly = false,
   initialLimit = PAGE_SIZE,
   initialQuery = "",
+  initialSort = "relevance",
   initialStatus = "all",
   products,
   totalProducts,
 }: {
   brands: Business[];
   categories: string[];
+  initialAvailability?: ProductAvailability | "all";
   initialCategory?: string;
+  initialDiscountedOnly?: boolean;
   initialLimit?: number;
   initialQuery?: string;
+  initialSort?: ProductSort;
   initialStatus?: BusinessStatus | "all";
   products: PublicProduct[];
   totalProducts: number;
@@ -43,6 +61,21 @@ export function ProductDirectory({
     ? brands.slice(0, BRAND_CAROUSEL_LIMIT)
     : [];
   const remaining = isFilteredByCategory ? products.slice(FEATURED_COUNT) : products;
+
+  function goTo(overrides: Partial<DirectoryHrefParams>) {
+    router.push(
+      getDirectoryHref({
+        availability: initialAvailability,
+        category: initialCategory,
+        discountedOnly: initialDiscountedOnly,
+        limit: PAGE_SIZE,
+        query: initialQuery,
+        sort: initialSort,
+        status: initialStatus,
+        ...overrides,
+      }),
+    );
+  }
 
   return (
     <section id="productos" className="bg-white py-8 sm:py-16">
@@ -58,16 +91,7 @@ export function ProductDirectory({
                 label: getShortCategoryLabel(category),
               })),
             ]}
-            onChange={(category) => {
-              router.push(
-                getDirectoryHref({
-                  category,
-                  limit: PAGE_SIZE,
-                  query: initialQuery,
-                  status: initialStatus,
-                }),
-              );
-            }}
+            onChange={(category) => goTo({ category })}
           />
           <BubbleSelect
             placeholder="Todos"
@@ -77,18 +101,48 @@ export function ProductDirectory({
               { value: "all", label: "Todos" },
               ...Object.entries(STATUS_LABELS).map(([value, label]) => ({ value, label })),
             ]}
-            onChange={(status) => {
-              router.push(
-                getDirectoryHref({
-                  category: initialCategory,
-                  limit: PAGE_SIZE,
-                  query: initialQuery,
-                  status: status as BusinessStatus | "all",
-                }),
-              );
-            }}
+            onChange={(status) => goTo({ status: status as BusinessStatus | "all" })}
           />
         </div>
+
+        <div className="mt-3 flex gap-3">
+          <BubbleSelect
+            placeholder="Disponibilidad"
+            value={initialAvailability}
+            options={[
+              { value: "all", label: "Disponibilidad" },
+              ...Object.entries(PRODUCT_AVAILABILITY_LABELS).map(([value, label]) => ({
+                value,
+                label,
+              })),
+            ]}
+            onChange={(availability) =>
+              goTo({ availability: availability as ProductAvailability | "all" })
+            }
+          />
+          <BubbleSelect
+            placeholder="Ordenar"
+            align="right"
+            value={initialSort}
+            options={Object.entries(SORT_LABELS).map(([value, label]) => ({
+              value,
+              label,
+            }))}
+            onChange={(sort) => goTo({ sort: sort as ProductSort })}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => goTo({ discountedOnly: !initialDiscountedOnly })}
+          className={`md-focus mt-3 flex min-h-11 w-fit items-center gap-1.5 rounded-full border px-4 text-sm font-bold transition ${
+            initialDiscountedOnly
+              ? "border-brand bg-brand text-white"
+              : "border-[var(--md-outline-variant)] bg-white text-stone-600"
+          }`}
+        >
+          Solo con descuento
+        </button>
 
         {products.length > 0 ? (
           isFilteredByCategory ? (
@@ -154,9 +208,12 @@ export function ProductDirectory({
             <Link
               className="md-filled-button px-6"
               href={getDirectoryHref({
+                availability: initialAvailability,
                 category: initialCategory,
+                discountedOnly: initialDiscountedOnly,
                 limit: nextLimit,
                 query: initialQuery,
+                sort: initialSort,
                 status: initialStatus,
               })}
               scroll={false}
@@ -188,17 +245,25 @@ function MoreIcon({ className }: { className?: string }) {
   );
 }
 
-function getDirectoryHref({
-  category,
-  limit,
-  query,
-  status,
-}: {
+type DirectoryHrefParams = {
+  availability: ProductAvailability | "all";
   category: string;
+  discountedOnly: boolean;
   limit: number;
   query: string;
+  sort: ProductSort;
   status: BusinessStatus | "all";
-}) {
+};
+
+function getDirectoryHref({
+  availability,
+  category,
+  discountedOnly,
+  limit,
+  query,
+  sort,
+  status,
+}: DirectoryHrefParams) {
   const params = new URLSearchParams();
 
   if (query) {
@@ -211,6 +276,18 @@ function getDirectoryHref({
 
   if (status !== "all") {
     params.set("estado", status);
+  }
+
+  if (availability !== "all") {
+    params.set("disponibilidad", availability);
+  }
+
+  if (discountedOnly) {
+    params.set("descuento", "1");
+  }
+
+  if (sort !== "relevance") {
+    params.set("orden", sort);
   }
 
   params.set("limite", String(limit));
