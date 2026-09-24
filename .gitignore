@@ -31,6 +31,10 @@
 # local unused media drafts
 public/brand/foto_centro_pereira_hero.png
 
+# supabase local runtime state
+supabase/.branches/
+supabase/.temp/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
