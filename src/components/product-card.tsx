@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getProductPriceDisplay } from "@/lib/product-pricing";
+import { PRODUCT_AVAILABILITY_LABELS, getProductPriceDisplay } from "@/lib/product-pricing";
 import type { PublicProduct } from "@/lib/products";
 
 export function ProductCard({ product }: { product: PublicProduct }) {
@@ -14,6 +14,11 @@ export function ProductCard({ product }: { product: PublicProduct }) {
         {price.badge ? (
           <span className="absolute left-2 top-2 rounded-full bg-brand px-2 py-0.5 text-[10px] font-black text-white shadow-sm sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
             {price.badge}
+          </span>
+        ) : null}
+        {product.availability !== "available" ? (
+          <span className="absolute right-2 top-2 rounded-full bg-ink/90 px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-sm sm:right-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
+            {PRODUCT_AVAILABILITY_LABELS[product.availability]}
           </span>
         ) : null}
         {product.primaryImageUrl ? (

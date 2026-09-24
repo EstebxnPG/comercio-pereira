@@ -7,12 +7,16 @@ import {
   ProductViewTracker,
   TrackedProductLink,
 } from "@/components/product-event-tracker";
+import { ProductCard } from "@/components/product-card";
 import { SITE_NAME } from "@/lib/constants";
 import {
   PRODUCT_AVAILABILITY_LABELS,
   getProductPriceDisplay,
   getPublishedProductBySlug,
+  getPublishedProductsForBusiness,
 } from "@/lib/products";
+
+const RELATED_PRODUCTS_LIMIT = 4;
 
 export const dynamic = "force-dynamic";
 
@@ -56,6 +60,11 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
       )}`
     : null;
   const price = getProductPriceDisplay(product);
+  const relatedProducts = (
+    await getPublishedProductsForBusiness(product.businessId, RELATED_PRODUCTS_LIMIT + 1)
+  )
+    .filter((candidate) => candidate.id !== product.id)
+    .slice(0, RELATED_PRODUCTS_LIMIT);
   const galleryImages =
     product.images.length > 0
       ? product.images
@@ -163,6 +172,22 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
             </Link>
           </section>
         </article>
+
+        {relatedProducts.length > 0 ? (
+          <div className="mx-auto mt-10 max-w-6xl sm:mt-14">
+            <p className="text-xs font-black uppercase tracking-wide text-brand sm:text-sm">
+              Mismo comercio
+            </p>
+            <h2 className="mt-1.5 font-display text-xl font-extrabold text-ink sm:mt-2 sm:text-2xl">
+              Mas de {product.businessName}
+            </h2>
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard key={relatedProduct.id} product={relatedProduct} />
+              ))}
+            </div>
+          </div>
+        ) : null}
       </main>
       <Footer />
     </>
