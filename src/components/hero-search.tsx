@@ -24,18 +24,18 @@ export function HeroSearch({ categories }: { categories: string[] }) {
     }
 
     const search = params.toString();
-    router.push(search ? `/comercios?${search}` : "/comercios");
+    router.push(search ? `/productos?${search}` : "/productos");
   }
 
   return (
     <div className="max-w-5xl sm:mt-7">
       <div className="mb-2 hidden flex-wrap items-center gap-2 sm:mb-3 sm:flex">
         <p className="text-sm font-black text-white drop-shadow-sm sm:text-base">
-          Busca por negocio, categoria o servicio
+          Busca productos, marcas o categorias
         </p>
         <span className="hidden h-1 w-1 rounded-full bg-gold sm:block" />
         <p className="hidden text-sm font-semibold text-white/80 sm:block">
-          Explora comercios reales de Pereira
+          De comercios reales de Pereira
         </p>
       </div>
       <form onSubmit={handleSubmit} className="sm:hidden">
@@ -44,7 +44,7 @@ export function HeroSearch({ categories }: { categories: string[] }) {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Que buscas hoy?"
+            placeholder="Que producto buscas?"
             className="min-w-0 flex-1 bg-transparent text-[15px] font-semibold text-ink outline-none placeholder:text-stone-500"
           />
           <button
@@ -66,12 +66,12 @@ export function HeroSearch({ categories }: { categories: string[] }) {
             <SearchIcon />
             <span className="min-w-0 flex-1">
               <span className="block text-xs font-black uppercase tracking-wide text-brand">
-                Buscar comercio
+                Buscar producto
               </span>
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Restaurantes, ropa, ferreterias, belleza..."
+                placeholder="Jeans, celulares, muebles, tenis..."
                 className="mt-1 min-h-7 w-full bg-transparent text-[15px] font-bold text-ink outline-none placeholder:text-stone-500 sm:min-h-8 sm:text-lg"
               />
             </span>

@@ -231,6 +231,69 @@ export async function getPublishedProducts({
   return data.map(mapProductRow);
 }
 
+/**
+ * Published products with a currently-active discount (percentage set,
+ * and within its start/end window when those are set). Used for the
+ * home page's "Productos en promocion" section.
+ */
+export async function getDiscountedProducts({ limit = 12 }: { limit?: number } = {}) {
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const normalizedLimit = Math.max(1, Math.min(limit, 48));
+  const nowIso = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(
+      `
+        id,
+        business_id,
+        slug,
+        name,
+        short_description,
+        description,
+        price_cents,
+        currency,
+        discount_ends_at,
+        discount_label,
+        discount_percentage,
+        discount_starts_at,
+        price_label,
+        availability,
+        primary_image_url,
+        product_images(
+          id,
+          public_url,
+          alt_text,
+          sort_order,
+          is_primary
+        ),
+        featured,
+        updated_at,
+        businesses!inner(name, slug, whatsapp)
+      `,
+    )
+    .eq("status", "published")
+    .eq("moderation_status", "approved")
+    .eq("businesses.published", true)
+    .not("discount_percentage", "is", null)
+    .or(`discount_starts_at.is.null,discount_starts_at.lte.${nowIso}`)
+    .or(`discount_ends_at.is.null,discount_ends_at.gte.${nowIso}`)
+    .order("updated_at", { ascending: false })
+    .limit(normalizedLimit);
+
+  if (error) {
+    console.error("Discounted products query failed", error);
+    return [];
+  }
+
+  return data.map((row) => mapProductRow(row as ProductRow));
+}
+
 export async function getPublishedProductsPage({
   category = "all",
   limit = 24,

@@ -16,7 +16,12 @@ const navItems = [
   { href: "/iniciativa", label: "Iniciativa" },
 ];
 
-const quickSearches = ["Restaurantes", "Ropa", "Ferreterias", "Belleza"];
+const quickSearches = [
+  { category: "Comida y Restaurantes", label: "Restaurantes" },
+  { category: "Moda y Ropa", label: "Ropa" },
+  { category: "Ferreteria y Construccion", label: "Ferreterias" },
+  { category: "Belleza y Cuidado Personal", label: "Belleza" },
+];
 
 export function Header() {
   const router = useRouter();
@@ -31,7 +36,7 @@ export function Header() {
   function handleHeaderSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const trimmed = headerQuery.trim();
-    router.push(trimmed ? `/comercios?q=${encodeURIComponent(trimmed)}` : "/comercios");
+    router.push(trimmed ? `/productos?q=${encodeURIComponent(trimmed)}` : "/productos");
   }
 
   return (
@@ -64,8 +69,8 @@ export function Header() {
           <input
             value={headerQuery}
             onChange={(event) => setHeaderQuery(event.target.value)}
-            placeholder="Que buscas hoy?"
-            aria-label="Buscar comercios"
+            placeholder="Que producto buscas?"
+            aria-label="Buscar productos"
             className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-ink outline-none placeholder:text-stone-500"
           />
         </form>
@@ -128,13 +133,13 @@ export function Header() {
         </div>
       </div>
       <div className="flex gap-4 overflow-x-auto px-4 pb-2.5 [scrollbar-width:none] sm:hidden">
-        {quickSearches.map((label) => (
+        {quickSearches.map((item) => (
           <Link
-            key={label}
-            href={`/comercios?q=${encodeURIComponent(label)}`}
+            key={item.label}
+            href={`/productos?categoria=${encodeURIComponent(item.category)}`}
             className="shrink-0 text-sm font-bold text-brand-deep underline-offset-4 hover:underline"
           >
-            {label}
+            {item.label}
           </Link>
         ))}
       </div>

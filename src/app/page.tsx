@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { HeroSearch } from "@/components/hero-search";
 import { HomeBusinessCard } from "@/components/home-business-card";
+import { HomeProductRail } from "@/components/home-product-rail";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
 import { SubmitCtaSection } from "@/components/submit-cta-section";
@@ -17,14 +18,22 @@ import {
   getTrustedBusinessesToDiscover,
 } from "@/lib/businesses";
 import { SITE_SLOGAN } from "@/lib/constants";
+import { getDiscountedProducts, getPublishedProductsPage } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
+
+const HOME_PRODUCT_RAIL_LIMIT = 8;
 
 export default async function Home() {
   const businesses = await getPublishedBusinesses();
   const categories = getCategories();
   const categorySummaries = await getCategorySummaries();
   const businessesToDiscover = await getTrustedBusinessesToDiscover();
+  const [featuredProductsPage, discountedProducts] = await Promise.all([
+    getPublishedProductsPage({ limit: HOME_PRODUCT_RAIL_LIMIT }),
+    getDiscountedProducts({ limit: HOME_PRODUCT_RAIL_LIMIT }),
+  ]);
+  const featuredProducts = featuredProductsPage.products;
   const homeCategoryNames = [
     "Moda y Ropa",
     "Calzado y Marroquineria",
@@ -122,6 +131,23 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        <HomeProductRail
+          eyebrow="Vitrina local"
+          title="Productos destacados"
+          href="/productos"
+          linkLabel="Ver todos los productos"
+          products={featuredProducts}
+        />
+
+        <HomeProductRail
+          eyebrow="Aprovecha hoy"
+          title="Productos en promocion"
+          description="Descuentos activos publicados por comercios aliados."
+          href="/productos"
+          linkLabel="Ver mas promociones"
+          products={discountedProducts}
+        />
 
         <section className="bg-paper py-6 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
