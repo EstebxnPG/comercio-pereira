@@ -26,8 +26,14 @@ import { absoluteUrl, formatDate, isSafeExternalUrl } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+type BusinessPageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
+
 export async function generateMetadata(
-  props: PageProps<"/comercios/[slug]">,
+  props: BusinessPageProps,
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
@@ -63,9 +69,7 @@ export async function generateMetadata(
   };
 }
 
-export default async function BusinessPage(
-  props: PageProps<"/comercios/[slug]">,
-) {
+export default async function BusinessPage(props: BusinessPageProps) {
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
 
