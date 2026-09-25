@@ -8,8 +8,14 @@ import { formatProductPrice, getPublishedProductsForBusiness } from "@/lib/produ
 
 export const dynamic = "force-dynamic";
 
+type BusinessProductsPageProps = {
+  params: Promise<{
+    slug: string;
+  }>;
+};
+
 export async function generateMetadata(
-  props: PageProps<"/comercios/[slug]/productos">,
+  props: BusinessProductsPageProps,
 ): Promise<Metadata> {
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
@@ -24,7 +30,7 @@ export async function generateMetadata(
 }
 
 export default async function BusinessProductsPage(
-  props: PageProps<"/comercios/[slug]/productos">,
+  props: BusinessProductsPageProps,
 ) {
   const { slug } = await props.params;
   const business = await getBusinessBySlug(slug);
