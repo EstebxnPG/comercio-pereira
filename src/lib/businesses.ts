@@ -124,6 +124,52 @@ export async function getBusinessBySlug(slug: string) {
   return getLocalPublishedBusinesses().find((business) => business.slug === slug);
 }
 
+export async function getPublishedBusinessesByIds(ids: string[]) {
+  if (ids.length === 0) {
+    return [];
+  }
+
+  const supabase = getSupabaseServerClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .select(
+      `
+        id,
+        slug,
+        name,
+        short_description,
+        full_description,
+        logo_url,
+        cover_image_url,
+        status,
+        phone,
+        whatsapp,
+        address,
+        maps_url,
+        schedule,
+        published,
+        featured,
+        last_updated_at,
+        categories(name),
+        business_social_links(platform, url)
+      `,
+    )
+    .eq("published", true)
+    .in("id", ids);
+
+  if (error) {
+    console.error("Businesses by ids query failed", error);
+    return [];
+  }
+
+  return data.map(mapSupabaseBusiness);
+}
+
 export function getCategories() {
   return commerceCategories.map((category) => category.name);
 }

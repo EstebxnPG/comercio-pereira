@@ -36,7 +36,7 @@ export function BusinessLogo({
 
   return (
     <div
-      className={`relative shrink-0 overflow-hidden border-white/90 bg-[#fffdf8] ${classes.frame}`}
+      className={`relative shrink-0 overflow-hidden border-white/90 bg-paper ${classes.frame}`}
     >
       {logo ? (
         <Image
@@ -47,7 +47,7 @@ export function BusinessLogo({
           sizes={classes.sizes}
         />
       ) : (
-        <span className="grid h-full place-items-center px-2 text-center text-sm font-black text-[#B3262E]">
+        <span className="grid h-full place-items-center px-2 text-center font-display text-sm font-bold text-brand">
           {businessName.slice(0, 2).toUpperCase()}
         </span>
       )}

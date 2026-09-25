@@ -12,13 +12,13 @@ export function PlaceholderShell({
   title: string;
 }) {
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <header className="border-b border-stone-200 pb-6">
-          <p className="text-sm font-black uppercase text-[#B3262E]">
+          <p className="text-sm font-black uppercase tracking-wide text-brand">
             {eyebrow}
           </p>
-          <h1 className="mt-2 text-3xl font-black">{title}</h1>
+          <h1 className="mt-2 font-display text-3xl font-extrabold">{title}</h1>
           <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-stone-600">
             Espacio reservado para diseno e implementacion funcional.
           </p>
@@ -39,11 +39,11 @@ export function PlaceholderShell({
         ) : null}
 
         <section className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-black">Pendiente por definir</h2>
+          <h2 className="font-display text-xl font-bold">Pendiente por definir</h2>
           <ul className="mt-4 grid gap-3 text-sm font-semibold leading-6 text-stone-700">
             {items.map((item) => (
               <li
-                className="rounded-xl border border-stone-200 bg-[#fffdf8] px-4 py-3"
+                className="rounded-xl border border-stone-200 bg-paper px-4 py-3"
                 key={item}
               >
                 {item}

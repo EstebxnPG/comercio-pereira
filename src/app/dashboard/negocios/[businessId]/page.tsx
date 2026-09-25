@@ -48,17 +48,17 @@ export default async function BusinessProfilePage(props: BusinessProfilePageProp
   );
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-4xl gap-6">
         <header className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Link
-              className="text-sm font-black text-[#B3262E] hover:underline"
+              className="text-sm font-black text-brand hover:underline"
               href="/dashboard"
             >
               Volver al dashboard
             </Link>
-            <h1 className="mt-3 text-3xl font-black">{business.name}</h1>
+            <h1 className="mt-3 font-display text-3xl font-extrabold">{business.name}</h1>
             <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
               Edita la informacion publica del comercio.
             </p>
@@ -261,7 +261,7 @@ export default async function BusinessProfilePage(props: BusinessProfilePageProp
 
         <section className="grid gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
           <div>
-            <h2 className="text-xl font-black">Imagenes del negocio</h2>
+            <h2 className="font-display text-xl font-bold">Imagenes del negocio</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
               Actualiza el logo y la portada publica del comercio.
             </p>
@@ -315,7 +315,7 @@ function ImageUploadForm({
   return (
     <form
       action={uploadBusinessImageAction}
-      className="grid gap-3 rounded-xl border border-stone-200 bg-[#fffdf8] p-4"
+      className="grid gap-3 rounded-xl border border-stone-200 bg-paper p-4"
     >
       <input name="businessId" type="hidden" value={businessId} />
       <input name="imageType" type="hidden" value={imageType} />
@@ -340,7 +340,7 @@ function ImageUploadForm({
         Nueva imagen
         <input
           accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
-          className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+          className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
           name="image"
           required
           type="file"

@@ -8,6 +8,7 @@ export type BusinessAuditAction =
   | "business_cover_updated"
   | "business_invites_claimed"
   | "business_owner_assigned"
+  | "business_moderated"
   | "product_created"
   | "product_updated"
   | "product_image_updated"
@@ -17,7 +18,10 @@ export type BusinessAuditAction =
   | "product_featured"
   | "promotion_created"
   | "promotion_updated"
-  | "promotion_deleted";
+  | "promotion_deleted"
+  | "team_member_invited"
+  | "team_member_role_updated"
+  | "team_member_removed";
 
 export async function logBusinessAudit({
   action,

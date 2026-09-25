@@ -6,7 +6,7 @@ import type { Business } from "@/types/business";
 
 export function BusinessCard({ business }: { business: Business }) {
   return (
-    <article className="group overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-[0_1px_2px_rgb(34_21_20/0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#B3262E]/25 hover:shadow-[0_16px_34px_rgb(34_21_20/0.12)]">
+    <article className="group overflow-hidden rounded-2xl border border-[var(--md-outline-variant)]/70 bg-white shadow-[0_1px_2px_rgb(36_21_18/0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-brand/25 hover:shadow-[0_16px_34px_rgb(36_21_18/0.14)]">
       <Link
         href={`/comercios/${business.slug}`}
         className="md-focus grid h-full grid-cols-[112px_1fr] sm:block"
@@ -30,12 +30,12 @@ export function BusinessCard({ business }: { business: Business }) {
         </div>
         <div className="min-w-0 p-3 sm:p-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="min-w-0 truncate text-xs font-black uppercase text-[#B3262E]">
+            <p className="min-w-0 truncate font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep sm:text-xs">
               {business.category}
             </p>
             <BusinessStatusBadge status={business.status} />
           </div>
-          <h2 className="mt-2 line-clamp-2 text-base font-black leading-tight text-[#22211f] sm:text-xl">
+          <h2 className="mt-2 line-clamp-2 font-display text-base font-bold leading-tight text-ink sm:text-xl">
             {business.name}
           </h2>
           <p className="mt-2 hidden line-clamp-2 text-sm leading-6 text-stone-600 sm:block">
@@ -46,7 +46,7 @@ export function BusinessCard({ business }: { business: Business }) {
               {business.address}
             </p>
           ) : null}
-          <span className="mt-3 inline-flex min-h-9 items-center rounded-full bg-[#fff3bd] px-3 text-xs font-black text-[#5b1b00] transition group-hover:bg-[#f5c84c] sm:mt-4 sm:min-h-10 sm:px-4 sm:text-sm">
+          <span className="mt-3 inline-flex min-h-9 items-center rounded-full bg-gold-soft px-3 text-xs font-black text-gold-ink transition group-hover:bg-gold sm:mt-4 sm:min-h-10 sm:px-4 sm:text-sm">
             Ver perfil
           </span>
         </div>

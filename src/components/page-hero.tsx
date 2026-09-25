@@ -14,12 +14,12 @@ export function PageHero({
   primaryLabel?: string;
 }) {
   return (
-    <section className="bg-[#fbfaf7]">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <p className="text-sm font-black uppercase tracking-wide text-[#B3262E]">
+    <section className="bg-paper">
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8">
+        <p className="text-sm font-black uppercase tracking-wide text-brand">
           {eyebrow}
         </p>
-        <h1 className="mt-4 max-w-4xl text-4xl font-black leading-tight text-[#22211f] sm:text-5xl">
+        <h1 className="mt-3 max-w-4xl font-display text-3xl font-extrabold leading-tight text-ink sm:mt-4 sm:text-5xl">
           {title}
         </h1>
         <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-700">

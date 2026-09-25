@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   deletePromotionAction,
   savePromotionAction,
+  setPromotionStatusAction,
 } from "@/app/dashboard/negocios/[businessId]/promociones/actions";
 import { requireBusinessRole } from "@/lib/auth";
 import {
@@ -24,16 +25,16 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
   const saved = getSingleParam(searchParams.saved) === "1";
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <header className="border-b border-stone-200 pb-6">
           <Link
-            className="text-sm font-black text-[#B3262E] hover:underline"
+            className="text-sm font-black text-brand hover:underline"
             href={`/dashboard/negocios/${businessId}`}
           >
             Volver al perfil
           </Link>
-          <h1 className="mt-3 text-3xl font-black">Promociones</h1>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Promociones</h1>
           <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
             Simula beneficios comerciales como envio gratis, cupones y descuentos
             de tienda.
@@ -51,7 +52,7 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
         <section className="grid gap-3">
           {promotions.length === 0 ? (
             <div className="md-surface p-6">
-              <h2 className="text-xl font-black">Sin promociones</h2>
+              <h2 className="font-display text-xl font-bold">Sin promociones</h2>
               <p className="mt-2 text-sm font-semibold text-stone-600">
                 Crea un beneficio para mostrarlo en el perfil publico del comercio.
               </p>
@@ -61,7 +62,7 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
               <article className="md-surface grid gap-4 p-5" key={promotion.id}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase text-[#B3262E]">
+                    <p className="font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
                       {
                         BUSINESS_PROMOTION_TYPE_LABELS[
                           promotion.type as BusinessPromotionType
@@ -69,8 +70,8 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
                       }{" "}
                       / {promotion.status}
                     </p>
-                    <h2 className="mt-1 text-xl font-black">{promotion.title}</h2>
-                    <p className="mt-1 text-sm font-black text-[#B3262E]">
+                    <h2 className="mt-1 font-display text-xl font-bold">{promotion.title}</h2>
+                    <p className="mt-1 text-sm font-black text-brand">
                       {formatPromotionValue({
                         minimumOrderAmount: promotion.minimum_order_amount,
                         type: promotion.type as BusinessPromotionType,
@@ -83,19 +84,36 @@ export default async function PromotionsPage(props: PromotionsPageProps) {
                       </p>
                     ) : null}
                   </div>
-                  {promotion.status === "active" ? (
-                    <p className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800">
-                      Pausala antes de eliminar
-                    </p>
-                  ) : (
-                    <form action={deletePromotionAction}>
-                      <input name="businessId" type="hidden" value={businessId} />
-                      <input name="promotionId" type="hidden" value={promotion.id} />
-                      <button className="md-outlined-button px-4 text-sm" type="submit">
-                        Eliminar
-                      </button>
-                    </form>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {promotion.status === "active" ? (
+                      <form action={setPromotionStatusAction}>
+                        <input name="businessId" type="hidden" value={businessId} />
+                        <input name="promotionId" type="hidden" value={promotion.id} />
+                        <input name="status" type="hidden" value="paused" />
+                        <button className="md-outlined-button px-4 text-sm" type="submit">
+                          Pausar
+                        </button>
+                      </form>
+                    ) : (
+                      <>
+                        <form action={setPromotionStatusAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="promotionId" type="hidden" value={promotion.id} />
+                          <input name="status" type="hidden" value="active" />
+                          <button className="md-outlined-button px-4 text-sm" type="submit">
+                            {promotion.status === "paused" ? "Reactivar" : "Activar"}
+                          </button>
+                        </form>
+                        <form action={deletePromotionAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="promotionId" type="hidden" value={promotion.id} />
+                          <button className="md-outlined-button px-4 text-sm" type="submit">
+                            Eliminar
+                          </button>
+                        </form>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <PromotionForm businessId={businessId} promotion={promotion} />
               </article>

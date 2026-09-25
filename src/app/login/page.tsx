@@ -31,23 +31,23 @@ export default async function LoginPage(props: LoginPageProps) {
   const errorMessage = error ? ERROR_MESSAGES[error] : undefined;
 
   return (
-    <main className="grid min-h-screen place-items-center bg-[#fbfaf7] px-4 py-12 text-[#22211f]">
+    <main className="grid min-h-screen place-items-center bg-paper px-4 py-12 text-ink">
       <form
         action={signInAction}
         className="grid w-full max-w-sm gap-4 rounded-2xl border border-stone-200 bg-white p-5 shadow-sm"
       >
         <div>
-          <p className="text-sm font-black uppercase text-[#B3262E]">
+          <p className="text-sm font-black uppercase tracking-wide text-brand">
             Acceso privado
           </p>
-          <h1 className="mt-2 text-2xl font-black">Iniciar sesion</h1>
+          <h1 className="mt-2 font-display text-2xl font-extrabold">Iniciar sesion</h1>
           <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
             Usa una cuenta autorizada para administrar Compra en Pereira.
           </p>
         </div>
 
         {errorMessage ? (
-          <p className="rounded-xl bg-[#ffdad8] px-3 py-2 text-sm font-bold text-[#410006]">
+          <p className="rounded-xl bg-brand-soft px-3 py-2 text-sm font-bold text-brand-deep">
             {errorMessage}
           </p>
         ) : null}

@@ -12,10 +12,10 @@ type CoverPalette = {
 };
 
 const FALLBACK_PALETTES: CoverPalette[] = [
-  { primary: "#163A5F", secondary: "#36A9E1", accent: "#F5C84C" },
-  { primary: "#0F5132", secondary: "#55B78B", accent: "#F4C95D" },
+  { primary: "#163A5F", secondary: "#36A9E1", accent: "#FFC107" },
+  { primary: "#0F5132", secondary: "#55B78B", accent: "#FFC107" },
   { primary: "#4C1D95", secondary: "#A855F7", accent: "#F97316" },
-  { primary: "#7F1D1D", secondary: "#DC2626", accent: "#F5C84C" },
+  { primary: "#A81318", secondary: "#E41D23", accent: "#FFC107" },
   { primary: "#1F2937", secondary: "#64748B", accent: "#38BDF8" },
 ];
 

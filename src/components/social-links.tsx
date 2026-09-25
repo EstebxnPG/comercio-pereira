@@ -8,7 +8,7 @@ import { isSafeExternalUrl } from "@/lib/utils";
 import type { Business } from "@/types/business";
 
 const linkClasses =
-  "inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 px-4 text-sm font-bold text-stone-800 transition hover:border-[#B3262E] hover:text-[#B3262E] focus:outline-none focus:ring-2 focus:ring-[#B3262E] focus:ring-offset-2";
+  "inline-flex min-h-11 items-center gap-2 rounded-full border border-stone-300 px-4 text-sm font-bold text-stone-800 transition hover:border-brand hover:text-brand focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2";
 
 export function SocialLinks({ business }: { business: Business }) {
   const links = [

@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { BubbleSelect } from "@/components/bubble-select";
 import { BusinessCard } from "@/components/business-card";
 import {
   DEFAULT_BUSINESS_COVER_IMAGE,
@@ -62,14 +63,120 @@ const INITIAL_STATE: FormState = {
   acceptsPublication: false,
 };
 
-const STEPS: Array<{ eyebrow: string; title: string }> = [
-  { eyebrow: "Informacion Basica", title: "Informacion principal" },
-  { eyebrow: "Contacto", title: "Contacto comercial" },
-  { eyebrow: "Ubicacion", title: "Ubicacion y horarios" },
-  { eyebrow: "Canales", title: "Redes e imagenes" },
-  { eyebrow: "Operacion", title: "Operacion" },
-  { eyebrow: "Final", title: "Revision final" },
+const STEPS: Array<{ eyebrow: string; encouragement: string; title: string }> = [
+  {
+    eyebrow: "Informacion Basica",
+    encouragement: "Empecemos con lo esencial de tu comercio.",
+    title: "Informacion principal",
+  },
+  {
+    eyebrow: "Contacto",
+    encouragement: "Vas muy bien. Ahora, como te contactan tus clientes.",
+    title: "Contacto comercial",
+  },
+  {
+    eyebrow: "Ubicacion",
+    encouragement: "Vamos por la mitad. Dinos donde te encuentran.",
+    title: "Ubicacion y horarios",
+  },
+  {
+    eyebrow: "Canales",
+    encouragement: "Ya casi. Suma tus redes y las fotos de tu comercio.",
+    title: "Redes e imagenes",
+  },
+  {
+    eyebrow: "Operacion",
+    encouragement: "Un ultimo tramo: domicilios y formas de pago.",
+    title: "Operacion",
+  },
+  {
+    eyebrow: "Final",
+    encouragement: "Llegaste al final. Revisa todo y envialo.",
+    title: "Revision final",
+  },
 ] as const;
+
+type ScheduleDay = "lun" | "mar" | "mie" | "jue" | "vie" | "sab" | "dom";
+
+type ScheduleEntry = {
+  close: string;
+  days: ScheduleDay[];
+  id: string;
+  open: string;
+};
+
+const SCHEDULE_DAYS: Array<{ key: ScheduleDay; label: string }> = [
+  { key: "lun", label: "L" },
+  { key: "mar", label: "M" },
+  { key: "mie", label: "X" },
+  { key: "jue", label: "J" },
+  { key: "vie", label: "V" },
+  { key: "sab", label: "S" },
+  { key: "dom", label: "D" },
+];
+
+const SCHEDULE_DAY_SHORT: Record<ScheduleDay, string> = {
+  dom: "Dom",
+  jue: "Jue",
+  lun: "Lun",
+  mar: "Mar",
+  mie: "Mie",
+  sab: "Sab",
+  vie: "Vie",
+};
+
+function formatScheduleDays(days: ScheduleDay[]) {
+  const set = new Set(days);
+  const weekdays: ScheduleDay[] = ["lun", "mar", "mie", "jue", "vie"];
+
+  if (SCHEDULE_DAYS.every((day) => set.has(day.key))) {
+    return "Todos los dias";
+  }
+
+  if (weekdays.every((day) => set.has(day)) && days.length === 5) {
+    return "Lun a Vie";
+  }
+
+  if (set.has("sab") && set.has("dom") && days.length === 2) {
+    return "Fin de semana";
+  }
+
+  return SCHEDULE_DAYS.filter((day) => set.has(day.key))
+    .map((day) => SCHEDULE_DAY_SHORT[day.key])
+    .join(", ");
+}
+
+function formatScheduleTime(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  const [hoursRaw, minutes] = value.split(":");
+  const hours = Number(hoursRaw);
+  const suffix = hours >= 12 ? "p.m." : "a.m.";
+  const hours12 = hours % 12 === 0 ? 12 : hours % 12;
+
+  return `${hours12}:${minutes} ${suffix}`;
+}
+
+function formatScheduleEntries(entries: ScheduleEntry[]) {
+  return entries
+    .filter((entry) => entry.days.length > 0 && entry.open && entry.close)
+    .map(
+      (entry) =>
+        `${formatScheduleDays(entry.days)}: ${formatScheduleTime(entry.open)} - ${formatScheduleTime(entry.close)}`,
+    )
+    .join(" · ");
+}
+
+function createScheduleEntry(): ScheduleEntry {
+  return {
+    close: "",
+    days: [],
+    id: Math.random().toString(36).slice(2),
+    open: "",
+  };
+}
 
 const MAX_LOGO_BYTES = 5 * 1024 * 1024;
 const MAX_COVER_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -101,6 +208,8 @@ export function BusinessSubmissionForm({
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
   const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
   const [stepError, setStepError] = useState("");
+  const [scheduleEntries, setScheduleEntries] = useState<ScheduleEntry[]>([]);
+  const [customSchedule, setCustomSchedule] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
   const hasChangedStep = useRef(false);
 
@@ -113,11 +222,24 @@ export function BusinessSubmissionForm({
     formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [currentStep]);
 
+  function handleScheduleEntriesChange(nextEntries: ScheduleEntry[]) {
+    setScheduleEntries(nextEntries);
+    updateField("schedule", formatScheduleEntries(nextEntries));
+  }
+
+  function handleCustomScheduleChange(next: boolean) {
+    setCustomSchedule(next);
+
+    if (!next) {
+      updateField("schedule", formatScheduleEntries(scheduleEntries));
+    }
+  }
+
   const previewBusiness = useMemo<Business>(
     () => ({
       id: "preview",
       slug: "vista-previa",
-      name: form.businessName.trim() || "Nombre de tu comercio",
+      name: form.businessName.trim() || "Tu comercio",
       category: form.category || "Categoria",
       shortDescription:
         form.description.trim() ||
@@ -279,6 +401,8 @@ export function BusinessSubmissionForm({
       setForm(INITIAL_STATE);
       updateLogoFile(null);
       updateCoverFile(null);
+      setScheduleEntries([]);
+      setCustomSchedule(false);
       setCurrentStep(0);
     } catch (error) {
       setSubmitState({
@@ -294,34 +418,37 @@ export function BusinessSubmissionForm({
   }
 
   return (
-    <section className="bg-[#fbfaf7] py-6 sm:py-14">
+    <section className="bg-paper py-6 sm:py-14">
       <div className="mx-auto grid max-w-7xl gap-6 px-3 sm:gap-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_430px] lg:px-8">
         <form
           ref={formRef}
           className="overflow-hidden rounded-[28px] border border-stone-200 bg-white shadow-[0_8px_30px_rgb(34_21_20/0.08)]"
           onSubmit={handleSubmit}
         >
-          <div className="grid gap-4 bg-[#fffdf8] px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
+          <div className="grid gap-4 bg-brand-soft/40 px-4 pb-5 pt-4 sm:px-6 sm:pt-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs font-black uppercase text-[#B3262E]">
+                <p className="font-mono text-xs font-bold uppercase tracking-wide text-brand-deep">
                   Registro de comercio
                 </p>
-                <h2 className="mt-1 text-2xl font-black tracking-normal text-[#22211f] sm:text-3xl">
+                <h2 className="mt-1 font-display text-2xl font-extrabold tracking-normal text-ink sm:text-3xl">
                   {STEPS[currentStep].title}
                 </h2>
               </div>
-              <span className="shrink-0 rounded-full bg-[#f4ede7] px-3 py-1.5 text-xs font-black text-stone-700">
+              <span className="shrink-0 rounded-full bg-brand-soft px-3 py-1.5 text-xs font-black text-brand-deep">
                 {currentStep + 1}/{STEPS.length}
               </span>
             </div>
+            <p className="-mt-1 text-sm font-bold text-brand-deep">
+              {STEPS[currentStep].encouragement}
+            </p>
             <StepProgress currentStep={currentStep} onStepChange={requestStep} />
           </div>
 
           <div className="grid gap-5 p-4 sm:p-6">
             {currentStep === 0 ? (
             <StepSection>
-              <div className="rounded-2xl border border-[#f5c84c] bg-[#fff8d8] px-4 py-3 text-sm font-bold leading-6 text-[#5b1b00]">
+              <div className="rounded-2xl border border-gold bg-gold-soft px-4 py-3 text-sm font-bold leading-6 text-gold-ink">
                 Al continuar con este formulario declaras que el comercio esta
                 registrado ante Camara de Comercio. 
               </div>
@@ -339,29 +466,23 @@ export function BusinessSubmissionForm({
                   />
                 </Field>
                 <Field label="Categoria" required>
-                  <select
-                    className="md-field"
-                    name="category"
-                    required
+                  <BubbleSelect
+                    onChange={(category) => updateField("category", category)}
+                    options={categories.map((category) => ({
+                      label: category,
+                      value: category,
+                    }))}
+                    placeholder="Seleccionar categoria"
                     value={form.category}
-                    onChange={(event) =>
-                      updateField("category", event.target.value)
-                    }
-                  >
-                    <option value="">Seleccionar categoria</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </Field>
               </div>
-              <Field label="Descripcion corta para la vista previa en la web" required>
+              <Field label="Frase corta para la tarjeta (ve al punto)" required>
                 <textarea
-                  className="md-field min-h-32 py-3 leading-6"
-                  maxLength={420}
+                  className="md-field min-h-20 py-3 leading-6"
+                  maxLength={140}
                   name="description"
+                  placeholder="Ej: Jeans y ropa colombiana para mujer y hombre, tallas 6 a 22."
                   required
                   value={form.description}
                   onChange={(event) =>
@@ -369,7 +490,8 @@ export function BusinessSubmissionForm({
                   }
                 />
                 <p className="mt-1 text-xs font-semibold text-stone-500">
-                  {form.description.length}/420 caracteres
+                  {form.description.length}/140 caracteres · una frase corta se
+                  lee mejor en la tarjeta que un parrafo largo.
                 </p>
               </Field>
               <Field label="Descripcion completa del perfil" required>
@@ -422,12 +544,12 @@ export function BusinessSubmissionForm({
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="WhatsApp" required>
-                  <div className="flex overflow-hidden rounded-xl border border-[#85736f] bg-white focus-within:ring-2 focus-within:ring-[#B3262E] focus-within:ring-offset-2">
-                    <span className="flex min-h-12 items-center border-r border-stone-200 bg-[#fffdf8] px-4 text-sm font-black text-stone-700">
+                  <div className="flex overflow-hidden rounded-xl border border-outline bg-white focus-within:ring-2 focus-within:ring-brand focus-within:ring-offset-2">
+                    <span className="flex min-h-12 items-center border-r border-stone-200 bg-paper px-4 text-sm font-black text-stone-700">
                       +57
                     </span>
                     <input
-                      className="min-h-12 w-full bg-transparent px-4 py-2 text-base font-semibold text-[#22211f] outline-none placeholder:text-stone-400"
+                      className="min-h-12 w-full bg-transparent px-4 py-2 text-base font-semibold text-ink outline-none placeholder:text-stone-400"
                       inputMode="numeric"
                       maxLength={10}
                       name="whatsapp"
@@ -483,31 +605,27 @@ export function BusinessSubmissionForm({
                   }
                 />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Barrio o zona">
-                  <input
-                    className="md-field"
-                    maxLength={80}
-                    name="neighborhood"
-                    value={form.neighborhood}
-                    onChange={(event) =>
-                      updateField("neighborhood", event.target.value)
-                    }
-                  />
-                </Field>
-                <Field label="Horario">
-                  <input
-                    className="md-field"
-                    maxLength={160}
-                    name="schedule"
-                    placeholder="Lun a sab, 8:00 a.m. - 6:00 p.m."
-                    value={form.schedule}
-                    onChange={(event) =>
-                      updateField("schedule", event.target.value)
-                    }
-                  />
-                </Field>
-              </div>
+              <Field label="Barrio o zona">
+                <input
+                  className="md-field"
+                  maxLength={80}
+                  name="neighborhood"
+                  value={form.neighborhood}
+                  onChange={(event) =>
+                    updateField("neighborhood", event.target.value)
+                  }
+                />
+              </Field>
+              <Field label="Horario">
+                <ScheduleBuilder
+                  custom={customSchedule}
+                  entries={scheduleEntries}
+                  onCustomChange={handleCustomScheduleChange}
+                  onEntriesChange={handleScheduleEntriesChange}
+                  schedule={form.schedule}
+                  onScheduleChange={(value) => updateField("schedule", value)}
+                />
+              </Field>
               <Field label="Link de Google Maps">
                 <input
                   className="md-field"
@@ -669,12 +787,12 @@ export function BusinessSubmissionForm({
 
           {currentStep === 5 ? (
             <StepSection>
-              <div className="rounded-2xl bg-[#fff3bd] p-4 text-sm font-bold leading-6 text-[#5b1b00]">
+              <div className="rounded-2xl bg-gold-soft p-4 text-sm font-bold leading-6 text-gold-ink">
                 Revisa la vista previa antes de enviar. La publicacion no es
                 automatica: primero validamos la informacion y luego creamos el
                 perfil definitivo.
               </div>
-              <div className="grid gap-3 rounded-2xl border border-stone-200 bg-[#fffdf8] p-4 text-sm font-semibold leading-6 text-stone-700 shadow-sm">
+              <div className="grid gap-3 rounded-2xl border border-stone-200 bg-paper p-4 text-sm font-semibold leading-6 text-stone-700 shadow-sm">
                 <p className="font-black text-stone-900">
                   Terminos de publicacion y autorizacion
                 </p>
@@ -699,7 +817,7 @@ export function BusinessSubmissionForm({
                     estado de revision, puedes escribirle a Fabian Sanchez
                     &quot;El Chinito&quot;.{" "}
                     <a
-                      className="font-black text-[#B3262E] underline underline-offset-4"
+                      className="font-black text-brand underline underline-offset-4"
                       href={`https://wa.me/${INCLUSION_WHATSAPP}?text=${encodeURIComponent(
                         "Hola Chinito, ya envie mi solicitud para unirme a compra en Pereira",
                       )}`}
@@ -712,10 +830,10 @@ export function BusinessSubmissionForm({
                   </p>
                 ) : null}
               </div>
-              <label className="flex gap-3 rounded-2xl border border-stone-200 bg-[#fffdf8] p-4 text-sm font-bold leading-6 text-stone-800 shadow-sm">
+              <label className="flex gap-3 rounded-2xl border border-stone-200 bg-paper p-4 text-sm font-bold leading-6 text-stone-800 shadow-sm">
                 <input
                   checked={form.acceptsPublication}
-                  className="mt-1 size-5 accent-[#B3262E]"
+                  className="mt-1 size-5 accent-brand"
                   name="acceptsPublication"
                   required
                   type="checkbox"
@@ -785,8 +903,8 @@ export function BusinessSubmissionForm({
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-xl font-black text-[#22211f]">Vista previa</h2>
-            <span className="rounded-full bg-[#fff3bd] px-3 py-1 text-xs font-black text-[#5b1b00]">
+            <h2 className="font-display text-xl font-bold text-ink">Vista previa</h2>
+            <span className="rounded-full bg-gold-soft px-3 py-1 text-xs font-black text-gold-ink">
               Vista previa de la Tarjeta web
             </span>
           </div>
@@ -811,10 +929,10 @@ function StepProgress({
   const nextStep = currentStep + 1 < STEPS.length ? currentStep + 1 : null;
 
   return (
-    <div className="rounded-[24px] bg-[#f4ede7] p-3 shadow-inner">
+    <div className="rounded-[24px] bg-brand-soft/60 p-3 shadow-inner">
       <div className="mb-3 h-2 overflow-hidden rounded-full bg-white">
         <div
-          className="h-full rounded-full bg-[#B3262E] transition-all duration-300"
+          className="h-full rounded-full bg-brand transition-all duration-300"
           style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
         />
       </div>
@@ -865,7 +983,7 @@ function StepBubble({
     >
       <span
         className={`grid size-10 place-items-center rounded-full text-sm font-black sm:size-11 ${
-          active ? "bg-[#B3262E] text-white" : "bg-white text-stone-600"
+          active ? "bg-brand text-white" : "bg-white text-stone-600"
         }`}
       >
         {stepText}
@@ -874,11 +992,151 @@ function StepBubble({
         <span className="block truncate text-xs font-black uppercase text-stone-500">
           Paso
         </span>
-        <span className="block truncate text-sm font-black text-[#22211f]">
+        <span className="block truncate text-sm font-black text-ink">
           {label}
         </span>
       </span>
     </button>
+  );
+}
+
+function ScheduleBuilder({
+  custom,
+  entries,
+  onCustomChange,
+  onEntriesChange,
+  onScheduleChange,
+  schedule,
+}: {
+  custom: boolean;
+  entries: ScheduleEntry[];
+  onCustomChange: (custom: boolean) => void;
+  onEntriesChange: (entries: ScheduleEntry[]) => void;
+  onScheduleChange: (value: string) => void;
+  schedule: string;
+}) {
+  function updateEntry(id: string, patch: Partial<ScheduleEntry>) {
+    onEntriesChange(
+      entries.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry)),
+    );
+  }
+
+  function toggleDay(id: string, day: ScheduleDay) {
+    const entry = entries.find((item) => item.id === id);
+
+    if (!entry) {
+      return;
+    }
+
+    const days = entry.days.includes(day)
+      ? entry.days.filter((item) => item !== day)
+      : [...entry.days, day];
+
+    updateEntry(id, { days });
+  }
+
+  if (custom) {
+    return (
+      <div className="grid gap-2">
+        <input
+          className="md-field"
+          maxLength={160}
+          name="schedule"
+          placeholder="Lun a sab, 8:00 a.m. - 6:00 p.m."
+          value={schedule}
+          onChange={(event) => onScheduleChange(event.target.value)}
+        />
+        <button
+          className="w-fit text-xs font-black text-brand hover:underline"
+          onClick={() => onCustomChange(false)}
+          type="button"
+        >
+          Usar el armador de horarios
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-3">
+      {entries.map((entry) => (
+        <div
+          className="grid gap-3 rounded-xl border border-stone-200 bg-paper p-3"
+          key={entry.id}
+        >
+          <div className="flex flex-wrap items-center gap-1.5">
+            {SCHEDULE_DAYS.map((day) => (
+              <button
+                className={`grid size-8 place-items-center rounded-full text-xs font-black transition ${
+                  entry.days.includes(day.key)
+                    ? "bg-brand text-white"
+                    : "bg-white text-stone-500 ring-1 ring-stone-200"
+                }`}
+                key={day.key}
+                onClick={() => toggleDay(entry.id, day.key)}
+                type="button"
+              >
+                {day.label}
+              </button>
+            ))}
+            <button
+              className="ml-auto text-xs font-black text-stone-400 hover:text-brand"
+              onClick={() =>
+                onEntriesChange(entries.filter((item) => item.id !== entry.id))
+              }
+              type="button"
+            >
+              Quitar
+            </button>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="grid gap-1 text-xs font-black text-stone-600">
+              Abre
+              <input
+                className="md-field"
+                type="time"
+                value={entry.open}
+                onChange={(event) =>
+                  updateEntry(entry.id, { open: event.target.value })
+                }
+              />
+            </label>
+            <label className="grid gap-1 text-xs font-black text-stone-600">
+              Cierra
+              <input
+                className="md-field"
+                type="time"
+                value={entry.close}
+                onChange={(event) =>
+                  updateEntry(entry.id, { close: event.target.value })
+                }
+              />
+            </label>
+          </div>
+        </div>
+      ))}
+      {schedule ? (
+        <p className="text-xs font-semibold text-stone-500">
+          Se vera asi: <span className="font-bold text-ink">{schedule}</span>
+        </p>
+      ) : null}
+      <div className="flex flex-wrap items-center gap-4">
+        <button
+          className="w-fit text-sm font-black text-brand hover:underline"
+          onClick={() => onEntriesChange([...entries, createScheduleEntry()])}
+          type="button"
+        >
+          + Agregar horario
+        </button>
+        <button
+          className="w-fit text-xs font-black text-stone-400 hover:text-brand"
+          onClick={() => onCustomChange(true)}
+          type="button"
+        >
+          Prefiero escribirlo yo
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -895,7 +1153,7 @@ function Field({
     <label className="grid gap-2 text-sm font-black text-stone-800">
       <span>
         {label}
-        {required ? <span className="text-[#B3262E]"> *</span> : null}
+        {required ? <span className="text-brand"> *</span> : null}
       </span>
       {children}
     </label>
@@ -923,11 +1181,11 @@ function FileField({
     <label className="grid gap-2 text-sm font-black text-stone-800">
       <span>
         {label}
-        {required ? <span className="text-[#B3262E]"> *</span> : null}
+        {required ? <span className="text-brand"> *</span> : null}
       </span>
       <input
         accept={accept}
-        className="md-field h-auto min-h-16 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+        className="md-field h-auto min-h-16 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
         name={name}
         required={required}
         type="file"

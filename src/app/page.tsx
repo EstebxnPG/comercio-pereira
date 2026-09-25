@@ -2,13 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { AutoScrollCarousel } from "@/components/auto-scroll-carousel";
 import { BrandRail } from "@/components/brand-rail";
-import { BusinessCard } from "@/components/business-card";
-import { CategoryGrid } from "@/components/category-grid";
+import { CategoryQuickGrid } from "@/components/category-quick-grid";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { HeroSearch } from "@/components/hero-search";
+import { HomeBusinessCard } from "@/components/home-business-card";
+import { HomeProductRail } from "@/components/home-product-rail";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { InitiativeSection } from "@/components/initiative-section";
+import { SubmitCtaSection } from "@/components/submit-cta-section";
 import {
   getCategories,
   getCategorySummaries,
@@ -16,14 +18,22 @@ import {
   getTrustedBusinessesToDiscover,
 } from "@/lib/businesses";
 import { SITE_SLOGAN } from "@/lib/constants";
+import { getDiscountedProducts, getPublishedProductsPage } from "@/lib/products";
 
 export const dynamic = "force-dynamic";
+
+const HOME_PRODUCT_RAIL_LIMIT = 8;
 
 export default async function Home() {
   const businesses = await getPublishedBusinesses();
   const categories = getCategories();
   const categorySummaries = await getCategorySummaries();
   const businessesToDiscover = await getTrustedBusinessesToDiscover();
+  const [featuredProductsPage, discountedProducts] = await Promise.all([
+    getPublishedProductsPage({ limit: HOME_PRODUCT_RAIL_LIMIT }),
+    getDiscountedProducts({ limit: HOME_PRODUCT_RAIL_LIMIT }),
+  ]);
+  const featuredProducts = featuredProductsPage.products;
   const homeCategoryNames = [
     "Moda y Ropa",
     "Calzado y Marroquineria",
@@ -44,7 +54,45 @@ export default async function Home() {
     <>
       <Header />
       <main>
-        <section className="relative overflow-hidden bg-[#1f1715] text-white">
+        <section className="relative overflow-hidden bg-[#1a1210] text-white sm:hidden">
+          <div className="relative h-60 w-full overflow-hidden">
+            <Image
+              src="/brand/imagen-pereire-hero.png"
+              alt="Plaza de Bolivar de Pereira con el Bolivar Desnudo"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgb(20_14_11/0)_30%,rgb(20_14_11/0.55)_68%,rgb(107_26_22/0.92)_88%,rgb(107_26_22/0.97)_100%)]" />
+            <div className="absolute inset-x-0 bottom-0 px-[1.1rem] pb-4">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[.12em] text-gold-soft">
+                <span className="size-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
+                {SITE_SLOGAN}
+              </p>
+              <h1 className="mt-[.6rem] font-display text-[1.6rem] font-extrabold leading-[1.05]">
+                Encuentra donde comprar en Pereira.
+              </h1>
+            </div>
+          </div>
+          <div className="bg-paper px-[1.1rem] py-4 text-ink">
+            <p className="text-sm leading-6 text-stone-600">
+              Busca comercios, servicios y negocios de la ciudad. Entra a sus
+              perfiles y contacta directamente.
+            </p>
+            <div className="mt-3 flex flex-wrap items-center gap-2.5 font-mono text-xs font-bold text-stone-500">
+              <Link href="/categorias" className="underline-offset-4 hover:underline">
+                {categorySummaries.length} categorias
+              </Link>
+              <span aria-hidden="true" className="text-stone-300">/</span>
+              <Link href="/comercios" className="underline-offset-4 hover:underline">
+                {businesses.length} comercios publicados
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="relative hidden overflow-hidden bg-[#1a1210] text-white sm:block">
           <div className="absolute inset-0">
             <Image
               src="/brand/imagen-pereire-hero.png"
@@ -54,28 +102,29 @@ export default async function Home() {
               sizes="100vw"
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(31_23_21/0.88),rgb(65_22_18/0.62)_48%,rgb(31_23_21/0.22))]" />
-            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#fbfaf7] via-[#fbfaf7]/30 to-transparent" />
+            <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(26_18_16/0.9),rgb(168_19_24/0.55)_55%,rgb(26_18_16/0.2))]" />
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#fffefb] via-[#fffefb]/25 to-transparent" />
           </div>
-          <div className="relative mx-auto max-w-7xl px-4 py-9 sm:px-6 sm:py-18 lg:px-8 lg:py-20">
+          <div className="relative mx-auto max-w-7xl px-6 py-18 lg:px-8 lg:py-20">
             <div className="max-w-3xl">
-              <p className="inline-flex rounded-full bg-white/12 px-3 py-1 text-[11px] font-black uppercase text-[#f5c84c] ring-1 ring-white/18 sm:text-xs">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/12 px-3 py-1 text-xs font-bold uppercase tracking-wide text-gold ring-1 ring-white/18">
+                <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
                 {SITE_SLOGAN}
               </p>
-              <h1 className="mt-3 max-w-3xl text-[2.25rem] font-black leading-[1.02] sm:mt-5 sm:text-6xl">
+              <h1 className="mt-5 max-w-3xl font-display text-6xl font-extrabold leading-[1.05]">
                 Encuentra donde comprar en Pereira.
               </h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-white/90 sm:mt-5 sm:text-xl sm:leading-8">
+              <p className="mt-5 max-w-2xl text-xl leading-8 text-white/90">
                 Busca comercios, servicios y negocios de la ciudad. Entra a sus
                 perfiles y contacta directamente.
               </p>
             </div>
             <HeroSearch categories={categories} />
-            <div className="mt-4 flex flex-wrap gap-3 text-sm font-bold text-white/90">
+            <div className="mt-5 flex flex-wrap items-center gap-3 font-mono text-sm font-bold text-white/85">
               <Link href="/categorias" className="underline-offset-4 hover:underline">
                 {categorySummaries.length} categorias
               </Link>
-              <span aria-hidden="true">/</span>
+              <span aria-hidden="true" className="text-white/40">/</span>
               <Link href="/comercios" className="underline-offset-4 hover:underline">
                 {businesses.length} comercios publicados
               </Link>
@@ -83,38 +132,63 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="bg-[#fbfaf7] py-10 sm:py-14">
+        <HomeProductRail
+          eyebrow="Vitrina local"
+          title="Productos destacados"
+          href="/productos"
+          linkLabel="Ver todos los productos"
+          products={featuredProducts}
+        />
+
+        <HomeProductRail
+          eyebrow="Aprovecha hoy"
+          title="Productos en promocion"
+          description="Descuentos activos publicados por comercios aliados."
+          href="/productos"
+          linkLabel="Ver mas promociones"
+          products={discountedProducts}
+        />
+
+        <section className="bg-paper py-6 sm:py-14">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div className="sm:hidden">
+              <Link
+                href="/categorias"
+                className="inline-flex min-h-9 items-center text-sm font-black text-brand underline-offset-4 hover:underline"
+              >
+                Ver todas las categorias
+              </Link>
+            </div>
+            <div className="hidden sm:flex sm:flex-row sm:items-end sm:justify-between sm:gap-3">
               <div>
-                <p className="text-sm font-black uppercase text-[#B3262E]">
+                <p className="text-sm font-black uppercase tracking-wide text-brand">
                   Explora rapido
                 </p>
-                <h2 className="mt-2 text-3xl font-black leading-tight text-[#22211f]">
+                <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
                   Que estas buscando?
                 </h2>
               </div>
               <Link
                 href="/categorias"
-                className="inline-flex min-h-11 items-center text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
+                className="inline-flex min-h-11 items-center text-sm font-black text-brand underline-offset-4 hover:underline"
               >
                 Ver todas las categorias
               </Link>
             </div>
-            <div className="mt-7">
-              <CategoryGrid categories={homeCategories} />
+            <div className="mt-4 sm:mt-7">
+              <CategoryQuickGrid categories={homeCategories} />
             </div>
           </div>
         </section>
 
-        <section className="bg-white py-11 sm:py-16">
+        <section className="bg-white py-10 sm:py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm font-black uppercase text-[#B3262E]">
+                <p className="text-sm font-black uppercase tracking-wide text-brand">
                   Por descubrir
                 </p>
-                <h2 className="mt-2 text-3xl font-black leading-tight text-[#22211f]">
+                <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight text-ink sm:text-3xl">
                   Comercios para explorar hoy
                 </h2>
                 <p className="mt-3 max-w-2xl leading-7 text-stone-600">
@@ -124,7 +198,7 @@ export default async function Home() {
               </div>
               <Link
                 href="/comercios"
-                className="inline-flex min-h-11 items-center text-sm font-black text-[#B3262E] underline-offset-4 hover:underline"
+                className="inline-flex min-h-11 items-center text-sm font-black text-brand underline-offset-4 hover:underline"
               >
                 Abrir directorio completo
               </Link>
@@ -134,16 +208,19 @@ export default async function Home() {
             >
               {businessesToDiscover.map((business) => (
                 <div key={business.id} className="w-[86%] shrink-0 snap-start sm:w-auto">
-                  <BusinessCard business={business} />
+                  <HomeBusinessCard business={business} />
                 </div>
               ))}
             </AutoScrollCarousel>
+            <div className="mt-4 sm:mt-6">
+              <BrandRail businesses={businesses} />
+            </div>
           </div>
         </section>
 
-        <BrandRail businesses={businesses} />
         <HowItWorksSection />
         <InitiativeSection />
+        <SubmitCtaSection />
       </main>
       <Footer />
     </>

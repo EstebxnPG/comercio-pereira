@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { hideProductAction } from "@/app/dashboard/negocios/[businessId]/productos/actions";
 import { requireBusinessRole } from "@/lib/auth";
 import {
   PRODUCT_AVAILABILITY_LABELS,
@@ -19,17 +20,17 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
   const { business, products } = await getBusinessProducts(businessId);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <header className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Link
-              className="text-sm font-black text-[#B3262E] hover:underline"
+              className="text-sm font-black text-brand hover:underline"
               href={`/dashboard/negocios/${businessId}`}
             >
               Volver al perfil
             </Link>
-            <h1 className="mt-3 text-3xl font-black">Productos</h1>
+            <h1 className="mt-3 font-display text-3xl font-extrabold">Productos</h1>
             <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
               {business?.name ?? "Negocio"} puede preparar borradores y enviar
               productos a revision.
@@ -45,7 +46,7 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
 
         {products.length === 0 ? (
           <section className="md-surface grid gap-3 p-6">
-            <h2 className="text-xl font-black">Aun no hay productos</h2>
+            <h2 className="font-display text-xl font-bold">Aun no hay productos</h2>
             <p className="max-w-2xl text-sm font-semibold leading-6 text-stone-600">
               Crea el primer producto como borrador o envialo a revision para
               que admin lo apruebe y aparezca publicamente.
@@ -97,12 +98,12 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
                       </Badge>
                       {price.hasDiscount ? <Badge>{price.badge}</Badge> : null}
                     </div>
-                    <h2 className="mt-3 text-xl font-black">{product.name}</h2>
+                    <h2 className="mt-3 font-display text-xl font-bold">{product.name}</h2>
                     <p className="mt-1 line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
                       {product.short_description}
                     </p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <p className="text-sm font-black text-[#B3262E]">
+                      <p className="text-sm font-black text-brand">
                         {price.current}
                       </p>
                       {price.original ? (
@@ -112,13 +113,31 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
                       ) : null}
                     </div>
                   </div>
-                  <div className="flex items-center sm:justify-end">
+                  <div className="flex flex-wrap items-center gap-2 sm:flex-col sm:items-end">
                     <Link
                       className="md-outlined-button px-4"
                       href={`/dashboard/negocios/${businessId}/productos/${product.id}`}
                     >
                       Editar
                     </Link>
+                    {product.status === "published" ? (
+                      <>
+                        <Link
+                          className="md-outlined-button px-4"
+                          href={`/productos/${product.slug}`}
+                          target="_blank"
+                        >
+                          Ver publico
+                        </Link>
+                        <form action={hideProductAction}>
+                          <input name="businessId" type="hidden" value={businessId} />
+                          <input name="productId" type="hidden" value={product.id} />
+                          <button className="md-outlined-button px-4" type="submit">
+                            Ocultar
+                          </button>
+                        </form>
+                      </>
+                    ) : null}
                   </div>
                 </article>
               );
@@ -132,7 +151,7 @@ export default async function BusinessProductsPage(props: ProductsPageProps) {
 
 function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full bg-[#ffdad8] px-3 py-1 text-xs font-black text-[#410006]">
+    <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-black text-brand-deep">
       {children}
     </span>
   );
@@ -153,6 +172,7 @@ async function getBusinessProducts(businessId: string) {
         `
           id,
           name,
+          slug,
           short_description,
           price_cents,
           currency,

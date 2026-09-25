@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { BusinessDirectory } from "@/components/business-directory";
 import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
-import { PageHero } from "@/components/page-hero";
 import { StatusSection } from "@/components/status-section";
 import { getCategories, getPublishedBusinessesPage } from "@/lib/businesses";
 import { BUSINESS_STATUSES, type BusinessStatus } from "@/types/business";
@@ -48,11 +47,6 @@ export default async function BusinessesPage(props: BusinessesPageProps) {
     <>
       <Header />
       <main>
-        <PageHero
-          eyebrow="Directorio"
-          title="Comercios aliados"
-          description="Busca negocios por nombre, categoria o descripcion. Filtra por estado de atencion y abre perfiles listos para contactar o compartir."
-        />
         <BusinessDirectory
           businesses={businessesPage.businesses}
           categories={categories}

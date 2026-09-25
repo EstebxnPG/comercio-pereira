@@ -33,14 +33,14 @@ export default async function DashboardPage(props: DashboardPageProps) {
   const claimed = getSingleParam(searchParams.claimed) === "1";
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-6xl gap-8">
         <header className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-black uppercase text-[#B3262E]">
+            <p className="text-sm font-black uppercase tracking-wide text-brand">
               CMS empresa
             </p>
-            <h1 className="mt-2 text-3xl font-black">Tus negocios</h1>
+            <h1 className="mt-2 font-display text-3xl font-extrabold">Tus negocios</h1>
             <p className="mt-2 max-w-2xl text-sm font-semibold leading-6 text-stone-600">
               Gestiona los perfiles donde tienes permisos activos.
             </p>
@@ -59,10 +59,10 @@ export default async function DashboardPage(props: DashboardPageProps) {
         ) : null}
 
         {pendingInvites.length > 0 ? (
-          <section className="rounded-2xl border border-[#f5c84c] bg-[#fff8d6] p-5 shadow-sm">
+          <section className="rounded-2xl border border-gold bg-gold-soft p-5 shadow-sm">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-black">Invitaciones pendientes</h2>
+                <h2 className="font-display text-xl font-bold">Invitaciones pendientes</h2>
                 <p className="mt-2 text-sm font-semibold leading-6 text-stone-700">
                   Hay negocios aprobados para el correo de esta cuenta.
                 </p>
@@ -88,7 +88,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
 
         {businesses.length === 0 ? (
           <section className="rounded-2xl border border-stone-200 bg-white p-8 text-center shadow-sm">
-            <h2 className="text-xl font-black">Aun no tienes negocios</h2>
+            <h2 className="font-display text-xl font-bold">Aun no tienes negocios</h2>
             <p className="mx-auto mt-2 max-w-xl text-sm font-semibold leading-6 text-stone-600">
               Cuando un admin apruebe o asigne tu comercio, aparecera aqui.
             </p>
@@ -111,10 +111,10 @@ export default async function DashboardPage(props: DashboardPageProps) {
                     src={business.logoUrl}
                   />
                   <div className="min-w-0">
-                    <h2 className="truncate text-xl font-black">
+                    <h2 className="truncate font-display text-xl font-bold">
                       {business.name}
                     </h2>
-                    <p className="mt-1 text-sm font-bold text-[#B3262E]">
+                    <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-wide text-brand-deep">
                       {business.categoryName}
                     </p>
                     <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-stone-600">
@@ -124,7 +124,7 @@ export default async function DashboardPage(props: DashboardPageProps) {
                 </div>
 
                 <div className="flex flex-wrap gap-2 text-xs font-black">
-                  <span className="rounded-full bg-[#fff3bd] px-3 py-1 text-[#5b1b00]">
+                  <span className="rounded-full bg-gold-soft px-3 py-1 text-gold-ink">
                     {ROLE_LABELS[business.role]}
                   </span>
                   <span className="rounded-full bg-stone-100 px-3 py-1 text-stone-700">

@@ -11,16 +11,16 @@ export default async function NewProductPage(props: NewProductPageProps) {
   await requireBusinessRole(businessId, ["owner", "manager", "editor"]);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-3xl gap-6">
         <header className="border-b border-stone-200 pb-6">
           <Link
-            className="text-sm font-black text-[#B3262E] hover:underline"
+            className="text-sm font-black text-brand hover:underline"
             href={`/dashboard/negocios/${businessId}/productos`}
           >
             Volver a productos
           </Link>
-          <h1 className="mt-3 text-3xl font-black">Nuevo producto</h1>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Nuevo producto</h1>
         </header>
         <ProductForm businessId={businessId} />
       </div>
@@ -98,6 +98,32 @@ function ProductForm({ businessId }: { businessId: string }) {
           </Field>
           <Field label="Fin">
             <input className="md-field" name="discountEndsAt" type="datetime-local" />
+          </Field>
+        </div>
+      </section>
+      <section className="grid gap-4 border-t border-stone-200 pt-4">
+        <div>
+          <h2 className="text-base font-black">Imagenes (opcional)</h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-stone-600">
+            Puedes agregar hasta 5 imagenes ahora mismo, o subirlas despues
+            desde la pagina de edicion.
+          </p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-[1fr_220px]">
+          <Field label="Agregar imagenes">
+            <input
+              accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
+              className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
+              multiple
+              name="images"
+              type="file"
+            />
+          </Field>
+          <Field label="Uso">
+            <select className="md-field" defaultValue="primary" name="imageRole">
+              <option value="primary">Usar como principal</option>
+              <option value="gallery">Agregar a galeria</option>
+            </select>
           </Field>
         </div>
       </section>

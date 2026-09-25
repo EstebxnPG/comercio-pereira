@@ -27,17 +27,17 @@ export default async function EditProductPage(props: EditProductPageProps) {
   const saved = getSingleParam(searchParams.saved) === "1";
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-4xl gap-6">
         <header className="flex flex-col gap-4 border-b border-stone-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <Link
-              className="text-sm font-black text-[#B3262E] hover:underline"
+              className="text-sm font-black text-brand hover:underline"
               href={`/dashboard/negocios/${businessId}/productos`}
             >
               Volver a productos
             </Link>
-            <h1 className="mt-3 text-3xl font-black">{product.name}</h1>
+            <h1 className="mt-3 font-display text-3xl font-extrabold">{product.name}</h1>
             <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
               Estado interno: {product.status}. Moderacion:{" "}
               {product.moderation_status}.
@@ -180,7 +180,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
 
         <section className="md-surface grid gap-5 p-5">
           <div>
-            <h2 className="text-xl font-black">Imagenes del producto</h2>
+            <h2 className="font-display text-xl font-bold">Imagenes del producto</h2>
             <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
               Usa una imagen principal para catalogo y hasta 4 imagenes extra
               para la ficha del producto.
@@ -196,7 +196,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
                 >
                   <div className="relative grid aspect-[4/3] place-items-center bg-stone-100">
                     {image.is_primary ? (
-                      <span className="absolute left-3 top-3 rounded-full bg-[#B3262E] px-3 py-1 text-xs font-black text-white shadow-sm">
+                      <span className="absolute left-3 top-3 rounded-full bg-brand px-3 py-1 text-xs font-black text-white shadow-sm">
                         Principal
                       </span>
                     ) : null}
@@ -246,7 +246,7 @@ export default async function EditProductPage(props: EditProductPageProps) {
               <Field label="Agregar imagenes">
                 <input
                   accept="image/png,image/jpeg,image/webp,image/heic,image/heif"
-                  className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-[#ffdad8] file:px-4 file:py-2 file:text-sm file:font-black file:text-[#410006]"
+                  className="md-field h-auto min-h-14 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-brand-soft file:px-4 file:py-2 file:text-sm file:font-black file:text-brand-deep"
                   multiple
                   name="images"
                   required

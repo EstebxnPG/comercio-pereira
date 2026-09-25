@@ -66,37 +66,95 @@ export function Footer() {
   const isInclusionExternal = Boolean(INCLUSION_WHATSAPP);
 
   return (
-    <footer className="border-t border-stone-200 bg-[#fffdf8]">
+    <footer className="border-t border-[var(--md-outline-variant)] bg-white">
       <div className="mx-auto max-w-7xl px-4 py-9 text-sm text-stone-600 sm:px-6 lg:px-8">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.25fr_0.55fr_0.65fr_0.8fr] lg:items-start">
-          <div>
-            <div className="flex items-start gap-3">
-              <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
-                <Image
-                  src="/brand/compra-en-pereira-logo.png"
-                  alt=""
-                  width={1254}
-                  height={1254}
-                  className="h-9 w-9 object-contain"
-                />
-              </div>
-              <div>
-                <p className="text-lg font-black text-[#22211f]">{SITE_NAME}</p>
-                <p className="mt-1 font-semibold text-stone-500">{SITE_DESCRIPTOR}</p>
-              </div>
-            </div>
-            <p className="mt-4 max-w-md leading-6">
-              Vitrina digital para descubrir comercios, servicios y negocios de
-              Pereira.
-            </p>
-            <p className="mt-3 text-xs leading-5 text-stone-500">
-              Desarrollado por DPG Consultora, con el respaldo de Fenalco y de
-              Fabian Sanchez &quot;El Chinito&quot;.
-            </p>
+        <div className="flex items-start gap-3">
+          <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-white shadow-sm ring-1 ring-[var(--md-outline-variant)]">
+            <Image
+              src="/brand/compra-en-pereira-logo.png"
+              alt=""
+              width={1254}
+              height={1254}
+              className="h-9 w-9 object-contain"
+            />
           </div>
+          <div>
+            <p className="font-display text-lg font-extrabold text-ink">{SITE_NAME}</p>
+            <p className="mt-1 font-semibold text-stone-500">{SITE_DESCRIPTOR}</p>
+          </div>
+        </div>
+        <p className="mt-4 max-w-md leading-6">
+          Vitrina digital para descubrir comercios, servicios y negocios de
+          Pereira.
+        </p>
 
+        {/* Mobile: collapsible accordions */}
+        <div className="mt-5 sm:hidden">
+          <details className="group border-t border-[var(--md-outline-variant)]">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-3 font-black text-ink">
+              Explorar
+              <ChevronIcon className="size-4 text-stone-500 transition-transform duration-200 group-open:rotate-180" />
+            </summary>
+            <div className="flex flex-col gap-3 pb-4">
+              {exploreLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="font-semibold text-stone-600">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </details>
+          <details className="group border-t border-[var(--md-outline-variant)]">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-3 font-black text-ink">
+              Compra en Pereira
+              <ChevronIcon className="size-4 text-stone-500 transition-transform duration-200 group-open:rotate-180" />
+            </summary>
+            <div className="flex flex-col gap-3 pb-4">
+              {platformLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="font-semibold text-stone-600">
+                  {link.label}
+                </Link>
+              ))}
+              <a
+                href={inclusionHref}
+                target={isInclusionExternal ? "_blank" : undefined}
+                rel={isInclusionExternal ? "noopener noreferrer" : undefined}
+                className="font-semibold text-stone-600"
+              >
+                Solicitar inclusion
+              </a>
+            </div>
+          </details>
+          <div className="border-t border-b border-[var(--md-outline-variant)] py-4">
+            <p className="font-black text-ink">Contacto</p>
+            <p className="mt-2 leading-6">
+              Actualizaciones, alianzas y correcciones por canales oficiales.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              {socialLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={link.label}
+                  title={link.label}
+                  className="md-focus grid size-10 place-items-center rounded-full border border-[var(--md-outline-variant)] bg-white text-brand shadow-sm transition hover:border-brand/45 hover:bg-brand-soft hover:text-brand-deep"
+                >
+                  {link.icon}
+                </a>
+              ))}
+            </div>
+          </div>
+          <p className="mt-4 text-xs leading-5 text-stone-500">
+            Desarrollado por DPG Consultora, con el respaldo de Fenalco y de
+            Fabian Sanchez &quot;El Chinito&quot;.
+          </p>
+        </div>
+
+        {/* Desktop: always-expanded columns */}
+        <div className="mt-6 hidden gap-8 sm:grid sm:grid-cols-3 lg:grid-cols-[0.55fr_0.65fr_0.8fr]">
           <nav aria-label="Explorar">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Explorar
             </p>
             <div className="mt-3 grid gap-1">
@@ -104,7 +162,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
                 >
                   {link.label}
                 </Link>
@@ -113,7 +171,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Compra en Pereira">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Compra en Pereira
             </p>
             <div className="mt-3 grid gap-1">
@@ -121,7 +179,7 @@ export function Footer() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                  className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
                 >
                   {link.label}
                 </Link>
@@ -130,7 +188,7 @@ export function Footer() {
                 href={inclusionHref}
                 target={isInclusionExternal ? "_blank" : undefined}
                 rel={isInclusionExternal ? "noopener noreferrer" : undefined}
-                className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-[#B3262E] hover:underline"
+                className="inline-flex min-h-9 items-center font-bold text-stone-700 underline-offset-4 hover:text-brand hover:underline"
               >
                 Solicitar inclusion
               </a>
@@ -138,7 +196,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label="Redes sociales de Compra en Pereira">
-            <p className="text-xs font-black uppercase text-[#B3262E]">
+            <p className="text-xs font-black uppercase tracking-wide text-brand">
               Contacto
             </p>
             <p className="mt-3 leading-6">
@@ -153,16 +211,20 @@ export function Footer() {
                   rel="noopener noreferrer"
                   aria-label={link.label}
                   title={link.label}
-                  className="md-focus grid size-10 place-items-center rounded-full border border-stone-200 bg-white text-[#B3262E] shadow-sm transition hover:border-[#B3262E]/45 hover:bg-[#ffdad8] hover:text-[#7F1D1D]"
+                  className="md-focus grid size-10 place-items-center rounded-full border border-[var(--md-outline-variant)] bg-white text-brand shadow-sm transition hover:border-brand/45 hover:bg-brand-soft hover:text-brand-deep"
                 >
                   {link.icon}
                 </a>
               ))}
             </div>
           </nav>
+          <p className="text-xs leading-5 text-stone-500 sm:col-span-3 lg:col-span-1 lg:self-end">
+            Desarrollado por DPG Consultora, con el respaldo de Fenalco y de
+            Fabian Sanchez &quot;El Chinito&quot;.
+          </p>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-stone-200 pt-5 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-[var(--md-outline-variant)] pt-5 text-xs leading-6 text-stone-500 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {currentYear} {SITE_NAME}. Todos los derechos reservados.
           </p>
@@ -174,5 +236,22 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2.4"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
   );
 }

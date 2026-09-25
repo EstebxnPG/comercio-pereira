@@ -12,16 +12,16 @@ export default async function BusinessStatsPage(props: StatsPageProps) {
   const stats = await getBusinessStats(businessId);
 
   return (
-    <main className="min-h-screen bg-[#fbfaf7] px-4 py-8 text-[#22211f] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-paper px-4 py-8 text-ink sm:px-6 lg:px-8">
       <div className="mx-auto grid max-w-5xl gap-6">
         <header className="border-b border-stone-200 pb-6">
           <Link
-            className="text-sm font-black text-[#B3262E] hover:underline"
+            className="text-sm font-black text-brand hover:underline"
             href={`/dashboard/negocios/${businessId}`}
           >
             Volver al perfil
           </Link>
-          <h1 className="mt-3 text-3xl font-black">Estadisticas</h1>
+          <h1 className="mt-3 font-display text-3xl font-extrabold">Estadisticas</h1>
           <p className="mt-2 text-sm font-semibold leading-6 text-stone-600">
             Lectura base de los ultimos 30 dias usando agregados diarios.
           </p>
@@ -38,7 +38,7 @@ export default async function BusinessStatsPage(props: StatsPageProps) {
         </section>
 
         <section className="md-surface p-5">
-          <h2 className="text-xl font-black">Productos con mas actividad</h2>
+          <h2 className="font-display text-xl font-bold">Productos con mas actividad</h2>
           {stats.products.length === 0 ? (
             <p className="mt-3 text-sm font-semibold text-stone-600">
               Aun no hay eventos suficientes para rankear productos.
@@ -51,7 +51,7 @@ export default async function BusinessStatsPage(props: StatsPageProps) {
                   key={product.product_id}
                 >
                   <span className="font-black">{product.name}</span>
-                  <span className="text-sm font-black text-[#B3262E]">
+                  <span className="text-sm font-black text-brand">
                     {product.product_views} vistas
                   </span>
                 </div>
@@ -68,7 +68,7 @@ function Metric({ label, value }: { label: string; value: number }) {
   return (
     <div className="md-surface p-5">
       <p className="text-xs font-black uppercase text-stone-500">{label}</p>
-      <p className="mt-2 text-3xl font-black text-[#B3262E]">{value}</p>
+      <p className="mt-2 text-3xl font-black text-brand">{value}</p>
     </div>
   );
 }
