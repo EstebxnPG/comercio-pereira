@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Public_Sans, Space_Mono } from "next/font/google";
 import { CategoryIconDefs } from "@/components/icons/category-icons";
+import type { ReactNode } from "react";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const fontDisplay = Bricolage_Grotesque({
@@ -49,7 +51,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="es-CO"
