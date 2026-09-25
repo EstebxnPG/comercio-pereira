@@ -1,5 +1,6 @@
 import Image from "next/image";
-import fenalcoLogo from "../../Logo_Fenalco_RGB_VERTICAL.png";
+
+const fenalcoLogo = "/brand/logo-fenalco-rgb-vertical.png";
 
 const founders = [
   {
